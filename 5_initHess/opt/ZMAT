@@ -1,0 +1,21 @@
+MIN4
+H
+O 1 R*
+H 2 R* 1 A*
+
+R=2.4
+A=108
+
+*CFOUR(REF=RHF
+       CALC=CCSD(T)
+       BASIS=cc-pVDZ
+       ORB=SEMICANONICAL
+       UNITS=BOHR
+       MEMORY=7
+       MEM_UNIT=GB
+       SCF_CONV=9
+       CC_CONV=6
+       CHARGE=0
+       MULT=1)
+
+

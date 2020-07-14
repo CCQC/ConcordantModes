@@ -1,0 +1,22 @@
+MIN4
+H
+O 1 R
+H 2 R 1 A
+
+R    =        1.825003884611463
+A    =      101.941289586770836
+
+*CFOUR(REF=RHF
+       CALC=CCSD(T)
+       VIB=FINDIF
+       BASIS=cc-pVDZ
+       ORB=SEMICANONICAL
+       UNITS=BOHR
+       MEMORY=7
+       MEM_UNIT=GB
+       SCF_CONV=9
+       CC_CONV=6
+       CHARGE=0
+       MULT=1)
+
+

@@ -1,0 +1,20 @@
+MIN4
+H                  0.00000000    -1.41770197     1.02062612
+O                  0.00000000    -0.00000000    -0.12861745
+H                  0.00000000     1.41770197     1.02062612
+
+*CFOUR(REF=RHF
+       CALC=CCSD(T)
+       VIB=FINDIF
+       BASIS=cc-pVDZ
+       COORD=CARTESIAN
+       ORB=SEMICANONICAL
+       UNITS=BOHR
+       MEMORY=7
+       MEM_UNIT=GB
+       SCF_CONV=9
+       CC_CONV=6
+       CHARGE=0
+       MULT=1)
+
+

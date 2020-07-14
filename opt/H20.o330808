@@ -1,0 +1,12 @@
+
+***********************************************************************
+ Starting job:
+
+    Name:              H20
+    ID:                330808
+    Hostname:          n045
+    Working directory: /home/vulcan/mel64643/overflow_Rand/3_MixedHess_H20/opt
+
+    Submitted using:   submit -N H20 debug.q molpro@2010.1.67+mpi
+***********************************************************************
+module load  molpro-2010.1.67-intel-16.0.1-rs4emkdxvcklcpznszgidjjdjc24vnpp

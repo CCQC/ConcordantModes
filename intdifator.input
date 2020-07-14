@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+  my %Variables = (
+      AtomLabels      => [qw(H O C H H H)],
+      First           => 1,
+      Last            => 157,
+      SubmitCommand   => "sjob -p molpro -q wda8p36g -n 2",
+      Theories        => ["CCSD(T)"],
+      DataFile        => "e.m",
+      SearchStrings   => ['!RHF-UCCSD\(T\) energy'],
+      InputUnits      => "Bohr",
+      InputFile       => "input.dat",
+      CronFile        => "cronlist",
+      EnergyColumns   => [3],
+      ConvCheck       => ["grep \"No convergence\" output.dat",
+                          "grep \"CONVERGENCE NOT REACHED\" output.dat"], 
+      WaitingJobs     => "llqs -u shiblee | grep \" I \" | wc -l",
+      MaxWaiting      => 4,
+      GetInputVars    => \&input_file_vars,
+  ); # End of hash of variables
+
+
+  sub input_file_vars
+  {
+    my($Disp, $x, $y, $z) = @_;
+    my $Header  = `cat ../input.header`;
+    my $Footer  = `cat ../input.footer`;
+    return ($Header, $Footer);
+  };
+
+
+#  use lib "/home/cluster/andysim/bin/Intdif";
+#  use lib "/u0/andysim/bin";
+#  use lib "./Intdif";
+   use lib "/home/cluster/wujawa/bin";
+  use Intdifator;
+  run(\%Variables);
