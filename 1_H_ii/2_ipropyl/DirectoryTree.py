@@ -26,7 +26,6 @@ if __name__ == "__main__":
     # print(disp)
     # disp = disp[:-1]
     n_disp = int((len(disp))/(n_atoms+1))
-    print(n_disp)
 
     for i in range(n_disp):
         disp_dict['disp'].append(i + 1)
