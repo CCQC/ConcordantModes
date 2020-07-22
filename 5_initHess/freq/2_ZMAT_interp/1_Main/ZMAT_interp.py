@@ -162,6 +162,14 @@ if len(Cartesians) > 0:
         cartesianOutput += Cartesians[i][len(Cartesians[i])-1] + '\n'
 cartesianOutput = cartesianOutput[:-1]
 
+root = os.getcwd()
+if os.path.exists(root + '/zmatFiles'):
+    shutil.rmtree(root + '/zmatFiles')
+
+os.mkdir('zmatFiles')
+os.chdir('zmatFiles')
+
+
 with open('atomList','w') as file:
     file.write(atomListOutput)
 with open('bondIndices','w') as file:

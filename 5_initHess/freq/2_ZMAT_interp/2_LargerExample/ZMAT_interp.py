@@ -27,14 +27,12 @@ zmatRange = []
 
 for i in range(len(output)):
     begZMAT = re.search(zmatBeginRegex,output[i])
-    # print(i)
     if begZMAT:
         zmatRange.append(i)
 
 for i in range(len(output) - zmatRange[0]):
     endZMAT1 = re.search(zmatEndRegex1,output[i + zmatRange[0]])
     endZMAT2 = re.search(zmatEndRegex2,output[i + zmatRange[0]])
-    # print(i)
     if endZMAT1 or endZMAT2:
         zmatRange.append(i + zmatRange[0])
         break
@@ -89,7 +87,6 @@ for i in range(len(output)):
 for i in range(len(tempOutput)):
     if re.search(cartesianRegex,tempOutput[i]):
         cartIndex = i
-        print(i)
         break
 
 # Find the cartesian coordinates, in bohr
@@ -164,6 +161,14 @@ if len(Cartesians) > 0:
             cartesianOutput += Cartesians[i][j] + ' '
         cartesianOutput += Cartesians[i][len(Cartesians[i])-1] + '\n'
 cartesianOutput = cartesianOutput[:-1]
+
+root = os.getcwd()
+if os.path.exists(root + '/zmatFiles'):
+    shutil.rmtree(root + '/zmatFiles')
+
+os.mkdir('zmatFiles')
+os.chdir('zmatFiles')
+
 
 with open('atomList','w') as file:
     file.write(atomListOutput)
