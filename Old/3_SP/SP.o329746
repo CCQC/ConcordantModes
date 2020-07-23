@@ -1,0 +1,12 @@
+
+***********************************************************************
+ Starting job:
+
+    Name:              SP
+    ID:                329746
+    Hostname:          n044
+    Working directory: /home/vulcan/mel64643/overflow_Rand/3_MixedHess_H20/3_SP
+
+    Submitted using:   submit -N SP debug.q molpro@2010.1.67+mpi
+***********************************************************************
+module load  molpro-2010.1.67-intel-16.0.1-rs4emkdxvcklcpznszgidjjdjc24vnpp

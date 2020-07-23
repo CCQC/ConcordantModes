@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/opt/scripts/cfour2avogadro", line 96, in <module>
+    k += 4 # To move down to the next block
+NameError: name 'k' is not defined
+tar: JMOL.plot: Cannot stat: No such file or directory
+tar: DIPDER: Cannot stat: No such file or directory
+tar: HESSIAN: Cannot stat: No such file or directory
+tar: Exiting with failure status due to previous errors
+kill: sending signal to 30167 failed: No such process

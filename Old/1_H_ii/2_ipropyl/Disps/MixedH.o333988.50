@@ -1,0 +1,12 @@
+
+***********************************************************************
+ Starting job:
+
+    Name:              MixedH
+    ID:                333988
+    Hostname:          n067
+    Working directory: /home/vulcan/mel64643/research/5_Mixed_H/MixedHessian/1_H_ii/2_ipropyl/Disps
+
+    Submitted using:   submit --array 1-61 -N MixedH -n 4 gen4.q,gen6.q molpro@2010.1.67+mpi
+***********************************************************************
+module load  molpro-2010.1.67-intel-16.0.1-rs4emkdxvcklcpznszgidjjdjc24vnpp

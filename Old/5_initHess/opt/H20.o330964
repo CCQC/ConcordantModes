@@ -1,0 +1,30 @@
+
+***********************************************************************
+ Starting job:
+
+    Name:              H20
+    ID:                330964
+    Hostname:          n059
+    Working directory: /home/vulcan/mel64643/overflow_Rand/3_MixedHess_H20/5_initHess/opt
+
+    Submitted using:   submit -N H20 gen4.q cfour@1.0~mpi
+***********************************************************************
+module load  cfour-1.0-intel-13.0.0-mkof24if6i3xagnr5bw2j3z6sr4lnth2
+ Running cfour on n059
+ Running calculation...
+  @GETMEM-I,   Allocated    6675 MB of main memory.
+  @CHECKOUT-I, Total execution time :       0.0000 seconds.
+Not a Frequency Job, No Conversion Necessary.
+ Saving data and cleaning up...
+OPTARC
+FCMINT
+FCMFINAL
+ZMATnew
+JOBARC
+JAINDX
+FJOBARC
+MOLDEN
+NEWMOS
+AVOGADROplot.log
+den.dat
+ Job complete on n059.
