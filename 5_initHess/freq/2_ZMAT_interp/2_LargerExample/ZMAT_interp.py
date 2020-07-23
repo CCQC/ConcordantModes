@@ -145,6 +145,14 @@ if len(torsionIndices) > 0:
 bondVariables = list(dict.fromkeys(bondVariables))
 angleVariables = list(dict.fromkeys(angleVariables))
 torsionVariables = list(dict.fromkeys(torsionVariables))
+
+flatAngles = np.array(angleVariables)
+flatTorsions = np.array(torsionVariables)
+for i in flatAngles:
+    variableDictionary[i] = str(float(variableDictionary[i]) * (np.pi/180))
+for i in flatTorsions:
+    variableDictionary[i] = str(float(variableDictionary[i]) * (np.pi/180))
+
 variables = np.array(bondVariables)
 variables = np.append(variables,angleVariables)
 variables = np.append(variables,torsionVariables)

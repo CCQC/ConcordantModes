@@ -34,7 +34,6 @@ conv = HART;
 A = Import[rootdir <> "/eigen.csv"]
 
 (* Giraffe2 *)
-Clear[];
 sym = {};
 U = Inverse[A];
 normU = U;
@@ -44,7 +43,7 @@ For[i = 1, i <= Length[U], i++,
 
 (* Giraffe2 unfortunately it appears I cannot import the equations as an array of strings. I will have to write these on the file explicitly. But that's fine. *)
 INTC[] =
-  Dot[normU,Internals];
+  Dot[normU,
 (*Cartesian coordinates in bohr*)
 
 (* Giraffe1 *)
