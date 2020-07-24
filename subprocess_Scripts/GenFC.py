@@ -3,13 +3,20 @@ import os
 import shutil
 import re
 
+root = os.getcwd()
+
 # Define some regexes
 intcRegex = re.compile(r'INTC\[\]')
 dotRegex = re.compile(r'Dot')
 
+os.chdir('../templates')
 
-with open('Template.wls','r') as file:
+with open('FCTemplate.wls','r') as file:
     data = file.readlines()
+
+os.chdir(root)
+
+os.chdir('../zmatFiles')
 
 # Read in ZMAT data
 with open('atomList','r') as file:
@@ -30,6 +37,8 @@ with open('variableDictionary','r') as file:
     variableDictionary = file.read()
 with open('Cartesians','r') as file:
     Cartesians = file.read()
+
+os.chdir(root)
 
 # Split the data into arrays
 varDict = {}
@@ -99,9 +108,9 @@ for i in range(len(atoms)-1):
         intcString += '\n'
         intcArray.append(intcString)
         intcString = '   '
-intcString += 'x' + str(len(atoms)+1) + '_, '
-intcString += 'y' + str(len(atoms)+1) + '_, '
-intcString += 'z' + str(len(atoms)+1) + '_] =\n'
+intcString += 'x' + str(len(atoms)) + '_, '
+intcString += 'y' + str(len(atoms)) + '_, '
+intcString += 'z' + str(len(atoms)) + '_] =\n'
 intcArray.append(intcString)
 intcArray.reverse()
 
@@ -227,8 +236,8 @@ if len(torsionIndices) > 0:
     else:
         dotString += '\n'
     dotArray.append(dotString)
-    dotString = '    }];\n'
-    dotArray.append(dotString) 
+dotString = '    }];\n'
+dotArray.append(dotString) 
 
 dotArray.reverse()
 for i in dotArray:
@@ -245,44 +254,44 @@ os.system('chmod +x FC.wls')
 # Here all of the imported files will be generated
 
 # First, the masses
-massesOutputString = ''
-for i in atoms:
-    massesOutputString += 'm' + i +  ','
-massesOutputString = massesOutputString[:-1]
+# massesOutputString = ''
+# for i in atoms:
+    # massesOutputString += 'm' + i +  ','
+# massesOutputString = massesOutputString[:-1]
 
-with open('masses.csv','w') as file:
-    file.write(massesOutputString)
+# with open('masses.csv','w') as file:
+    # file.write(massesOutputString)
 
-# Next the variables
-variablesOutputString = ''
-for i in variables:
-    variablesOutputString += str(varDict[i]) + ','
-variablesOutputString = variablesOutputString[:-1]
+# # Next the variables
+# variablesOutputString = ''
+# for i in variables:
+    # variablesOutputString += str(varDict[i]) + ','
+# variablesOutputString = variablesOutputString[:-1]
 
-with open('variables.csv','w') as file:
-    file.write(variablesOutputString)
+# with open('variables.csv','w') as file:
+    # file.write(variablesOutputString)
 
-# Next the disp variables
-dispsOutputString = ''
-for i in bondVariables:
-    dispsOutputString += 'rdisp,'
-for i in angleVariables:
-    dispsOutputString += 'adisp,'
-for i in torsionVariables:
-    dispsOutputString += 'adisp,'
-dispsOutputString = dispsOutputString[:-1]
+# # Next the disp variables
+# # dispsOutputString = ''
+# # for i in bondVariables:
+    # # dispsOutputString += 'rdisp,'
+# # for i in angleVariables:
+    # # dispsOutputString += 'adisp,'
+# # for i in torsionVariables:
+    # # dispsOutputString += 'adisp,'
+# # dispsOutputString = dispsOutputString[:-1]
 
-with open('disps.csv','w') as file:
-    file.write(dispsOutputString)
+# # with open('disps.csv','w') as file:
+    # # file.write(dispsOutputString)
 
-# Finally, the cartesians
-cartesiansOutputString = ''
-for i in range(len(Cartesians)):
-    cartesiansOutputString += Cartesians[i][0] + ',' + Cartesians[i][1] + ',' + Cartesians[i][2] + '\n'
-cartesiansOutputString = cartesiansOutputString[:-1]
+# # Finally, the cartesians
+# cartesiansOutputString = ''
+# for i in range(len(Cartesians)):
+    # cartesiansOutputString += Cartesians[i][0] + ',' + Cartesians[i][1] + ',' + Cartesians[i][2] + '\n'
+# cartesiansOutputString = cartesiansOutputString[:-1]
 
-with open('cartesians.csv','w') as file:
-    file.write(cartesiansOutputString)
+# with open('cartesians.csv','w') as file:
+    # file.write(cartesiansOutputString)
 
 # for i in data:
      # print(i)

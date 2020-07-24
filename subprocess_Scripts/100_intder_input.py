@@ -11,12 +11,8 @@ with open('SymAdaptInts.dat','r') as file:
     SymAdaptInts = file.readlines()
 
 root = os.getcwd()
-if os.path.exists(root + '/zmatFiles'):
-    shutil.rmtree(root + '/zmatFiles')
 
-os.chdir(root + '/..')
-shutil.copytree('4_zmatFiles',root + '/zmatFiles')
-os.chdir(root + '/zmatFiles')
+os.chdir('../zmatFiles')
 
 # Read in the ZMAT data
 with open('atomList','r') as file:

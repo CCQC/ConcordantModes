@@ -11,9 +11,7 @@ root = os.getcwd()
 if os.path.exists(root + '/zmatFiles'):
     shutil.rmtree(root + '/zmatFiles')
 
-os.chdir(root + '/..')
-shutil.copytree('4_zmatFiles',root + '/zmatFiles')
-os.chdir(root + '/zmatFiles')
+os.chdir('../zmatFiles')
 
 # Read in the ZMAT data
 with open('atomList','r') as file:
@@ -85,7 +83,6 @@ if torsions[0][0] != '':
         template.append(buffString)
 
 # Now we can write in the cartesian coordinates
-print(cartesians)
 if len(cartesians) > 0:
     for i in cartesians:
         buffString = ''

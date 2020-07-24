@@ -1,10 +1,13 @@
 import os
 import shutil
 
-
+root = os.getcwd()
+os.chdir('../zmatFiles')
 # Read in atoms, we only really need the number of atoms
 with open("atoms.txt",'r') as file:
     atoms = file.read()
+
+os.chdir(root)
 atoms = atoms.split('\n')[:-1]
 n_atoms = len(atoms)
 
@@ -27,6 +30,7 @@ for i in range(n_disp):
         disp[i*(n_atoms + 1) + j + 1] = disp[i*(n_atoms + 1) + j + 1][:45] + ',' + disp[i*(n_atoms + 1) + j + 1][45:]
         disp_dict['geom'][i].append(disp[i*(n_atoms + 1) + j + 1])
 
+# You will need to change into the proper directory to reap these energies
 with open('e.dat','r') as file:
     energies = file.readlines()
 

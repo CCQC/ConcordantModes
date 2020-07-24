@@ -3,13 +3,20 @@ import os
 import shutil
 import re
 
+root = os.getcwd()
+
 # Define some regexes
 intcRegex = re.compile(r'INTC\[\]')
 dotRegex = re.compile(r'Dot')
 
+os.chdir('../templates')
 
-with open('Template.wls','r') as file:
+with open('LoadTemplate.wls','r') as file:
     data = file.readlines()
+
+os.chdir(root)
+
+os.chdir('../zmatFiles')
 
 # Read in ZMAT data
 with open('atomList','r') as file:
@@ -30,6 +37,8 @@ with open('variableDictionary','r') as file:
     variableDictionary = file.read()
 with open('Cartesians','r') as file:
     Cartesians = file.read()
+
+os.chdir(root)
 
 # Split the data into arrays
 varDict = {}
@@ -53,10 +62,13 @@ for i in range(len(variableDictionary)):
     varDict[variableDictionary[i][0]] = float(variableDictionary[i][1])
 
 variables = bondVariables.copy()
-for i in angleVariables:
-    variables.append(i)
-for i in torsionVariables:
-    variables.append(i)
+
+if angleIndices[0][0] != '':
+    for i in angleVariables:
+        variables.append(i)
+if torsionIndices[0][0] != '':
+    for i in torsionVariables:
+        variables.append(i)
 
 Cartesians = Cartesians.split('\n')
 for i in range(len(Cartesians)):
@@ -99,9 +111,9 @@ for i in range(len(atoms)-1):
         intcString += '\n'
         intcArray.append(intcString)
         intcString = '   '
-intcString += 'x' + str(len(atoms)+1) + '_, '
-intcString += 'y' + str(len(atoms)+1) + '_, '
-intcString += 'z' + str(len(atoms)+1) + '_] =\n'
+intcString += 'x' + str(len(atoms)) + '_, '
+intcString += 'y' + str(len(atoms)) + '_, '
+intcString += 'z' + str(len(atoms)) + '_] =\n'
 intcArray.append(intcString)
 intcArray.reverse()
 
@@ -134,7 +146,7 @@ dotString += 'x' + str(bondIndices[len(bondIndices)-1][1])
 dotString += ', y' + str(bondIndices[len(bondIndices)-1][1])
 dotString += ', z' + str(bondIndices[len(bondIndices)-1][1])
 dotString += '}]'
-if len(angleIndices) == 0:
+if angleIndices[0][0] == '':
     dotString += '\n'
     dotArray.append(dotString)
 else:
@@ -143,7 +155,7 @@ else:
     dotString = '    '
 
 # Angles from Cartesians equations
-if len(angleIndices) > 0:
+if angleIndices[0][0] != '':
     for i in range(len(angleIndices)-1):
         dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[i][0])
         dotString += ', y' + str(angleIndices[i][0])
@@ -167,7 +179,7 @@ if len(angleIndices) > 0:
     dotString += ', y' + str(angleIndices[i][2])
     dotString += ', z' + str(angleIndices[i][2])
     dotString += '}]]'
-    if len(torsionIndices) == 0:
+    if torsionIndices[0][0] == '':
         dotString += '\n'
         dotArray.append(dotString)
     else:
@@ -176,7 +188,7 @@ if len(angleIndices) > 0:
         dotString = '    '
 
 # Torsion angles from Cartesians equations
-if len(torsionIndices) > 0:
+if torsionIndices[0][0] != '':
     for i in range(len(torsionIndices)-1):
         dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(torsionIndices[i][0])
         dotString += ', y' + str(torsionIndices[i][0])
@@ -227,8 +239,8 @@ if len(torsionIndices) > 0:
     else:
         dotString += '\n'
     dotArray.append(dotString)
-    dotString = '    }];\n'
-    dotArray.append(dotString) 
+dotString = '    }];\n'
+dotArray.append(dotString) 
 
 dotArray.reverse()
 for i in dotArray:
@@ -266,10 +278,12 @@ with open('variables.csv','w') as file:
 dispsOutputString = ''
 for i in bondVariables:
     dispsOutputString += 'rdisp,'
-for i in angleVariables:
-    dispsOutputString += 'adisp,'
-for i in torsionVariables:
-    dispsOutputString += 'adisp,'
+if angleIndices[0][0] != '':
+    for i in angleVariables:
+        dispsOutputString += 'adisp,'
+if torsionIndices[0][0] != '':
+    for i in torsionVariables:
+        dispsOutputString += 'adisp,'
 dispsOutputString = dispsOutputString[:-1]
 
 with open('disps.csv','w') as file:

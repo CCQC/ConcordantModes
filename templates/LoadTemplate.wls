@@ -26,8 +26,8 @@ re = Import[rootdir <> "/variables.csv"]
 
 rdisp = 0.01;
 adisp = 0.02;
-
-rr = Import[rootdir <> "/disps.csv"]
+(* I may just have to write this one out explicitly as well, but this shouldn't be too big of a burden *)
+rr = Flatten[Import[rootdir <> "/disps.csv"]]
    
 conv = HART;
 
@@ -47,18 +47,17 @@ INTC[] =
 
 xref = Import[rootdir <> "/cartesians.csv"]
 (*Difference should be close to zero *)
-(* Print[INTC @@ Flatten[xref BOHR]] *)
-(* Print[INTC @@ Flatten[xref BOHR] - re] *)
-Print[Norm[INTC @@ Flatten[xref BOHR] - re]]
+Print[INTC @@ Flatten[xref BOHR]]
+Print[INTC @@ Flatten[xref BOHR] - re]
+(*Print[Norm[INTC @@ Flatten[xref BOHR] - re]]
 norm_thresh = 1.0*^-4;
-Print[1.0*^-4 > Norm[INTC @@ Flatten[xref BOHR] - re]]
+Print[1.0*^-4 > Norm[INTC @@ Flatten[xref BOHR] - re]] *)
 
 (* Giraffe_general: I need to figure out how to properly throw errors in mathematica... but don't spend too much time with it *)
-CheckNorm[x_] := If[1.0*^-4 > x, Print[Norm criteria met], Throw[Norm criteria not met]];
+(*CheckNorm[x_] := If[1.0*^-4 > x, Print[Norm criteria met], Throw[Norm criteria not met]];
 Check[Catch[CheckNorm[Norm[INTC @@ Flatten[xref BOHR] - re]]],err]
 Check[Catch[Throw[Test]],err]
-Check[Catch[CheckNorm[1.0*^-5]],err]
-
+Check[Catch[CheckNorm[1.0*^-5]],err]*)
 
 job = "disp";
 Get[intdif];

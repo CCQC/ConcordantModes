@@ -27,7 +27,7 @@ re = Import[rootdir <> "/variables.csv"]
 rdisp = 0.01;
 adisp = 0.02;
 
-rr = Import[rootdir <> "/disps.csv"]
+rr = Flatten[Import[rootdir <> "/disps.csv"]]
    
 conv = HART;
 
