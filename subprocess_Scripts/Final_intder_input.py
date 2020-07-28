@@ -3,18 +3,14 @@ import os
 import shutil
 import re
 
+root = os.getcwd()
 # Do some directory tomfoolery here to get all the necessary files
+os.chdir('../templates')
 with open('intder_Final_template.dat','r') as file:
     template = file.readlines()
+os.chdir(root)
 
-root = os.getcwd()
-if os.path.exists(root + '/zmatFiles'):
-    shutil.rmtree(root + '/zmatFiles')
-
-os.chdir(root + '/..')
-shutil.copytree('4_zmatFiles',root + '/zmatFiles')
-os.chdir(root + '/zmatFiles')
-
+os.chdir('../zmatFiles')
 # Read in the ZMAT data
 with open('atomList','r') as file:
     atoms = file.read()
@@ -31,7 +27,6 @@ os.chdir(root)
 
 # split the data into arrays
 
-# print(atoms.split('\n'))
 atoms = atoms.split('\n') 
 # print(bonds.split('\n'))
 bonds = bonds.split('\n')

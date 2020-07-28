@@ -62,10 +62,13 @@ for i in range(len(variableDictionary)):
     varDict[variableDictionary[i][0]] = float(variableDictionary[i][1])
 
 variables = bondVariables.copy()
-for i in angleVariables:
-    variables.append(i)
-for i in torsionVariables:
-    variables.append(i)
+
+if angleIndices[0][0] != '':
+    for i in angleVariables:
+        variables.append(i)
+if torsionIndices[0][0] != '':
+    for i in torsionVariables:
+        variables.append(i)
 
 Cartesians = Cartesians.split('\n')
 for i in range(len(Cartesians)):
@@ -75,6 +78,28 @@ for i in range(len(Cartesians)):
 # print(angleIndices)
 # print(torsionIndices)
 
+dispOutputString = 'rr = {'
+massesOutputString = 'mass = {'
+for i in atoms:
+    massesOutputString += 'm' + i + ','
+massesOutputString = massesOutputString[:-1]
+massesOutputString += '};'
+data[12] = massesOutputString
+
+
+dispsOutputString = 'rr = {'
+
+for i in bondVariables:
+    dispsOutputString += 'rdisp,'
+if angleIndices[0][0] != '':
+    for i in angleVariables:
+        dispsOutputString += 'adisp,'
+if torsionIndices[0][0] != '':
+    for i in torsionVariables:
+        dispsOutputString += 'adisp,'
+dispsOutputString = dispsOutputString[:-1]
+dispsOutputString += '};'
+data[29] = dispsOutputString
 
 clearArray = []
 clearString = ''
@@ -122,26 +147,26 @@ for i in range(len(data)):
         index = i
 
 dotArray = []
-dotString = '  {'
+dotString = '   {'
 # Radii from Cartesians equations
 for i in range(len(bondIndices)-1):
     dotString += 'Rab[{x' + str(bondIndices[i][0])
-    dotString += ', y' + str(bondIndices[i][0])
-    dotString += ', z' + str(bondIndices[i][0])
-    dotString += '}, {'
+    dotString += ',y' + str(bondIndices[i][0])
+    dotString += ',z' + str(bondIndices[i][0])
+    dotString += '},{'
     dotString += 'x' + str(bondIndices[i][1])
-    dotString += ', y' + str(bondIndices[i][1])
-    dotString += ', z' + str(bondIndices[i][1])
+    dotString += ',y' + str(bondIndices[i][1])
+    dotString += ',z' + str(bondIndices[i][1])
     dotString += '}],\n'
     dotArray.append(dotString)
     dotString = '    '
 dotString += 'Rab[{x' + str(bondIndices[len(bondIndices)-1][0])
-dotString += ', y' + str(bondIndices[len(bondIndices)-1][0])
-dotString += ', z' + str(bondIndices[len(bondIndices)-1][0])
-dotString += '}, {'
+dotString += ',y' + str(bondIndices[len(bondIndices)-1][0])
+dotString += ',z' + str(bondIndices[len(bondIndices)-1][0])
+dotString += '},{'
 dotString += 'x' + str(bondIndices[len(bondIndices)-1][1])
-dotString += ', y' + str(bondIndices[len(bondIndices)-1][1])
-dotString += ', z' + str(bondIndices[len(bondIndices)-1][1])
+dotString += ',y' + str(bondIndices[len(bondIndices)-1][1])
+dotString += ',z' + str(bondIndices[len(bondIndices)-1][1])
 dotString += '}]'
 if len(angleIndices) == 0:
     dotString += '\n'
@@ -155,28 +180,28 @@ else:
 if len(angleIndices) > 0:
     for i in range(len(angleIndices)-1):
         dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[i][0])
-        dotString += ', y' + str(angleIndices[i][0])
-        dotString += ', z' + str(angleIndices[i][0])
-        dotString += '}, {x' + str(angleIndices[i][1])
-        dotString += ', y' + str(angleIndices[i][1])
-        dotString += ', z' + str(angleIndices[i][1])
-        dotString += '}, {x' + str(angleIndices[i][2])
-        dotString += ', y' + str(angleIndices[i][2])
-        dotString += ', z' + str(angleIndices[i][2])
+        dotString += ',y' + str(angleIndices[i][0])
+        dotString += ',z' + str(angleIndices[i][0])
+        dotString += '},{x' + str(angleIndices[i][1])
+        dotString += ',y' + str(angleIndices[i][1])
+        dotString += ',z' + str(angleIndices[i][1])
+        dotString += '},{x' + str(angleIndices[i][2])
+        dotString += ',y' + str(angleIndices[i][2])
+        dotString += ',z' + str(angleIndices[i][2])
         dotString += '}]],\n'
         dotArray.append(dotString)
         dotString = '    '
     dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[i][0])
-    dotString += ', y' + str(angleIndices[i][0])
-    dotString += ', z' + str(angleIndices[i][0])
-    dotString += '}, {x' + str(angleIndices[i][1])
-    dotString += ', y' + str(angleIndices[i][1])
-    dotString += ', z' + str(angleIndices[i][1])
-    dotString += '}, {x' + str(angleIndices[i][2])
-    dotString += ', y' + str(angleIndices[i][2])
-    dotString += ', z' + str(angleIndices[i][2])
+    dotString += ',y' + str(angleIndices[i][0])
+    dotString += ',z' + str(angleIndices[i][0])
+    dotString += '},{x' + str(angleIndices[i][1])
+    dotString += ',y' + str(angleIndices[i][1])
+    dotString += ',z' + str(angleIndices[i][1])
+    dotString += '},{x' + str(angleIndices[i][2])
+    dotString += ',y' + str(angleIndices[i][2])
+    dotString += ',z' + str(angleIndices[i][2])
     dotString += '}]]'
-    if len(torsionIndices) == 0:
+    if torsionIndices[0][0] == '':
         dotString += '\n'
         dotArray.append(dotString)
     else:
@@ -185,54 +210,54 @@ if len(angleIndices) > 0:
         dotString = '    '
 
 # Torsion angles from Cartesians equations
-if len(torsionIndices) > 0:
+if torsionIndices[0][0] != '':
     for i in range(len(torsionIndices)-1):
         dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(torsionIndices[i][0])
-        dotString += ', y' + str(torsionIndices[i][0])
-        dotString += ', z' + str(torsionIndices[i][0])
-        dotString += '}, {x' + str(torsionIndices[i][1])
-        dotString += ', y' + str(torsionIndices[i][1])
-        dotString += ', z' + str(torsionIndices[i][1])
-        dotString += '}, {x' + str(torsionIndices[i][2])
-        dotString += ', y' + str(torsionIndices[i][2])
-        dotString += ', z' + str(torsionIndices[i][2])
-        dotString += '}, {x' + str(torsionIndices[i][3])
-        dotString += ', y' + str(torsionIndices[i][3])
-        dotString += ', z' + str(torsionIndices[i][3])
+        dotString += ',y' + str(torsionIndices[i][0])
+        dotString += ',z' + str(torsionIndices[i][0])
+        dotString += '},{x' + str(torsionIndices[i][1])
+        dotString += ',y' + str(torsionIndices[i][1])
+        dotString += ',z' + str(torsionIndices[i][1])
+        dotString += '},{x' + str(torsionIndices[i][2])
+        dotString += ',y' + str(torsionIndices[i][2])
+        dotString += ',z' + str(torsionIndices[i][2])
+        dotString += '},{x' + str(torsionIndices[i][3])
+        dotString += ',y' + str(torsionIndices[i][3])
+        dotString += ',z' + str(torsionIndices[i][3])
         dotString += '}]]'
         if varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= (3*np.pi)/2:
-            dotString += ' + \[Pi],\n'
+            dotString += '+\[Pi],\n'
         elif varDict[torsionVariables[i]] > (3*np.pi)/2 and varDict[torsionVariables[i]] <= 2*np.pi:
-            dotString += ' + 2 \[Pi],\n'
+            dotString += '+2 \[Pi],\n'
         elif varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -(3*np.pi)/2:
-            dotString += ' - \[Pi],\n'
+            dotString += '-\[Pi],\n'
         elif varDict[torsionVariables[i]] < -(3*np.pi)/2 and varDict[torsionVariables[i]] >= -2*np.pi:
-            dotString += ' - 2 \[Pi],\n'
+            dotString += '-2 \[Pi],\n'
         else:
             dotString += ',\n'
         dotArray.append(dotString)
         dotString = '    '
     dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(torsionIndices[len(torsionIndices)-1][0])
-    dotString += ', y' + str(torsionIndices[len(torsionIndices)-1][0])
-    dotString += ', z' + str(torsionIndices[len(torsionIndices)-1][0])
-    dotString += '}, {x' + str(torsionIndices[len(torsionIndices)-1][1])
-    dotString += ', y' + str(torsionIndices[len(torsionIndices)-1][1])
-    dotString += ', z' + str(torsionIndices[len(torsionIndices)-1][1])
-    dotString += '}, {x' + str(torsionIndices[len(torsionIndices)-1][2])
-    dotString += ', y' + str(torsionIndices[len(torsionIndices)-1][2])
-    dotString += ', z' + str(torsionIndices[len(torsionIndices)-1][2])
-    dotString += '}, {x' + str(torsionIndices[len(torsionIndices)-1][3])
-    dotString += ', y' + str(torsionIndices[len(torsionIndices)-1][3])
-    dotString += ', z' + str(torsionIndices[len(torsionIndices)-1][3])
+    dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][0])
+    dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][0])
+    dotString += '},{x' + str(torsionIndices[len(torsionIndices)-1][1])
+    dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][1])
+    dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][1])
+    dotString += '},{x' + str(torsionIndices[len(torsionIndices)-1][2])
+    dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][2])
+    dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][2])
+    dotString += '},{x' + str(torsionIndices[len(torsionIndices)-1][3])
+    dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][3])
+    dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][3])
     dotString += '}]]'
     if varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= (3*np.pi)/2:
-        dotString += ' + \[Pi]\n'
+        dotString += '+\[Pi]\n'
     elif varDict[torsionVariables[i]] > (3*np.pi)/2 and varDict[torsionVariables[i]] <= 2*np.pi:
-        dotString += ' + 2 \[Pi]\n'
+        dotString += '+2 \[Pi]\n'
     if varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -(3*np.pi)/2:
-        dotString += ' - \[Pi]\n'
+        dotString += '-\[Pi]\n'
     elif varDict[torsionVariables[i]] < -(3*np.pi)/2 and varDict[torsionVariables[i]] >= -2*np.pi:
-        dotString += ' - 2 \[Pi]\n'
+        dotString += '-2 \[Pi]\n'
     else:
         dotString += '\n'
     dotArray.append(dotString)

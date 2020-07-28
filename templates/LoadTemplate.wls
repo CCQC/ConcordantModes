@@ -6,11 +6,11 @@ intdif = rootdir <> "/Intdif2008.m";
 job = "initialize";
 Get[intdif];
 
-
-n = 30; 
+xref = Import[rootdir <> "/cartesians.csv"];
+n = 3 Length[xref] - 6; 
 fcTrunc = True;
 
-mass = Import[rootdir <> "/masses.csv"][[1]]  
+mass = Import[rootdir <> "/masses.csv"][[1]]
 nder = 2;  (*quadratic etc*)
 tder = 1;  (*tder=1--> Hii, tder=2-->Hij*)  
 dispder = 0;
@@ -22,16 +22,16 @@ cb = 0.5291772085936;
 
 u1 = 1/Sqrt[2];
 
-re = Import[rootdir <> "/variables.csv"]
+re = Import[rootdir <> "/symVariables.csv"][[1]];
 
 rdisp = 0.01;
 adisp = 0.02;
 (* I may just have to write this one out explicitly as well, but this shouldn't be too big of a burden *)
-rr = Flatten[Import[rootdir <> "/disps.csv"]]
-   
+rr = Import[rootdir <> "/disps.csv"]
+
 conv = HART;
 
-A = Import[rootdir <> "/eigen.csv"]
+A = Import[rootdir <> "/eigen.csv"];
 
 sym = {};
 U = Inverse[A];
@@ -45,19 +45,10 @@ INTC[] =
 (*Cartesian coordinates in bohr*)
 
 
-xref = Import[rootdir <> "/cartesians.csv"]
+
 (*Difference should be close to zero *)
 Print[INTC @@ Flatten[xref BOHR]]
 Print[INTC @@ Flatten[xref BOHR] - re]
-(*Print[Norm[INTC @@ Flatten[xref BOHR] - re]]
-norm_thresh = 1.0*^-4;
-Print[1.0*^-4 > Norm[INTC @@ Flatten[xref BOHR] - re]] *)
-
-(* Giraffe_general: I need to figure out how to properly throw errors in mathematica... but don't spend too much time with it *)
-(*CheckNorm[x_] := If[1.0*^-4 > x, Print[Norm criteria met], Throw[Norm criteria not met]];
-Check[Catch[CheckNorm[Norm[INTC @@ Flatten[xref BOHR] - re]]],err]
-Check[Catch[Throw[Test]],err]
-Check[Catch[CheckNorm[1.0*^-5]],err]*)
 
 job = "disp";
 Get[intdif];
