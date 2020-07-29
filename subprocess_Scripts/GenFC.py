@@ -85,7 +85,7 @@ massesOutputString = 'mass = {'
 for i in atoms:
     massesOutputString += 'm' + i + ','
 massesOutputString = massesOutputString[:-1]
-massesOutputString += '};'
+massesOutputString += '};\n'
 data[12] = massesOutputString
 
 

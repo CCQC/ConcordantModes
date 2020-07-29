@@ -1,7 +1,10 @@
+import time
 import sys
 import shutil
 import os
 import subprocess
+
+t1 = time.time()
 
 rootdir = os.getcwd()
 # print(rootdir)
@@ -48,10 +51,10 @@ os.system('python ' + packagepath + '/subprocess_Scripts/GrabEig.py')
 os.system('python ' + packagepath + '/subprocess_Scripts/TED.py')
 
 # delete some of the INTDER initial files and bring in the 100 files
-os.remove('intder.inp')
-os.remove('intder.out')
-# shutil.move('intder.inp','old_intder.inp')
-# shutil.move('intder.out','old_intder.out')
+# os.remove('intder.inp')
+# os.remove('intder.out')
+shutil.move('intder.inp','init_intder.inp')
+shutil.move('intder.out','init_intder.out')
 
 # shutil.copy(packagepath + '/templates/intder_100_template.dat','../')
 os.system('python ' + packagepath + '/subprocess_Scripts/100_intder_input.py')
@@ -64,9 +67,12 @@ os.system('python ' + packagepath + '/subprocess_Scripts/GrabSym.py')
 shutil.copy('intder.out','../intderTEDcheck.out')
 shutil.copy('eigen.csv','../')
 shutil.copy('symVariables.csv','../')
-os.remove('intder.inp')
-os.remove('intder.out')
-os.remove('file15')
+# os.remove('intder.inp')
+# os.remove('intder.out')
+shutil.move('intder.inp','100_intder.inp')
+shutil.move('intder.out','100_intder.out')
+# os.remove('file15')
+shutil.move('file15','old_file15')
 
 os.chdir('..')
 
@@ -91,7 +97,7 @@ dispList = []
 for i in os.listdir(rootdir + '/Disps'):
     dispList.append(i)
 
-q = 'debug.q,gen4.q,gen5.q,gen6.q'
+q = 'gen4.q,gen5.q,gen6.q'
 prog = 'molpro@2010.1.67+mpi'
 progname = 'molpro'
 job_num = len(dispList)
@@ -174,14 +180,16 @@ shutil.copy('intder.out','../MixedHessOutput.dat')
 os.chdir('..')
 
 # Remove templates
-# shutil.remove('intder_init_template.dat')
-# shutil.remove('intder_100_template.dat')
-os.remove('eigen.csv')
-os.remove('symVariables.csv')
+# os.remove('eigen.csv')
+# os.remove('symVariables.csv')
 
-if os.path.exists(rootdir + '/zmatFiles'):
-    shutil.rmtree(rootdir + '/zmatFiles')
-if os.path.exists(rootdir + '/mma'):
-    shutil.rmtree(rootdir + '/mma')
-if os.path.exists(rootdir + '/Intder'):
-    shutil.rmtree(rootdir + '/Intder')
+# if os.path.exists(rootdir + '/zmatFiles'):
+    # shutil.rmtree(rootdir + '/zmatFiles')
+# if os.path.exists(rootdir + '/mma'):
+    # shutil.rmtree(rootdir + '/mma')
+# if os.path.exists(rootdir + '/Intder'):
+    # shutil.rmtree(rootdir + '/Intder')
+
+t2 = time.time()
+
+print('This program took ' + str(t2-t1) ' seconds to run.')
