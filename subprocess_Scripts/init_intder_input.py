@@ -3,13 +3,15 @@ import os
 import shutil
 import re
 
+root = os.getcwd()
+packagepath = os.path.realpath(__file__)
+packagepath = packagepath[:-len('/init_intder_input.py')]
 # Do some directory tomfoolery here to get all the necessary files
+
+os.chdir(packagepath + '/../templates')
 with open('intder_init_template.dat','r') as file:
     template = file.readlines()
-
-root = os.getcwd()
-if os.path.exists(root + '/zmatFiles'):
-    shutil.rmtree(root + '/zmatFiles')
+os.chdir(root)
 
 os.chdir('../zmatFiles')
 

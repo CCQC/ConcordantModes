@@ -12,7 +12,10 @@ if __name__ == "__main__":
     disp_dict = {}
     disp_dict['disp'] = []
     disp_dict['geom'] = []
+
     root = os.getcwd()
+    packagepath = os.path.realpath(__file__)
+    packagepath = packagepath[:-len('/DirectoryTree.py')]
 
     os.chdir('zmatFiles')
 
@@ -41,7 +44,7 @@ if __name__ == "__main__":
         for j in range(n_atoms):
             disp_dict['geom'][i].append(disp[i*(n_atoms + 1) + j + 1])
     
-    os.chdir('templates')
+    os.chdir(packagepath + '/../templates')
 
     with open('input.dat','r') as file:
         data = file.readlines()

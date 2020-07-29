@@ -3,14 +3,18 @@ import os
 import shutil
 import re
 
+root = os.getcwd()
+packagepath = os.path.realpath(__file__)
+packagepath = packagepath[:-len('/100_intder_input.py')]
 # Do some directory tomfoolery here to get all the necessary files
+os.chdir(packagepath + '/../templates')
 with open('intder_100_template.dat','r') as file:
     template = file.readlines()
+os.chdir(root)
 
 with open('SymAdaptInts.dat','r') as file:
     SymAdaptInts = file.readlines()
 
-root = os.getcwd()
 
 os.chdir('../zmatFiles')
 

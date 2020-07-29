@@ -4,8 +4,10 @@ import shutil
 import re
 
 root = os.getcwd()
+packagepath = os.path.realpath(__file__)
+packagepath = packagepath[:-len('/Final_intder_input.py')]
 # Do some directory tomfoolery here to get all the necessary files
-os.chdir('../templates')
+os.chdir(packagepath + '/../templates')
 with open('intder_Final_template.dat','r') as file:
     template = file.readlines()
 os.chdir(root)

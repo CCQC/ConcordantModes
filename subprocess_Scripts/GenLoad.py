@@ -4,12 +4,14 @@ import shutil
 import re
 
 root = os.getcwd()
+packagepath = os.path.realpath(__file__)
+packagepath = packagepath[:-len('/GenLoad.py')]
 
 # Define some regexes
 intcRegex = re.compile(r'INTC\[\]')
 dotRegex = re.compile(r'Dot')
 
-os.chdir('../templates')
+os.chdir(packagepath + '/../templates')
 
 with open('LoadTemplate.wls','r') as file:
     data = file.readlines()

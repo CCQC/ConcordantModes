@@ -43,9 +43,9 @@ for i in Energies:
 with open('e.dat','w') as file:
     file.write(outputString)
 
-with open('e.dat','r') as file:
-    energyData = file.readlines()
+# with open('e.dat','r') as file:
+    # energyData = file.readlines()
 
-print(energyData)
-for i in energyData:
-    print(i[:-2])
+# print(energyData)
+# for i in energyData:
+    # print(i[:-2])

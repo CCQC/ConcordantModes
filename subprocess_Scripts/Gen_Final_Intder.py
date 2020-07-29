@@ -5,6 +5,8 @@ import os
 import shutil
 
 rootdir = os.getcwd()
+packagepath = os.path.realpath(__file__)
+packagepath = packagepath[:-len('/Gen_Final_Intder.py')]
 
 # Define Regexes
 fcRegex = re.compile('\s+\d+\s+\d+\s+(\d+\.\d+)')
@@ -67,5 +69,5 @@ f16_outputString = f16_outputString[:-1]
 
 with open('file16','w') as file:
     file.write(f16_outputString)
-os.system('../subprocess_Scripts/INTDER < intder.inp > intder.out')
+os.system(packagepath + '/INTDER < intder.inp > intder.out')
 
