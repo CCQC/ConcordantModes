@@ -2,15 +2,15 @@
 ***********************************************************************
  Starting job:
 
-    Name:              Water
-    ID:                332041
-    Hostname:          n022
-    Working directory: /home/vulcan/mel64643/research/5_Mixed_H/1_MixedHess_H20/5_initHess/freq
+    Name:              initOpt
+    ID:                335398
+    Hostname:          n044
+    Working directory: /home/vulcan/mel64643/research/5_Mixed_H/MixedHessian/Old/5_initHess/freq/1_Computation
 
-    Submitted using:   submit -N Water gen4.q cfour@1.0~mpi
+    Submitted using:   submit -N initOpt debug.q cfour@1.0~mpi
 ***********************************************************************
 module load  cfour-1.0-intel-13.0.0-mkof24if6i3xagnr5bw2j3z6sr4lnth2
- Running cfour on n022
+ Running cfour on n044
  Running calculation...
   @GETMEM-I,   Allocated    6675 MB of main memory.
  @GETREC: requested length of vector SVAVA0X  is longer than actual
@@ -77,4 +77,4 @@ MOLDEN
 NEWMOS
 AVOGADROplot.log
 den.dat
- Job complete on n022.
+ Job complete on n044.

@@ -41,7 +41,7 @@ f16_mat = np.reshape(f16_arr,(dim,dim))
 
 # This line of code may have to be checked. I'm only using it because it seems that the force constants are closer to the DZ when flipped.
 # This can be checked for my own structures.
-fc = np.flip(fc,0)
+# fc = np.flip(fc,0)
 
 f16_new = f16_mat
 for i in range(dim):

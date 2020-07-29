@@ -3,15 +3,15 @@ H
 O 1 R*
 H 2 R* 1 A*
 
-R=2.4
-A=108
+R    =        1.825003884611470
+A    =      101.941289586768463
 
 *CFOUR(REF=RHF
        CALC=CCSD(T)
-       BASIS=cc-pVDZ
+       BASIS=cc-pVTZ
        ORB=SEMICANONICAL
        UNITS=BOHR
-       MEMORY=7
+       MEMORY=24
        MEM_UNIT=GB
        SCF_CONV=9
        CC_CONV=6

@@ -22,8 +22,10 @@ with open('torsionIndices','r') as file:
     torsions = file.read()
 with open('Cartesians','r') as file:
     cartesians = file.read()
-
 os.chdir(root)
+
+with open('SymAdaptInts.dat','r') as file:
+    SymAdaptInts = file.readlines()
 
 # split the data into arrays
 
@@ -50,7 +52,7 @@ template[-1] = '{:5d}'.format(1) + template[-1][35:]
 template[-1] = '{:5d}'.format(2000) + template[-1]
 template[-1] = '{:5d}'.format(0) + template[-1]
 template[-1] = '{:5d}'.format(2) + template[-1]
-template[-1] = '{:5d}'.format(0) + template[-1]
+template[-1] = '{:5d}'.format(len(atoms)*3 - 6) + template[-1]
 template[-1] = '{:5d}'.format(len(atoms)*3 - 6) + template[-1]
 template[-1] = '{:5d}'.format(len(atoms)) + template[-1]
 
@@ -83,6 +85,12 @@ if torsions[0][0] != '':
             buffString += '{:5d}'.format(int(j))
         buffString += '\n'
         template.append(buffString)
+
+# Write the symmetry adapted internal coordinates
+if len(SymAdaptInts) > 0:
+    for i in SymAdaptInts:
+        template.append(i)
+template.append('{:5d}'.format(0) + '\n')
 
 # Now we can write in the cartesian coordinates
 if len(cartesians) > 0:

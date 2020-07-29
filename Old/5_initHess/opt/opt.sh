@@ -1,6 +1,6 @@
 #!/bin/sh
-#$ -q gen4.q
-#$ -N H20
+#$ -q debug.q
+#$ -N initOpt
 #$ -S /bin/sh
 #$ -cwd
 
@@ -18,7 +18,7 @@ echo "    ID:                "$JOB_ID
 echo "    Hostname:          "$HOSTNAME
 echo "    Working directory: "$SGE_O_WORKDIR
 echo ""
-echo "    Submitted using:   submit -N H20 gen4.q cfour@1.0~mpi"
+echo "    Submitted using:   submit -N initOpt debug.q cfour@1.0~mpi"
 echo "***********************************************************************"
 
 
