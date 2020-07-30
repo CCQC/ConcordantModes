@@ -7,29 +7,9 @@ import subprocess
 t1 = time.time()
 
 rootdir = os.getcwd()
-# print(rootdir)
-# print(os.path.realpath(__file__))
 
 packagepath = os.path.realpath(__file__)
 packagepath = packagepath[:-len('/MH.py')]
-
-# os.chdir(packagepath + '/subprocess_Scripts')
-os.chdir(packagepath)
-# print('Package path:')
-# print(os.getcwd())
-os.chdir(rootdir)
-# print('Working path:')
-# print(os.getcwd())
-
-if os.path.exists(rootdir + '/subprocess_Scripts'):
-    shutil.rmtree(rootdir + '/subprocess_Scripts')
-if os.path.exists(rootdir + '/templates'):
-    shutil.rmtree(rootdir + '/templates')
-
-
-
-# shutil.copytree(packagepath + '/subprocess_Scripts',rootdir + '/subprocess_Scripts')
-# shutil.copytree(packagepath + '/templates',rootdir + '/templates')
 
 # Parse the output to get all pertinent ZMAT info
 if os.path.exists(rootdir + '/zmatFiles'):
@@ -40,49 +20,43 @@ os.system('python ' + packagepath + '/subprocess_Scripts/ZMAT_interp.py')
 if os.path.exists(rootdir + '/Intder'):
     shutil.rmtree(rootdir + '/Intder')
 os.mkdir('Intder')
-# shutil.copy(packagepath +  '/templates/intder_init_template.dat','.')
 shutil.copy('FCMFINAL','Intder/file15')
 os.chdir('Intder')
 os.system('python ' + packagepath + '/subprocess_Scripts/init_intder_input.py')
-os.system(packagepath + '/subprocess_Scripts/INTDER < intder.inp > intder.out')
+os.system('/home/vulcan/mel64643/bin/MixedHessian/subprocess_Scripts/INTDER < intder.inp > intder.out')
 
 # Some post processing of INTDER initial to generate the SALCS for intder 100
 os.system('python ' + packagepath + '/subprocess_Scripts/GrabEig.py')
 os.system('python ' + packagepath + '/subprocess_Scripts/TED.py')
 
-# delete some of the INTDER initial files and bring in the 100 files
-# os.remove('intder.inp')
-# os.remove('intder.out')
+# move some of the INTDER initial files, then generate and run the 100 INTDER job
 shutil.move('intder.inp','init_intder.inp')
 shutil.move('intder.out','init_intder.out')
 
-# shutil.copy(packagepath + '/templates/intder_100_template.dat','../')
 os.system('python ' + packagepath + '/subprocess_Scripts/100_intder_input.py')
-os.system(packagepath + '/subprocess_Scripts/INTDER < intder.inp > intder.out')
+os.system('/home/vulcan/mel64643/bin/MixedHessian/subprocess_Scripts/INTDER < intder.inp > intder.out')
 
-# Insert script here that grabs the symmetry internal coordinate values
+# script that grabs the symmetry internal coordinate values
 os.system('python ' + packagepath + '/subprocess_Scripts/GrabSym.py')
 
 
+# Move some INTDER files around, then move onto the next thing
 shutil.copy('intder.out','../intderTEDcheck.out')
 shutil.copy('eigen.csv','../')
 shutil.copy('symVariables.csv','../')
-# os.remove('intder.inp')
-# os.remove('intder.out')
 shutil.move('intder.inp','100_intder.inp')
 shutil.move('intder.out','100_intder.out')
-# os.remove('file15')
 shutil.move('file15','old_file15')
 
 os.chdir('..')
 
 
 # Now for the Mathematica portion of our adventure
-
 if os.path.exists(rootdir + '/mma'):
     shutil.rmtree(rootdir + '/mma')
 os.mkdir('mma')
 os.chdir('mma')
+# Unfortunately, Intdif must be in the same directory as the mathematica script...for now
 shutil.copy(packagepath + '/subprocess_Scripts/Intdif2008.m','.')
 shutil.copy('../eigen.csv','.')
 shutil.copy('../symVariables.csv','.')
@@ -159,7 +133,6 @@ out = vulcan_template.format(**odict)
 with open('displacements.sh','w') as file:
     file.write(out)
 subprocess.call('qsub displacements.sh', stderr=sys.stdout.buffer, shell=True)
-# print(os.getcwd())
 
 
 # After this point, all of the jobs will have finished, and its time to reap the energies
@@ -179,7 +152,7 @@ os.system('python ' + packagepath + '/subprocess_Scripts/Gen_Final_Intder.py')
 shutil.copy('intder.out','../MixedHessOutput.dat')
 os.chdir('..')
 
-# Remove templates
+# Remove scratch files in cwd()
 # os.remove('eigen.csv')
 # os.remove('symVariables.csv')
 

@@ -69,5 +69,5 @@ f16_outputString = f16_outputString[:-1]
 
 with open('file16','w') as file:
     file.write(f16_outputString)
-os.system(packagepath + '/INTDER < intder.inp > intder.out')
+os.system('/home/vulcan/mel64643/bin/MixedHessian/subprocess_Scripts/INTDER < intder.inp > intder.out')
 
