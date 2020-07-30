@@ -165,4 +165,4 @@ os.chdir('..')
 
 t2 = time.time()
 
-print('This program took ' + str(t2-t1) ' seconds to run.')
+print('This program took ' + str(t2-t1) + ' seconds to run.')
