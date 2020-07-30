@@ -193,15 +193,15 @@ if angleIndices[0][0] != '':
         dotString += '}]],\n'
         dotArray.append(dotString)
         dotString = '    '
-    dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[i][0])
-    dotString += ',y' + str(angleIndices[i][0])
-    dotString += ',z' + str(angleIndices[i][0])
-    dotString += '},{x' + str(angleIndices[i][1])
-    dotString += ',y' + str(angleIndices[i][1])
-    dotString += ',z' + str(angleIndices[i][1])
-    dotString += '},{x' + str(angleIndices[i][2])
-    dotString += ',y' + str(angleIndices[i][2])
-    dotString += ',z' + str(angleIndices[i][2])
+    dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[len(angleIndices)-1][0])
+    dotString += ',y' + str(angleIndices[len(angleIndices)-1][0])
+    dotString += ',z' + str(angleIndices[len(angleIndices)-1][0])
+    dotString += '},{x' + str(angleIndices[len(angleIndices)-1][1])
+    dotString += ',y' + str(angleIndices[len(angleIndices)-1][1])
+    dotString += ',z' + str(angleIndices[len(angleIndices)-1][1])
+    dotString += '},{x' + str(angleIndices[len(angleIndices)-1][2])
+    dotString += ',y' + str(angleIndices[len(angleIndices)-1][2])
+    dotString += ',z' + str(angleIndices[len(angleIndices)-1][2])
     dotString += '}]]'
     if torsionIndices[0][0] == '':
         dotString += '\n'
@@ -227,14 +227,14 @@ if torsionIndices[0][0] != '':
         dotString += ',y' + str(torsionIndices[i][3])
         dotString += ',z' + str(torsionIndices[i][3])
         dotString += '}]]'
-        if varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= (3*np.pi)/2:
+        Condition1 = varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= np.pi
+        Condition2 = varDict[torsionVariables[i]] > np.pi and varDict[torsionVariables[i]] <= (3*np.pi)/2
+        Condition3 = varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -np.pi
+        Condition4 = varDict[torsionVariables[i]] < -np.pi and varDict[torsionVariables[i]] >= -(3*np.pi)/2
+        if Condition1 or Condition4:
             dotString += '+\[Pi],\n'
-        elif varDict[torsionVariables[i]] > (3*np.pi)/2 and varDict[torsionVariables[i]] <= 2*np.pi:
-            dotString += '+2 \[Pi],\n'
-        elif varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -(3*np.pi)/2:
+        elif Condition2 or Condition3:
             dotString += '-\[Pi],\n'
-        elif varDict[torsionVariables[i]] < -(3*np.pi)/2 and varDict[torsionVariables[i]] >= -2*np.pi:
-            dotString += '-2 \[Pi],\n'
         else:
             dotString += ',\n'
         dotArray.append(dotString)
@@ -252,14 +252,14 @@ if torsionIndices[0][0] != '':
     dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][3])
     dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][3])
     dotString += '}]]'
-    if varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= (3*np.pi)/2:
-        dotString += '+\[Pi]\n'
-    elif varDict[torsionVariables[i]] > (3*np.pi)/2 and varDict[torsionVariables[i]] <= 2*np.pi:
-        dotString += '+2 \[Pi]\n'
-    if varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -(3*np.pi)/2:
-        dotString += '-\[Pi]\n'
-    elif varDict[torsionVariables[i]] < -(3*np.pi)/2 and varDict[torsionVariables[i]] >= -2*np.pi:
-        dotString += '-2 \[Pi]\n'
+    Condition1 = varDict[torsionVariables[len(torsionIndices)-1]] > np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] <= np.pi
+    Condition2 = varDict[torsionVariables[len(torsionIndices)-1]] > np.pi and varDict[torsionVariables[len(torsionIndices)-1]] <= (3*np.pi)/2
+    Condition3 = varDict[torsionVariables[len(torsionIndices)-1]] < -np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] >= -np.pi
+    Condition4 = varDict[torsionVariables[len(torsionIndices)-1]] < -np.pi and varDict[torsionVariables[len(torsionIndices)-1]] >= -(3*np.pi)/2
+    if Condition1 or Condition4:
+        dotString += '+\[Pi],\n'
+    elif Condition2 or Condition3:
+        dotString += '-\[Pi],\n'
     else:
         dotString += '\n'
     dotArray.append(dotString)
