@@ -227,14 +227,10 @@ if torsionIndices[0][0] != '':
         dotString += ',y' + str(torsionIndices[i][3])
         dotString += ',z' + str(torsionIndices[i][3])
         dotString += '}]]'
-        Condition1 = varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= np.pi
-        Condition2 = varDict[torsionVariables[i]] > np.pi and varDict[torsionVariables[i]] <= (3*np.pi)/2
-        Condition3 = varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -np.pi
-        Condition4 = varDict[torsionVariables[i]] < -np.pi and varDict[torsionVariables[i]] >= -(3*np.pi)/2
-        if Condition1 or Condition4:
+        Condition1 = varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= (3*np.pi)/2
+        Condition2 = varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -(3*np.pi)/2
+        if Condition1 or Condition2:
             dotString += '+\[Pi],\n'
-        elif Condition2 or Condition3:
-            dotString += '-\[Pi],\n'
         else:
             dotString += ',\n'
         dotArray.append(dotString)
@@ -252,14 +248,10 @@ if torsionIndices[0][0] != '':
     dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][3])
     dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][3])
     dotString += '}]]'
-    Condition1 = varDict[torsionVariables[len(torsionIndices)-1]] > np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] <= np.pi
-    Condition2 = varDict[torsionVariables[len(torsionIndices)-1]] > np.pi and varDict[torsionVariables[len(torsionIndices)-1]] <= (3*np.pi)/2
-    Condition3 = varDict[torsionVariables[len(torsionIndices)-1]] < -np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] >= -np.pi
-    Condition4 = varDict[torsionVariables[len(torsionIndices)-1]] < -np.pi and varDict[torsionVariables[len(torsionIndices)-1]] >= -(3*np.pi)/2
-    if Condition1 or Condition4:
-        dotString += '+\[Pi],\n'
-    elif Condition2 or Condition3:
-        dotString += '-\[Pi],\n'
+    Condition1 = varDict[torsionVariables[len(torsionIndices)-1]] > np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] <= (3*np.pi)/2
+    Condition2 = varDict[torsionVariables[len(torsionIndices)-1]] < -np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] >= -(3*np.pi)/2
+    if Condition1 or Condition2:
+        dotString += '+\[Pi]\n'
     else:
         dotString += '\n'
     dotArray.append(dotString)
