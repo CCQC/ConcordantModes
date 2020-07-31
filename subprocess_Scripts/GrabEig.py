@@ -46,19 +46,26 @@ for i in rawEigs:
 eigs = eigs.astype(float)
 
 
-# These lines sort the eigenvalues into a proper matrix format
+# These lines sort the eigenvalues into a proper matrix format. There isn't an easy way to understand what's
+# going on here, unfortunately.
 sortedEigs = np.zeros((degFree,degFree))
 k = 0
+l = 0
+m = degFree//10
+decrement = 10 - degFree%10
 if degFree > 9:
     increment = 10
 else:
     increment = degFree
 for i in range(degFree):
     for j in range(degFree):
-        sortedEigs[i][j] = eigs[i*increment + j + k*(10*(degFree - 1))]
+        if j + 1 > m*10:
+            l = 1
+        sortedEigs[i][j] = eigs[i*(increment - l*decrement) + j + k*(10*(degFree - 1))]
         if (j+1)%10 == 0:
             k += 1
     k = 0
+    l = 0
 
 # These final lines format the eigenvalue matrix into an 'eigen.csv' file that may be further processed by the TED.py script.
 outputString = ''
