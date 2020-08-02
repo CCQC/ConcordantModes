@@ -31,6 +31,7 @@ for i in range(n_disp):
     with open("output.dat",'r') as file:
         data = file.read()
     if not re.search(molproSuccess,data):
+        print('Energy failed at ' + str(i+1))
         raise RuntimeError
     energy = re.findall(molproEnergy,data)
     Energies = np.append(Energies,energy[0])
