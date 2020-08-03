@@ -34,6 +34,12 @@ if __name__ == "__main__":
         disp = file.readlines()
    
     os.chdir(root)
+    
+    with open("basis",'r') as file:
+        b = file.readlines()
+    
+    # print(b[0][:-1])
+    basis = b[0]
 
     # disp = disp[:-1]
     n_disp = int((len(disp))/(n_atoms+1))
@@ -49,6 +55,9 @@ if __name__ == "__main__":
     with open('input.dat','r') as file:
         data = file.readlines()
     
+    print(data[10])
+    data[10] = 'basis=' + basis
+    print(data[10])
     os.chdir(root)
 
     data_buff = data.copy()

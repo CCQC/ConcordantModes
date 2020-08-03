@@ -11,6 +11,10 @@ rootdir = os.getcwd()
 packagepath = os.path.realpath(__file__)
 packagepath = packagepath[:-len('/MH.py')]
 
+# First things first. Read in options from the MHopt.py file
+
+
+
 # Parse the output to get all pertinent ZMAT info
 if os.path.exists(rootdir + '/zmatFiles'):
     shutil.rmtree(rootdir + '/zmatFiles')
