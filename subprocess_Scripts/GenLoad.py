@@ -40,13 +40,20 @@ with open('variableDictionary','r') as file:
 with open('Cartesians','r') as file:
     Cartesians = file.read()
 
+os.chdir('..')
+
+with open('disp_option','r') as file:
+    disp_file = file.read()
+
 os.chdir(root)
+
 
 # Split the data into arrays
 varDict = {}
-atoms          = atoms.split('\n')
-bondVariables  = bondVariables.split('\n')
-bondIndices    = bondIndices.split('\n')
+disp_data     = disp_file.split('\n')
+atoms         = atoms.split('\n')
+bondVariables = bondVariables.split('\n')
+bondIndices   = bondIndices.split('\n')
 for i in range(len(bondIndices)):
     bondIndices[i] = bondIndices[i].split(' ')
 angleVariables = angleVariables.split('\n')
@@ -88,6 +95,13 @@ massesOutputString = massesOutputString[:-1]
 massesOutputString += '};\n'
 data[12] = massesOutputString
 
+# Option for the disp length
+dispOutputString = 'rdisp = '
+dispOutputString += str(disp_data[0]) + ';\n'
+data[26]
+dispOutputString = 'adisp = '
+dispOutputString += str(disp_data[1]) + ';\n'
+data[27]
 
 dispsOutputString = 'rr = {'
 
