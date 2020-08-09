@@ -53,19 +53,19 @@ k = 0
 l = 0
 m = degFree//10
 decrement = 10 - degFree%10
+increment = 10
 if degFree > 9:
-    increment = 10
+    for i in range(degFree):
+        for j in range(degFree):
+            if j + 1 > m*10:
+                l = 1
+            sortedEigs[i][j] = eigs[i*(increment - l*decrement) + j + k*(10*(degFree - 1))]
+            if (j+1)%10 == 0:
+                k += 1
+        k = 0
+        l = 0
 else:
-    increment = degFree
-for i in range(degFree):
-    for j in range(degFree):
-        if j + 1 > m*10:
-            l = 1
-        sortedEigs[i][j] = eigs[i*(increment - l*decrement) + j + k*(10*(degFree - 1))]
-        if (j+1)%10 == 0:
-            k += 1
-    k = 0
-    l = 0
+    sortedEigs = np.reshape(eigs,(degFree,degFree))
 
 # These final lines format the eigenvalue matrix into an 'eigen.csv' file that may be further processed by the TED.py script.
 outputString = ''

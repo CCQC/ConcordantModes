@@ -55,7 +55,6 @@ if __name__ == "__main__":
     with open('input.dat','r') as file:
         data = file.readlines()
     
-    print(data[10])
     data[10] = 'basis=' + basis
     print(data[10])
     os.chdir(root)

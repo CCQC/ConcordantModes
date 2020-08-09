@@ -96,10 +96,10 @@ data[12] = massesOutputString
 # Option for the disp length
 dispOutputString = 'rdisp = '
 dispOutputString += str(disp_data[0]) + ';\n'
-data[26]
+data[26] = dispOutputString
 dispOutputString = 'adisp = '
 dispOutputString += str(disp_data[1]) + ';\n'
-data[27]
+data[27] = dispOutputString
 
 dispsOutputString = 'rr = {'
 
