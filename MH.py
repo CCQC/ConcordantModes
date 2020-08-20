@@ -75,7 +75,7 @@ dispList = []
 for i in os.listdir(rootdir + '/Disps'):
     dispList.append(i)
 
-if os.path.exists(rootdir + '/prog.dat')
+if os.path.exists(rootdir + '/prog.dat'):
     with open("prog.dat","r") as file:
         data = file.read()
     p = data.split('\n')
