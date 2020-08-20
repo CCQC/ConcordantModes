@@ -75,9 +75,19 @@ dispList = []
 for i in os.listdir(rootdir + '/Disps'):
     dispList.append(i)
 
-q = 'gen4.q,gen5.q,gen6.q'
-prog = 'molpro@2010.1.67+mpi'
-progname = 'molpro'
+if os.path.exists(rootdir + '/prog.dat')
+    with open("prog.dat","r") as file:
+        data = file.read()
+    p = data.split('\n')
+    prog     = p[0]
+    progname = p[1]
+else:
+    prog = 'molpro@2010.1.67+mpi'
+    progname = 'molpro'
+if prog == 'psi4':
+    q = 'gen3.q,gen4.q,gen5.q,gen6.q'
+else:
+    q = 'gen4.q,gen5.q,gen6.q'
 job_num = len(dispList)
 
 # This portion is highly cumbersome and will have to split out into another script eventually,

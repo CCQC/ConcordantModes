@@ -26,7 +26,7 @@ re = Import[rootdir <> "/symVariables.csv"][[1]];
 
 rdisp = 0.01;
 adisp = 0.02;
-(* I may just have to write this one out explicitly as well, but this shouldn't be too big of a burden *)
+
 rr = Import[rootdir <> "/disps.csv"]
 
 conv = HART;
