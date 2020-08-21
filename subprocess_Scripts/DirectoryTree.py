@@ -2,10 +2,16 @@ import fileinput
 import os
 import shutil
 
-def Make_Input(data,dispp,n_at,at):	
-    data.insert(7,' ' + n_at + " \n" )
-    for i in range(int(n_at)):
-        data.insert(9+i , ' ' + at[i] + dispp[i])
+
+# Alright, it's time to generalize this for multiple program inputs
+def Make_Input(data,dispp,n_at,at,prog):	
+    if prog == 'molpro':
+        data.insert(7,' ' + n_at + " \n" )
+        for i in range(int(n_at)):
+            data.insert(9+i , ' ' + at[i] + dispp[i])
+    elif prog == 'psi4':
+        for i in range(int(n_at)):
+            data.insert(6+i , '  ' + at[i] + dispp[i])
     return data
     
 if __name__ == "__main__":
@@ -16,6 +22,16 @@ if __name__ == "__main__":
     root = os.getcwd()
     packagepath = os.path.realpath(__file__)
     packagepath = packagepath[:-len('/DirectoryTree.py')]
+
+    # Read in the program
+    if os.path.exists(root + '/prog.dat'):
+        with open("prog.dat","r") as file:
+            data = file.read()
+        p = data.split('\n')
+        progname = p[1]
+        print('progname is: ' + progname)
+    else:
+        progname = 'molpro'
 
     os.chdir('zmatFiles')
 
@@ -52,10 +68,20 @@ if __name__ == "__main__":
     
     os.chdir(packagepath + '/../templates')
 
-    with open('input.dat','r') as file:
-        data = file.readlines()
+    basis_string = ''
+    if progname == 'molpro':
+        with open('input.dat','r') as file:
+            data = file.readlines()
+    elif progname == 'psi4':
+        with open('psi4_template.dat','r') as file:
+            data = file.readlines()
+        basis_string += '  '
+    else:
+        print('Specified program not supported: ' + progname)
+        raise RuntimeError
     
-    data[10] = 'basis=' + basis
+    basis_string += 'basis=' + basis
+    data[10] = basis_string
     print(data[10])
     os.chdir(root)
 
@@ -67,7 +93,7 @@ if __name__ == "__main__":
     for i in range(n_disp):
         os.mkdir(str(i+1))
         os.chdir("./" + str(i+1))
-        data = Make_Input(data,disp_dict['geom'][i],str(n_atoms),atoms)
+        data = Make_Input(data,disp_dict['geom'][i],str(n_atoms),atoms,progname)
         with open('input.dat','w') as file:
            file.writelines(data)
         data = data_buff.copy()

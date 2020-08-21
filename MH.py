@@ -76,7 +76,7 @@ for i in os.listdir(rootdir + '/Disps'):
     dispList.append(i)
 
 if os.path.exists(rootdir + '/prog.dat'):
-    with open("prog.dat","r") as file:
+    with open("../prog.dat","r") as file:
         data = file.read()
     p = data.split('\n')
     prog     = p[0]
@@ -84,7 +84,7 @@ if os.path.exists(rootdir + '/prog.dat'):
 else:
     prog = 'molpro@2010.1.67+mpi'
     progname = 'molpro'
-if prog == 'psi4':
+if progname == 'psi4':
     q = 'gen3.q,gen4.q,gen5.q,gen6.q'
 else:
     q = 'gen4.q,gen5.q,gen6.q'
