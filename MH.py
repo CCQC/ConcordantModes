@@ -11,6 +11,9 @@ rootdir = os.getcwd()
 packagepath = os.path.realpath(__file__)
 packagepath = packagepath[:-len('/MH.py')]
 
+if os.path.exists(rootdir + '/nohup.out'):
+    os.remove('nohup.out')
+
 # First things first. Read in options from the MHopt.py file
 
 

@@ -10,4 +10,4 @@ geomtyp=xyz
 
 basis=cc-pvtz
 {rhf;maxit,200}
-{rccsd(t);maxit,200}
+{uccsd(t);maxit,200}

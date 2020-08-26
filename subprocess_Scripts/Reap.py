@@ -39,12 +39,12 @@ os.chdir(rootdir)
 n_disp = int((len(disp))/(n_atoms+1))
 Energies = np.array([])
 
+# print('Prog at reap is: ')
+# print(progname)
 for i in range(n_disp):
     os.chdir("./"+str(i+1))
     with open("output.dat",'r') as file:
         data = file.read()
-    print('Prog at reap is: ')
-    print(progname)
     if progname == 'molpro':
         if not re.search(molproSuccess,data):
             print('Energy failed at ' + str(i+1))
