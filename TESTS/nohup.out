@@ -1,0 +1,39 @@
+
+General::obspkg: 
+   VectorAnalysis` is now obsolete. The legacy version being loaded may
+     conflict with current functionality. See the Compatibility Guide for
+     updating information.
+
+General::compat: 
+   Combinatorica Graph and Permutations functionality has been superseded by
+    preloaded functionality. The package now being loaded may conflict with
+    this. Please see the Compatibility Guide for details.
+{1.7961501993211249, 1.4312592441883532, 2.5636034348214257*^-19}
+{-7.887512865067947*^-11, -9.701164693787234*^-8, 2.5636034348214257*^-19}
+Without symmetry 7 displaced geometries are required
+
+With symmetry 7 displaced geometries are required
+
+Your job-array 337738.1-7:1 ("MixedHess") has been submitted
+Job 337738.1 exited with exit code 0.
+Job 337738.5 exited with exit code 0.
+Job 337738.3 exited with exit code 0.
+Job 337738.4 exited with exit code 0.
+Job 337738.6 exited with exit code 0.
+Job 337738.2 exited with exit code 0.
+Job 337738.7 exited with exit code 0.
+
+General::obspkg: 
+   VectorAnalysis` is now obsolete. The legacy version being loaded may
+     conflict with current functionality. See the Compatibility Guide for
+     updating information.
+
+General::compat: 
+   Combinatorica Graph and Permutations functionality has been superseded by
+    preloaded functionality. The package now being loaded may conflict with
+    this. Please see the Compatibility Guide for details.
+The energies at the displaced geometries:
+MatrixForm[{{-76.34578231037428, -76.3457803004507, -76.34578029457795, -76.34575820213948, -76.34575780198337, -76.3456830231858, -76.34568302318596}}]
+  basis=cc-pVTZ
+
+This program took 37.69473743438721 seconds to run.
