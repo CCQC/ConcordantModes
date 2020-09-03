@@ -6,7 +6,8 @@ import subprocess
 from MixedHessian.GenFC import GenFC
 from MixedHessian.GenLoad import GenLoad
 from MixedHessian.DirectoryTree import DirectoryTree
-from MixedHessian.Reap import Reap 
+from MixedHessian.Reap import Reap
+from MixedHessian.ZMAT_parse import ZMAT
 
 class MixedHessian(object):
     def __init__(self, options):
@@ -23,14 +24,12 @@ class MixedHessian(object):
         # if os.path.exists(rootdir + '/nohup.out'):
             # os.remove('nohup.out')
         
-        # First things first. Read in options from the MHopt.py file
-        
-        
-        
         # Parse the output to get all pertinent ZMAT info
         if os.path.exists(rootdir + '/zmatFiles'):
             shutil.rmtree(rootdir + '/zmatFiles')
         os.system('python ' + packagepath + '/subprocess_Scripts/ZMAT_interp.py')
+        self.zmat = ZMAT()
+        self.zmat.run()
         
         # Next block, generate and then run intder initial
         if os.path.exists(rootdir + '/Intder'):
@@ -85,7 +84,7 @@ class MixedHessian(object):
         prog = self.options.program
         progname = prog.split('@')[0]
         # The displacements have been generated, now we have to run them!
-        Dir_obj = DirectoryTree(progname, self.options.basis)
+        Dir_obj = DirectoryTree(progname, self.options.basis, self.options.charge, self.options.spin)
         Dir_obj.run()
         # os.system('python ' + packagepath + '/subprocess_Scripts/DirectoryTree.py')
         os.chdir(rootdir + '/Disps')
@@ -177,7 +176,7 @@ export NSLOTS={nslots}
         # Now to generate the e.m file, then to generate the force constants!
         os.chdir('../mma')
         os.system('python ' + packagepath + '/subprocess_Scripts/GenEM.py')
-        FC_obj = GenFC(self.options.rdisp,self.options.adisp)
+        FC_obj = GenFC(self.options.rdisp,self.options.adisp,self.zmat)
         FC_obj.run()
         # os.system('python ' + packagepath + '/subprocess_Scripts/GenFC.py')
         os.system('./FC.wls')

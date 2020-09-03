@@ -6,9 +6,11 @@ import shutil
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,basis):
+    def __init__(self,progname,basis,charge,spin):
         self.progname = progname
         self.basis = basis
+        self.charge = charge
+        self.spin = spin
 
     def Make_Input(self,data,dispp,n_at,at,prog):	
         if prog == 'molpro':
@@ -16,6 +18,9 @@ class DirectoryTree(object):
             for i in range(int(n_at)):
                 data.insert(9+i , ' ' + at[i] + dispp[i])
         elif prog == 'psi4':
+            data[5] = '  ' + str(self.charge) + ' ' + str(self.spin) + '\n'
+            if self.spin != 1:
+                data[11] = '  reference uhf\n'
             for i in range(int(n_at)):
                 data.insert(6+i , '  ' + at[i] + dispp[i])
         return data

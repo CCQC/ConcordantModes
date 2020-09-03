@@ -4,9 +4,10 @@ import shutil
 import re
 
 class GenFC(object):
-    def __init__(self,rdisp,adisp):
+    def __init__(self,rdisp,adisp,zmat):
         self.rdisp = rdisp
         self.adisp = adisp
+        self.zmat = zmat
 
     def run(self):
         root = os.getcwd()
@@ -56,30 +57,46 @@ class GenFC(object):
         varDict = {}
         # disp_data      = disp_file.split('\n')
         atoms          = atoms.split('\n')
+        print(atoms)
         bondVariables  = bondVariables.split('\n')
+        print(bondVariables)
         bondIndices    = bondIndices.split('\n')
         for i in range(len(bondIndices)):
             bondIndices[i] = bondIndices[i].split(' ')
+        print(bondIndices)
         angleVariables = angleVariables.split('\n')
+        print(angleVariables)
         angleIndices   = angleIndices.split('\n')
         for i in range(len(angleIndices)):
             angleIndices[i] = angleIndices[i].split(' ')
+        print(angleIndices)
         torsionVariables = torsionVariables.split('\n')
+        print(torsionVariables)
         torsionIndices   = torsionIndices.split('\n')
         for i in range(len(torsionIndices)):
             torsionIndices[i] = torsionIndices[i].split(' ')
+        print(torsionIndices)
         variableDictionary = variableDictionary.split('\n')
         for i in range(len(variableDictionary)):
             variableDictionary[i] = variableDictionary[i].split(' ')
         for i in range(len(variableDictionary)):
             varDict[variableDictionary[i][0]] = float(variableDictionary[i][1])
+        print(varDict)
+        print(self.zmat.atomList)
+        print(self.zmat.bondIndices)
+        print(self.zmat.bondVariables)
+        print(self.zmat.angleIndices)
+        print(self.zmat.angleVariables)
+        print(self.zmat.torsionIndices)
+        print(self.zmat.torsionVariables)
+        print(self.zmat.variableDictionary)
         
         variables = bondVariables.copy()
         
-        if angleIndices[0][0] != '':
+        if self.zmat.angleIndices > 0:
             for i in angleVariables:
                 variables.append(i)
-        if torsionIndices[0][0] != '':
+        if len(self.zmat.torsionIndices) > 0:
             for i in torsionVariables:
                 variables.append(i)
         
@@ -111,10 +128,10 @@ class GenFC(object):
         
         for i in bondVariables:
             dispsOutputString += 'rdisp,'
-        if angleIndices[0][0] != '':
+        if self.zmat.angleIndices > 0:
             for i in angleVariables:
                 dispsOutputString += 'adisp,'
-        if torsionIndices[0][0] != '':
+        if len(self.zmat.torsionIndices) > 0:
             for i in torsionVariables:
                 dispsOutputString += 'adisp,'
         dispsOutputString = dispsOutputString[:-1]
@@ -188,7 +205,7 @@ class GenFC(object):
         dotString += ',y' + str(bondIndices[len(bondIndices)-1][1])
         dotString += ',z' + str(bondIndices[len(bondIndices)-1][1])
         dotString += '}]'
-        if len(angleIndices) == 0:
+        if len(self.zmat.angleIndices) == 0:
             dotString += '\n'
             dotArray.append(dotString)
         else:
@@ -197,31 +214,31 @@ class GenFC(object):
             dotString = '    '
         
         # Angles from Cartesians equations
-        if len(angleIndices) > 0:
-            for i in range(len(angleIndices)-1):
-                dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[i][0])
-                dotString += ',y' + str(angleIndices[i][0])
-                dotString += ',z' + str(angleIndices[i][0])
-                dotString += '},{x' + str(angleIndices[i][1])
-                dotString += ',y' + str(angleIndices[i][1])
-                dotString += ',z' + str(angleIndices[i][1])
-                dotString += '},{x' + str(angleIndices[i][2])
-                dotString += ',y' + str(angleIndices[i][2])
-                dotString += ',z' + str(angleIndices[i][2])
+        if len(self.zmat.angleIndices) > 0:
+            for i in range(len(self.zmat.angleIndices)-1):
+                dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(self.zmat.angleIndices[i][0])
+                dotString += ',y' + str(self.zmat.angleIndices[i][0])
+                dotString += ',z' + str(self.zmat.angleIndices[i][0])
+                dotString += '},{x' + str(self.zmat.angleIndices[i][1])
+                dotString += ',y' + str(self.zmat.angleIndices[i][1])
+                dotString += ',z' + str(self.zmat.angleIndices[i][1])
+                dotString += '},{x' + str(self.zmat.angleIndices[i][2])
+                dotString += ',y' + str(self.zmat.angleIndices[i][2])
+                dotString += ',z' + str(self.zmat.angleIndices[i][2])
                 dotString += '}]],\n'
                 dotArray.append(dotString)
                 dotString = '    '
-            dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(angleIndices[len(angleIndices)-1][0])
-            dotString += ',y' + str(angleIndices[len(angleIndices)-1][0])
-            dotString += ',z' + str(angleIndices[len(angleIndices)-1][0])
-            dotString += '},{x' + str(angleIndices[len(angleIndices)-1][1])
-            dotString += ',y' + str(angleIndices[len(angleIndices)-1][1])
-            dotString += ',z' + str(angleIndices[len(angleIndices)-1][1])
-            dotString += '},{x' + str(angleIndices[len(angleIndices)-1][2])
-            dotString += ',y' + str(angleIndices[len(angleIndices)-1][2])
-            dotString += ',z' + str(angleIndices[len(angleIndices)-1][2])
+            dotString += 'ArcCos[Cos\[Theta]abc[{x' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][0])
+            dotString += ',y' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][0])
+            dotString += ',z' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][0])
+            dotString += '},{x' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][1])
+            dotString += ',y' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][1])
+            dotString += ',z' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][1])
+            dotString += '},{x' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][2])
+            dotString += ',y' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][2])
+            dotString += ',z' + str(self.zmat.angleIndices[len(self.zmat.angleIndices)-1][2])
             dotString += '}]]'
-            if torsionIndices[0][0] == '':
+            if len(self.zmat.torsionIndices) == 0:
                 dotString += '\n'
                 dotArray.append(dotString)
             else:
@@ -230,20 +247,21 @@ class GenFC(object):
                 dotString = '    '
         
         # Torsion angles from Cartesians equations
-        if torsionIndices[0][0] != '':
-            for i in range(len(torsionIndices)-1):
-                dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(torsionIndices[i][0])
-                dotString += ',y' + str(torsionIndices[i][0])
-                dotString += ',z' + str(torsionIndices[i][0])
-                dotString += '},{x' + str(torsionIndices[i][1])
-                dotString += ',y' + str(torsionIndices[i][1])
-                dotString += ',z' + str(torsionIndices[i][1])
-                dotString += '},{x' + str(torsionIndices[i][2])
-                dotString += ',y' + str(torsionIndices[i][2])
-                dotString += ',z' + str(torsionIndices[i][2])
-                dotString += '},{x' + str(torsionIndices[i][3])
-                dotString += ',y' + str(torsionIndices[i][3])
-                dotString += ',z' + str(torsionIndices[i][3])
+        # if torsionIndices[0][0] != '':
+        if len(self.zmat.torsionIndices) > 0:
+            for i in range(len(self.zmat.torsionIndices)-1):
+                dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(self.zmat.torsionIndices[i][0])
+                dotString += ',y' + str(self.zmat.torsionIndices[i][0])
+                dotString += ',z' + str(self.zmat.torsionIndices[i][0])
+                dotString += '},{x' + str(self.zmat.torsionIndices[i][1])
+                dotString += ',y' + str(self.zmat.torsionIndices[i][1])
+                dotString += ',z' + str(self.zmat.torsionIndices[i][1])
+                dotString += '},{x' + str(self.zmat.torsionIndices[i][2])
+                dotString += ',y' + str(self.zmat.torsionIndices[i][2])
+                dotString += ',z' + str(self.zmat.torsionIndices[i][2])
+                dotString += '},{x' + str(self.zmat.torsionIndices[i][3])
+                dotString += ',y' + str(self.zmat.torsionIndices[i][3])
+                dotString += ',z' + str(self.zmat.torsionIndices[i][3])
                 dotString += '}]]'
                 Condition1 = varDict[torsionVariables[i]] > np.pi/2 and varDict[torsionVariables[i]] <= (3*np.pi)/2
                 Condition2 = varDict[torsionVariables[i]] < -np.pi/2 and varDict[torsionVariables[i]] >= -(3*np.pi)/2
@@ -253,21 +271,21 @@ class GenFC(object):
                     dotString += ',\n'
                 dotArray.append(dotString)
                 dotString = '    '
-            dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(torsionIndices[len(torsionIndices)-1][0])
-            dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][0])
-            dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][0])
-            dotString += '},{x' + str(torsionIndices[len(torsionIndices)-1][1])
-            dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][1])
-            dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][1])
-            dotString += '},{x' + str(torsionIndices[len(torsionIndices)-1][2])
-            dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][2])
-            dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][2])
-            dotString += '},{x' + str(torsionIndices[len(torsionIndices)-1][3])
-            dotString += ',y' + str(torsionIndices[len(torsionIndices)-1][3])
-            dotString += ',z' + str(torsionIndices[len(torsionIndices)-1][3])
+            dotString += 'ArcTan[Tan\[Tau]abcd[{x' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][0])
+            dotString += ',y' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][0])
+            dotString += ',z' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][0])
+            dotString += '},{x' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][1])
+            dotString += ',y' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][1])
+            dotString += ',z' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][1])
+            dotString += '},{x' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][2])
+            dotString += ',y' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][2])
+            dotString += ',z' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][2])
+            dotString += '},{x' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][3])
+            dotString += ',y' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][3])
+            dotString += ',z' + str(self.zmat.torsionIndices[len(self.zmat.torsionIndices)-1][3])
             dotString += '}]]'
-            Condition1 = varDict[torsionVariables[len(torsionIndices)-1]] > np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] <= (3*np.pi)/2
-            Condition2 = varDict[torsionVariables[len(torsionIndices)-1]] < -np.pi/2 and varDict[torsionVariables[len(torsionIndices)-1]] >= -(3*np.pi)/2
+            Condition1 = varDict[torsionVariables[len(self.zmat.torsionIndices)-1]] > np.pi/2 and varDict[torsionVariables[len(self.zmat.torsionIndices)-1]] <= (3*np.pi)/2
+            Condition2 = varDict[torsionVariables[len(self.zmat.torsionIndices)-1]] < -np.pi/2 and varDict[torsionVariables[len(self.zmat.torsionIndices)-1]] >= -(3*np.pi)/2
             if Condition1 or Condition2:
                 dotString += '+\[Pi]\n'
             else:

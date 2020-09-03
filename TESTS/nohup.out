@@ -14,14 +14,14 @@ Without symmetry 7 displaced geometries are required
 
 With symmetry 7 displaced geometries are required
 
-Your job-array 337738.1-7:1 ("MixedHess") has been submitted
-Job 337738.1 exited with exit code 0.
-Job 337738.5 exited with exit code 0.
-Job 337738.3 exited with exit code 0.
-Job 337738.4 exited with exit code 0.
-Job 337738.6 exited with exit code 0.
-Job 337738.2 exited with exit code 0.
-Job 337738.7 exited with exit code 0.
+Your job-array 337969.1-7:1 ("MixedHess") has been submitted
+Job 337969.1 exited with exit code 0.
+Job 337969.2 exited with exit code 0.
+Job 337969.3 exited with exit code 0.
+Job 337969.4 exited with exit code 0.
+Job 337969.5 exited with exit code 0.
+Job 337969.6 exited with exit code 0.
+Job 337969.7 exited with exit code 0.
 
 General::obspkg: 
    VectorAnalysis` is now obsolete. The legacy version being loaded may
@@ -33,7 +33,23 @@ General::compat:
     preloaded functionality. The package now being loaded may conflict with
     this. Please see the Compatibility Guide for details.
 The energies at the displaced geometries:
-MatrixForm[{{-76.34578231037428, -76.3457803004507, -76.34578029457795, -76.34575820213948, -76.34575780198337, -76.3456830231858, -76.34568302318596}}]
+MatrixForm[{{-76.34578231037413, -76.34578030045076, -76.34578029457806, -76.34575820213925, -76.3457578019832, -76.34568302318587, -76.3456830231861}}]
   basis=cc-pVTZ
 
-This program took 37.69473743438721 seconds to run.
+['H', 'O', 'H']
+['R', 'R']
+[['2', '1'], ['3', '2']]
+['A']
+[['3', '2', '1']]
+['']
+[['']]
+{'A': 1.8103975742886766, 'R': 1.810017290509182}
+['H', 'O', 'H']
+[['2', '1'], ['3', '2']]
+['R', 'R']
+[['3', '2', '1']]
+['A']
+[]
+[]
+{'A': '1.8103975742886766', 'R': '1.810017290509182'}
+This program took 114.39802503585815 seconds to run.

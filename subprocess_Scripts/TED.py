@@ -1,15 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 16 11:00:01 2015
-
-@author: marcus_bartlett
-"""
-
 import numpy as np
 from numpy.linalg import inv
-m = np.loadtxt("eigen.csv", delimiter=',')
-# print(m)
 
+
+m = np.loadtxt("eigen.csv", delimiter=',')
 
 ainv = inv(m)
 
@@ -22,23 +15,19 @@ for i in range(len(ainv)):
     k = 0
     line += "{:5d}".format(i+1)
     line += "{:4d}".format(1)
-    # line += "{:+11.6f}".format(ainv[i][0])
     line += "{:+14.9f}".format(ainv[i][0])
     for j in range(len(ainv)-1):
         width = (k+1)*76
         if len(line)<(width-1):
             line += "{:4d}".format(j+2)
-            # line += "{:+11.6f}".format(ainv[i][j+1])
             line += "{:+14.9f}".format(ainv[i][j+1])
         else:
             line += "\n"
             k += 1
             line += "{:5d}".format(i+1)
             line += "{:4d}".format(j+2)
-            # line += "{:+11.6f}".format(ainv[i][j+1])
             line += "{:+14.9f}".format(ainv[i][j+1])
     outputString += line + '\n'
-    # print(line)
 
 with open('SymAdaptInts.dat','w') as file:
     file.write(outputString)

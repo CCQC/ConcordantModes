@@ -1,11 +1,13 @@
 class Options(object):
     def __init__(self, **kwargs):
         self.queue = kwargs.pop("queue", "gen4.q")
-        self.nslots = kwargs.pop("nslots", 4)
+        self.nslots = kwargs.pop("nslots", 1)
         self.program = kwargs.pop('program', "molpro@2010.1.67+mpi")
         self.rdisp = kwargs.pop('rdisp', 0.005)
         self.adisp = kwargs.pop('adisp', 0.01)
         self.basis = kwargs.pop('basis', "cc-pVDZ")
+        self.charge = kwargs.pop('charge', 0)
+        self.spin = kwargs.pop('spin', 1)
 
         ## These options may be helpful in the future, or maybe not!
         # self.input_name = kwargs.pop("input_name", "input.dat")
