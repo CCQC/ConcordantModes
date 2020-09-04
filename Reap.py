@@ -4,8 +4,9 @@ import shutil
 import re
 
 class Reap(object):
-    def __init__(self, progname):
+    def __init__(self, progname, zmat):
         self.progname = progname
+        self.zmat = zmat
 
     def run(self):
         # Define energy search regex
@@ -15,14 +16,14 @@ class Reap(object):
         psi4Success = re.compile(r"\*\*\* Psi4 exiting successfully. Buy a developer a beer!")
         
         rootdir = os.getcwd()
-        os.chdir('../zmatFiles')
-        with open("atomList",'r') as file:
-            atoms = file.read()
+        # os.chdir('../zmatFiles')
+        # with open("atomList",'r') as file:
+            # atoms = file.read()
         
-        os.chdir(rootdir)
+        # os.chdir(rootdir)
         
-        atoms = atoms.split('\n')
-        n_atoms = len(atoms)
+        # atoms = atoms.split('\n')
+        n_atoms = len(self.zmat.atomList)
         dispCart = "dispcart" 
         
         # os.chdir('..')

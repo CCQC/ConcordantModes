@@ -14,14 +14,14 @@ Without symmetry 7 displaced geometries are required
 
 With symmetry 7 displaced geometries are required
 
-Your job-array 400601.1-7:1 ("MixedHess") has been submitted
-Job 400601.3 exited with exit code 0.
-Job 400601.1 exited with exit code 0.
-Job 400601.5 exited with exit code 0.
-Job 400601.2 exited with exit code 0.
-Job 400601.6 exited with exit code 0.
-Job 400601.4 exited with exit code 0.
-Job 400601.7 exited with exit code 0.
+Your job-array 400606.1-7:1 ("MixedHess") has been submitted
+Job 400606.2 exited with exit code 0.
+Job 400606.3 exited with exit code 0.
+Job 400606.4 exited with exit code 0.
+Job 400606.1 exited with exit code 0.
+Job 400606.6 exited with exit code 0.
+Job 400606.5 exited with exit code 0.
+Job 400606.7 exited with exit code 0.
 
 General::obspkg: 
    VectorAnalysis` is now obsolete. The legacy version being loaded may
@@ -33,7 +33,7 @@ General::compat:
     preloaded functionality. The package now being loaded may conflict with
     this. Please see the Compatibility Guide for details.
 The energies at the displaced geometries:
-MatrixForm[{{-76.34578231037416, -76.34578030045087, -76.34578029457786, -76.34575820213956, -76.3457578019832, -76.34568302318591, -76.34568302318601}}]
+MatrixForm[{{-76.34578231037425, -76.34578030045087, -76.345780294578, -76.34575820213936, -76.34575780198325, -76.3456830231859, -76.34568302318601}}]
   basis=cc-pVTZ
 
-This program took 31.097410440444946 seconds to run.
+This program took 34.2398521900177 seconds to run.

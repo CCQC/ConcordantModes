@@ -6,11 +6,12 @@ import shutil
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,basis,charge,spin):
+    def __init__(self,progname,basis,charge,spin,zmat):
         self.progname = progname
         self.basis = basis
         self.charge = charge
         self.spin = spin
+        self.zmat = zmat
 
     def Make_Input(self,data,dispp,n_at,at,prog):	
         if prog == 'molpro':
@@ -46,15 +47,15 @@ class DirectoryTree(object):
         
         progname = self.progname
 
-        os.chdir('zmatFiles')
+        # os.chdir('zmatFiles')
 
-        with open("atomList",'r') as file:
-            atoms = file.read()
-        atoms = atoms.split('\n')
+        # with open("atomList",'r') as file:
+            # atoms = file.read()
+        # atoms = atoms.split('\n')
         
-        os.chdir(root)
+        # os.chdir(root)
 
-        n_atoms = len(atoms)
+        n_atoms = len(self.zmat.atomList)
         dispCart = "dispcart" 
         
         os.chdir('mma')
@@ -107,7 +108,7 @@ class DirectoryTree(object):
         for i in range(n_disp):
             os.mkdir(str(i+1))
             os.chdir("./" + str(i+1))
-            data = self.Make_Input(data,disp_dict['geom'][i],str(n_atoms),atoms,progname)
+            data = self.Make_Input(data,disp_dict['geom'][i],str(n_atoms),self.zmat.atomList,progname)
             with open('input.dat','w') as file:
                file.writelines(data)
             data = data_buff.copy()
