@@ -28,6 +28,6 @@ echo "***********************************************************************"
 cd $SGE_O_WORKDIR/$SGE_TASK_ID
 vulcan load psi4@master
 
-export NSLOTS=4
+export NSLOTS=1
 
 psi4 -n $NSLOTS

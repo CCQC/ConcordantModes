@@ -75,7 +75,7 @@ class MixedHessian(object):
         shutil.copy(packagepath + '/subprocess_Scripts/Intdif2008.m','.')
         shutil.copy('../eigen.csv','.')
         shutil.copy('../symVariables.csv','.')
-        Load_obj = GenLoad(self.options.rdisp,self.options.adisp)
+        Load_obj = GenLoad(self.options.rdisp,self.options.adisp,self.zmat)
         Load_obj.run()
         # os.system('python ' + packagepath + '/subprocess_Scripts/GenLoad.py')
         os.system('./Load.wls')
