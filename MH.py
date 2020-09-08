@@ -13,6 +13,7 @@ from MixedHessian.GrabEig import GrabEig
 from MixedHessian.GrabSym import GrabSym
 from MixedHessian.init_intder_input import intder_init
 from MixedHessian.Reap import Reap
+from MixedHessian.s_vectors import s_vectors
 from MixedHessian.TED_intder_input import intder_100
 from MixedHessian.TED import TED
 from MixedHessian.ZMAT_parse import ZMAT
@@ -38,7 +39,12 @@ class MixedHessian(object):
         # os.system('python ' + packagepath + '/subprocess_Scripts/ZMAT_interp.py')
         self.zmat = ZMAT()
         self.zmat.run()
-        
+        """
+            This is a new addition, the hope is to compute s-vectors right off the bat!
+        """
+        s_vec = s_vectors(self.zmat)
+        s_vec.run()
+
         # Next block, generate and then run intder initial
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')

@@ -12,7 +12,7 @@ from numpy import linalg as LA
 
 
 class s_vectors(object):
-    def __init__(self):
+    def __init__(self,zmat):
         self.s_STRE_dict    = {}
         self.s_BEND_dict    = {}
         self.s_TORS_dict    = {}
@@ -27,12 +27,16 @@ class s_vectors(object):
         # self.bondIndices    = np.array([[2,1],[3,1],[4,1],[5,1],[6,2]])
         # self.angleIndices   = np.array([[3,1,2],[4,1,2],[5,1,2],[6,2,1]])
         # self.torsionIndices = np.array([[4,1,2,3],[5,1,2,3],[6,2,1,3]])
-        self.carts    = np.array([[-0.0000000000,-1.4236653500,0.9926470200],
-                                  [0.0000000000,0.0000000000,-0.1250915700],
-                                  [-0.0000000000,1.4236653500,0.9926470200]])
-        self.bondIndices    = np.array([[2,1],[3,2]])
-        self.angleIndices   = np.array([[3,2,1]])
-        self.torsionIndices = np.array([])
+        # self.carts    = np.array([[-0.0000000000,-1.4236653500,0.9926470200],
+                                  # [0.0000000000,0.0000000000,-0.1250915700],
+                                  # [-0.0000000000,1.4236653500,0.9926470200]])
+        # self.bondIndices    = np.array([[2,1],[3,2]])
+        # self.angleIndices   = np.array([[3,2,1]])
+        # self.torsionIndices = np.array([])
+        self.carts          = np.array(zmat.Cartesians).astype(np.float) 
+        self.bondIndices    = np.array(zmat.bondIndices).astype(np.int) 
+        self.angleIndices   = np.array(zmat.angleIndices).astype(np.int) 
+        self.torsionIndices = np.array(zmat.torsionIndices).astype(np.int) 
 
     def run(self):
         """
@@ -45,6 +49,10 @@ class s_vectors(object):
             then out-of-plane motions (Eventually)
         """
         # An ad hoc check
+        # print(self.carts)
+        # print(self.bondIndices)
+        # print(self.angleIndices)
+        # print(self.torsionIndices)
         self.carts = 0.5291772085936*self.carts
         """
             First, bonds.

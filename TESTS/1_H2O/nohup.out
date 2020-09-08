@@ -14,26 +14,36 @@ Without symmetry 7 displaced geometries are required
 
 With symmetry 7 displaced geometries are required
 
-Your job-array 400660.1-7:1 ("MixedHess") has been submitted
-Job 400660.6 exited with exit code 0.
-Job 400660.7 exited with exit code 0.
-Job 400660.1 exited with exit code 0.
-Job 400660.2 exited with exit code 0.
-Job 400660.3 exited with exit code 0.
-Job 400660.5 exited with exit code 0.
-Job 400660.4 exited with exit code 0.
-
-General::obspkg: 
-   VectorAnalysis` is now obsolete. The legacy version being loaded may
-     conflict with current functionality. See the Compatibility Guide for
-     updating information.
-
-General::compat: 
-   Combinatorica Graph and Permutations functionality has been superseded by
-    preloaded functionality. The package now being loaded may conflict with
-    this. Please see the Compatibility Guide for details.
-The energies at the displaced geometries:
-MatrixForm[{{-76.34578231037405, -76.34578030045076, -76.34578029457798, -76.34575820213942, -76.3457578019834, -76.34568302318583, -76.345683023186}}]
+Your job-array 400831.1-7:1 ("MixedHess") has been submitted
+Job 400831.3 exited with exit code 1.
+Job 400831.7 exited with exit code 0.
+Job 400831.2 exited with exit code 0.
+Job 400831.4 exited with exit code 0.
+Job 400831.1 exited with exit code 0.
+Job 400831.6 exited with exit code 0.
+Job 400831.5 exited with exit code 0.
+Bond s-vectors:
+B1
+[[-0.         -0.78654793  0.61752923]
+ [ 0.          0.78654793 -0.61752923]
+ [-0.          0.          0.        ]]
+B2
+[[-0.         -0.          0.        ]
+ [ 0.         -0.78654793 -0.61752923]
+ [-0.          0.78654793  0.61752923]]
+Angle s-vectors:
+A1
+[[ 0.         -0.64472375 -0.82118562]
+ [-0.          0.          1.64237125]
+ [ 0.          0.64472375 -0.82118562]]
   basis=cc-pVTZ
 
-This program took 32.8246796131134 seconds to run.
+Energy failed at 3
+Traceback (most recent call last):
+  File "MH_Main.py", line 38, in <module>
+    MH_obj.run()
+  File "/home/vulcan/mel64643/bin/MixedHessian/MH.py", line 198, in run
+    Reap_obj.run()
+  File "/home/vulcan/mel64643/bin/MixedHessian/Reap.py", line 63, in run
+    raise RuntimeError
+RuntimeError
