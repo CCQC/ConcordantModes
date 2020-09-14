@@ -16,6 +16,7 @@ from MixedHessian.Reap import Reap
 from MixedHessian.s_vectors import s_vectors
 from MixedHessian.TED_intder_input import intder_100
 from MixedHessian.TED import TED
+from MixedHessian.TransDisp import TransDisp
 from MixedHessian.ZMAT_parse import ZMAT
 
 class MixedHessian(object):
@@ -29,14 +30,11 @@ class MixedHessian(object):
         
         packagepath = os.path.realpath(__file__)
         packagepath = packagepath[:-len('/MH.py')]
-        
-        # if os.path.exists(rootdir + '/nohup.out'):
-            # os.remove('nohup.out')
-        
-        # Parse the output to get all pertinent ZMAT info
+        """
+            Parse the output to get all pertinent ZMAT info
+        """
         if os.path.exists(rootdir + '/zmatFiles'):
             shutil.rmtree(rootdir + '/zmatFiles')
-        # os.system('python ' + packagepath + '/subprocess_Scripts/ZMAT_interp.py')
         self.zmat = ZMAT()
         self.zmat.run()
         """
@@ -44,42 +42,49 @@ class MixedHessian(object):
         """
         s_vec = s_vectors(self.zmat)
         s_vec.run()
-
-        # Next block, generate and then run intder initial
+        
+        """
+            Next block, generate and then run intder initial
+        """
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')
         os.mkdir('Intder')
         shutil.copy('FCMFINAL','Intder/file15')
         os.chdir('Intder')
-        # os.system('python ' + packagepath + '/subprocess_Scripts/init_intder_input.py')
         self.intder_init = intder_init(self.zmat)
         self.intder_init.run()
         os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
+       
         
-        # Some post processing of INTDER initial to generate the SALCS for intder 100
-        # os.system('python ' + packagepath + '/subprocess_Scripts/GrabEig.py')
-        # os.system('python ' + packagepath + '/subprocess_Scripts/TED.py')
+        """
+            Some post processing of INTDER initial to generate the SALCS for intder 100
+        """
         GrabE = GrabEig()
         GrabE.run()
         ted = TED()
         ted.run()
+        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,GrabE.eigs)
+        transdisp.run()
         
-        # move some of the INTDER initial files, then generate and run the 100 INTDER job
+        """
+            move some of the INTDER initial files, then generate and run the 100 INTDER job
+        """
         shutil.move('intder.inp','init_intder.inp')
         shutil.move('intder.out','init_intder.out')
         
-        # os.system('python ' + packagepath + '/subprocess_Scripts/100_intder_input.py')
         self.intder_100 = intder_100(self.zmat)
         self.intder_100.run()
         os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
         
-        # script that grabs the symmetry internal coordinate values
-        # os.system('python ' + packagepath + '/subprocess_Scripts/GrabSym.py')
+        """
+            script that grabs the Normal internal coordinate values
+        """
         grabSym = GrabSym()
         grabSym.run()
         
-        
-        # Move some INTDER files around, then move onto the next thing
+        """
+            Move some INTDER files around, then move onto the next thing
+        """
         shutil.copy('intder.out','../intderTEDcheck.out')
         shutil.copy('eigen.csv','../')
         shutil.copy('symVariables.csv','../')
@@ -89,52 +94,45 @@ class MixedHessian(object):
         
         os.chdir('..')
         
-        
-        # Now for the Mathematica portion of our adventure
+        """
+            Now for the Mathematica portion of our adventure
+        """
         if os.path.exists(rootdir + '/mma'):
             shutil.rmtree(rootdir + '/mma')
         os.mkdir('mma')
         os.chdir('mma')
-        # Unfortunately, Intdif must be in the same directory as the mathematica script...for now
+        """
+            Unfortunately, Intdif must be in the same directory as the mathematica script...for now
+        """
         shutil.copy(packagepath + '/Temporary_Scripts/Intdif2008.m','.')
         shutil.copy('../eigen.csv','.')
         shutil.copy('../symVariables.csv','.')
         Load_obj = GenLoad(self.options.rdisp,self.options.adisp,self.zmat)
         Load_obj.run()
-        # os.system('python ' + packagepath + '/subprocess_Scripts/GenLoad.py')
         os.system('./Load.wls')
         os.chdir('..')
         
         prog = self.options.program
         progname = prog.split('@')[0]
-        # The displacements have been generated, now we have to run them!
+
+        """
+            The displacements have been generated, now we have to run them!
+        """
         Dir_obj = DirectoryTree(progname, self.options.basis, self.options.charge, self.options.spin, self.zmat)
         Dir_obj.run()
-        # os.system('python ' + packagepath + '/subprocess_Scripts/DirectoryTree.py')
         os.chdir(rootdir + '/Disps')
         dispList = []
         for i in os.listdir(rootdir + '/Disps'):
             dispList.append(i)
         
-        # if os.path.exists(rootdir + '/prog.dat'):
-            # with open("../prog.dat","r") as file:
-                # data = file.read()
-            # p = data.split('\n')
-            # prog     = p[0]
-            # progname = p[1]
-        # else:
-            # prog = 'molpro@2010.1.67+mpi'
-            # progname = 'molpro'
         q = self.options.queue
-        # if progname == 'psi4':
-            # q = 'gen3.q,gen4.q,gen5.q,gen6.q'
-        # else:
-            # q = 'gen4.q,gen5.q,gen6.q'
         job_num = len(dispList)
         
-        # This portion is highly cumbersome and will have to split out into another script eventually,
-        # but for now I just want my code to work. :D
-        
+        """
+            This portion is highly cumbersome and will have to split out into another script eventually,
+            but for now I just want my code to work. :D
+        """
+
         vulcan_template = """#!/bin/sh
 #$ -q {q}
 #$ -N MixedHess
@@ -190,39 +188,33 @@ export NSLOTS={nslots}
             file.write(out)
         subprocess.call('qsub displacements.sh', stderr=sys.stdout.buffer, shell=True)
         
-        
-        # After this point, all of the jobs will have finished, and its time to reap the energies
-        # as well as checking for sucesses on all of the jobs
-        # os.system('python ' + packagepath + '/subprocess_Scripts/Reap.py')
+        """
+            After this point, all of the jobs will have finished, and its time to reap the energies
+            as well as checking for sucesses on all of the jobs
+        """
         Reap_obj = Reap(progname,self.zmat)
         Reap_obj.run()
 
-        # Now to generate the e.m file, then to generate the force constants!
+        """
+            Now to generate the e.m file, then to generate the force constants!
+        """
         os.chdir('../mma')
-        # os.system('python ' + packagepath + '/subprocess_Scripts/GenEM.py')
         EM = GenEM(self.zmat)
         EM.run()
         FC_obj = GenFC(self.options.rdisp,self.options.adisp,self.zmat)
         FC_obj.run()
-        # os.system('python ' + packagepath + '/subprocess_Scripts/GenFC.py')
         os.system('./FC.wls')
         
-        # And now we scoot back over to the Intder directory to run the final hessian!
+        """
+            And now we scoot back over to the Intder directory to run the final hessian!
+        """
         os.chdir('../Intder')
-        # os.system('python ' + packagepath + '/subprocess_Scripts/Final_intder_input.py')
         FinalIntder = intder_final(self.zmat)
         FinalIntder.run()
-        # os.system('python ' + packagepath + '/subprocess_Scripts/Gen_Final_Intder.py')
         Fin_Int = Final_Intder()
         Fin_Int.run()
         shutil.copy('intder.out','../MixedHessOutput.dat')
         os.chdir('..')
-        
-        
-        # if os.path.exists(rootdir + '/mma'):
-            # shutil.rmtree(rootdir + '/mma')
-        # if os.path.exists(rootdir + '/Intder'):
-            # shutil.rmtree(rootdir + '/Intder')
         
         t2 = time.time()
         

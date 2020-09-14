@@ -73,6 +73,7 @@ class GrabEig(object):
         else:
             sortedEigs = np.reshape(eigs,(degFree,degFree))
         
+        self.eigs = sortedEigs
         # These final lines format the eigenvalue matrix into an 'eigen.csv' file that may be further processed by the TED.py script.
         outputString = ''
         

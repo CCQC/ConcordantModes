@@ -16,23 +16,6 @@ class s_vectors(object):
         self.s_STRE_dict    = {}
         self.s_BEND_dict    = {}
         self.s_TORS_dict    = {}
-        # For now a test case (methanol) is used. But later I will feed these in to initialize.
-        # They MUST be np arrays, however!
-        # self.carts    = np.array([[-1.37093756,-0.02453364,0.00000403],
-                                  # [1.30184940,0.12055381,0.00000330],
-                                  # [-2.07199296,1.90293990,-0.00091896],
-                                  # [-2.10348346,-0.97490875,1.67685231],
-                                  # [-2.10340229,-0.97642099,-1.67602173],
-                                  # [1.94110263,-1.57276879,-0.00001194]])
-        # self.bondIndices    = np.array([[2,1],[3,1],[4,1],[5,1],[6,2]])
-        # self.angleIndices   = np.array([[3,1,2],[4,1,2],[5,1,2],[6,2,1]])
-        # self.torsionIndices = np.array([[4,1,2,3],[5,1,2,3],[6,2,1,3]])
-        # self.carts    = np.array([[-0.0000000000,-1.4236653500,0.9926470200],
-                                  # [0.0000000000,0.0000000000,-0.1250915700],
-                                  # [-0.0000000000,1.4236653500,0.9926470200]])
-        # self.bondIndices    = np.array([[2,1],[3,2]])
-        # self.angleIndices   = np.array([[3,2,1]])
-        # self.torsionIndices = np.array([])
         self.carts          = np.array(zmat.Cartesians).astype(np.float) 
         self.bondIndices    = np.array(zmat.bondIndices).astype(np.int) 
         self.angleIndices   = np.array(zmat.angleIndices).astype(np.int) 
@@ -48,34 +31,23 @@ class s_vectors(object):
             Torsions,
             then out-of-plane motions (Eventually)
         """
-        # An ad hoc check
-        # print(self.carts)
-        # print(self.bondIndices)
-        # print(self.angleIndices)
-        # print(self.torsionIndices)
-        self.carts = 0.5291772085936*self.carts
+        # Toggle this to convert from bohr to angstrom
+        # self.carts = 0.5291772085936*self.carts
         """
             First, bonds.
         """
         if len(self.bondIndices) > 0:
-            print("Bond s-vectors:")
             for i in range(len(self.bondIndices)):
                 self.s_STRE_dict["B" + str(i+1)] = self.carts.copy()
                 self.s_STRE_dict["B" + str(i+1)] = 0*self.s_STRE_dict["B" + str(i+1)]
                 r = self.compute_r(self.carts,self.bondIndices[i][0]-1,self.bondIndices[i][1]-1)
                 self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][0]-1] = self.compute_e(self.carts,self.bondIndices[i][0]-1,self.bondIndices[i][1]-1,r)
                 self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][1]-1] = -self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][0]-1]
-                """
-                    Print out s-vector matrix for internal coord
-                """
-                print("B" + str(i+1))
-                print(self.s_STRE_dict["B" + str(i+1)])
 
         """
             Next, angles.
         """
         if len(self.angleIndices) > 0:
-            print("Angle s-vectors:")
             for i in range(len(self.angleIndices)):
                 self.s_BEND_dict["A" + str(i+1)] = self.carts.copy()
                 self.s_BEND_dict["A" + str(i+1)] = 0*self.s_BEND_dict["A" + str(i+1)]
@@ -87,14 +59,11 @@ class s_vectors(object):
                 self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][0]-1] = self.compute_BEND(e_1,e_2,phi,r_1)
                 self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][2]-1] = self.compute_BEND(e_2,e_1,phi,r_2)
                 self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][1]-1] = -self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][0]-1] - self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][2]-1]
-                print("A" + str(i+1))
-                print(self.s_BEND_dict["A" + str(i+1)])
         
         """
             Finally, for now, torsions.
         """
         if len(self.torsionIndices) > 0:
-            print("Torsion s-vectors:")
             for i in range(len(self.torsionIndices)):
                 self.s_TORS_dict["D" + str(i+1)] = self.carts.copy()
                 self.s_TORS_dict["D" + str(i+1)] = 0*self.s_TORS_dict["D" + str(i+1)]
@@ -112,26 +81,26 @@ class s_vectors(object):
                 self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][2]-1] = -self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][0]-1] \
                                                                                           -self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][1]-1] \
                                                                                           -self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][3]-1] 
-                print("D" + str(i+1))
-                print(self.s_TORS_dict["D" + str(i+1)])
 
-        # for key in self.s_STRE_dict:
-            # print("STRE,BEND dots:")
-            # for k in self.s_BEND_dict:
-                # print(key)
-                # print(k)
-                # print(np.dot(self.s_STRE_dict[key],self.s_BEND_dict[k]).round(decimals=10))
-            # print("STRE,TORS dots:")
-            # for k in self.s_TORS_dict:
-                # print(key)
-                # print(k)
-                # print(np.dot(self.s_STRE_dict[key],self.s_TORS_dict[k]).round(decimals=10))
-        # for key in self.s_BEND_dict:
-            # print("BEND,TORS dots:")
-            # for k in self.s_TORS_dict:
-                # print(key)
-                # print(k)
-                # print(np.dot(self.s_BEND_dict[key],self.s_TORS_dict[k]).round(decimals=10))
+        """
+            The last step will be to concatenate all of the s-vectors into a singular B-tensor, in order of stretches, then bends, then torsions.
+        """
+        self.B = np.array([self.s_STRE_dict['B1'].flatten()])
+        """
+            Append stretches
+        """
+        for i in range(len(self.s_STRE_dict)-1):
+            self.B = np.append(self.B,np.array([self.s_STRE_dict['B'+str(i+2)].flatten()]),axis=0)
+        """
+            Append bends
+        """
+        for i in range(len(self.s_BEND_dict)):
+            self.B = np.append(self.B,np.array([self.s_BEND_dict['A'+str(i+1)].flatten()]),axis=0)
+        """
+            Append torsions
+        """
+        for i in range(len(self.s_TORS_dict)):
+            self.B = np.append(self.B,np.array([self.s_TORS_dict['D'+str(i+1)].flatten()]),axis=0)
 
     def compute_STRE(self,bondIndices,carts,r):
         s = (carts[bondIndices[0]-1] - carts[bondIndices[1]-1])/r

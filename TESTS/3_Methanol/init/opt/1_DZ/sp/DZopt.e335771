@@ -1,0 +1,28 @@
+forrtl: No such file or directory
+forrtl: severe (29): file not found, unit 10, file /tmp/335771.1.debug.q/mel64643/335771/GRD
+Image              PC                Routine            Line        Source             
+xja2fja            000000000049D60E  Unknown               Unknown  Unknown
+xja2fja            000000000049C0A6  Unknown               Unknown  Unknown
+xja2fja            000000000045AB42  Unknown               Unknown  Unknown
+xja2fja            00000000004191FB  Unknown               Unknown  Unknown
+xja2fja            0000000000418762  Unknown               Unknown  Unknown
+xja2fja            0000000000429AC8  Unknown               Unknown  Unknown
+xja2fja            00000000004042C4  Unknown               Unknown  Unknown
+xja2fja            0000000000407002  Unknown               Unknown  Unknown
+xja2fja            000000000040286C  Unknown               Unknown  Unknown
+libc.so.6          00002B38AF399B15  Unknown               Unknown  Unknown
+xja2fja            0000000000402769  Unknown               Unknown  Unknown
+Traceback (most recent call last):
+  File "/opt/scripts/cfour2avogadro", line 54, in <module>
+    if "IVIB" in inputLines[i]:
+IndexError: list index out of range
+tar: OPTARC: Cannot stat: No such file or directory
+tar: FCMINT: Cannot stat: No such file or directory
+tar: FCMFINAL: Cannot stat: No such file or directory
+tar: ZMATnew: Cannot stat: No such file or directory
+tar: JMOL.plot: Cannot stat: No such file or directory
+tar: DIPDER: Cannot stat: No such file or directory
+tar: HESSIAN: Cannot stat: No such file or directory
+tar: AVOGADROplot.log: Cannot stat: No such file or directory
+tar: Exiting with failure status due to previous errors
+kill: sending signal to 29826 failed: No such process

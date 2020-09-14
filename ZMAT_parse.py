@@ -150,7 +150,9 @@ class ZMAT(object):
         # self.torsionVariables = list(dict.fromkeys(self.torsionVariables))
         
         flatAngles = np.array(self.angleVariables)
+        flatAngles = np.unique(flatAngles)
         flatTorsions = np.array(self.torsionVariables)
+        flatTorsions = np.unique(flatTorsions)
         for i in flatAngles:
             self.variableDictionary[i] = str(float(self.variableDictionary[i]) * (np.pi/180))
         for i in flatTorsions:
