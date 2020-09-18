@@ -80,12 +80,12 @@ class DirectoryTree(object):
         # raise RuntimeError
         basis_string += 'basis=' + basis + '\n'
         data[10] = basis_string
-        print(data[10])
+        # print(data[10])
         os.chdir(root)
 
         data_buff = data.copy()
         if os.path.exists(os.getcwd() + '/Disps'):
-            shutil.rmtree('Disps')
+            shutil.rmtree('Disps',ignore_errors=True)
         os.mkdir('Disps')
         os.chdir('./Disps')
         os.mkdir("1")

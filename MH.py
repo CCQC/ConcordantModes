@@ -2,6 +2,7 @@ import time
 import sys
 import shutil
 import os
+import re
 import subprocess
 from MixedHessian.DirectoryTree      import DirectoryTree
 from MixedHessian.Final_intder_input import intder_final
@@ -105,18 +106,18 @@ class MixedHessian(object):
         """
         if os.path.exists(rootdir + '/mma'):
             shutil.rmtree(rootdir + '/mma')
-        os.mkdir('mma')
-        os.chdir('mma')
+        # os.mkdir('mma')
+        # os.chdir('mma')
         """
             Unfortunately, Intdif must be in the same directory as the mathematica script...for now
         """
-        shutil.copy(packagepath + '/Temporary_Scripts/Intdif2008.m','.')
-        shutil.copy('../eigen.csv','.')
-        shutil.copy('../symVariables.csv','.')
-        Load_obj = GenLoad(self.options.rdisp,self.options.adisp,self.zmat)
-        Load_obj.run()
-        os.system('./Load.wls')
-        os.chdir('..')
+        # shutil.copy(packagepath + '/Temporary_Scripts/Intdif2008.m','.')
+        # shutil.copy('../eigen.csv','.')
+        # shutil.copy('../symVariables.csv','.')
+        # Load_obj = GenLoad(self.options.rdisp,self.options.adisp,self.zmat)
+        # Load_obj.run()
+        # os.system('./Load.wls')
+        # os.chdir('..')
         
         prog = self.options.program
         progname = prog.split('@')[0]
@@ -135,69 +136,32 @@ class MixedHessian(object):
         # job_num = len(dispList)
         
         """
-            This portion is highly cumbersome and will have to split out into another script eventually,
-            but for now I just want my code to work. :D
+            This code generates the submit script for the displacements, submits an array, then checks if all jobs have finished every 10 seconds. :D
         """
 
-        # vulcan_template = """#!/bin/sh
-# #$ -q {q}
-# #$ -N MixedHess
-# #$ -S /bin/sh
-# #$ -sync y
-# #$ -cwd
-# #$ -t {jarray}
-# #$ -tc {tc}
-
-# . /etc/profile.d/modules.sh
-
-# # Disable production of core dump files
-# ulimit -c 0
-
-# echo ""
-# echo "***********************************************************************"
-# echo " Starting job:"
-# echo ""
-# echo "    Name:              "$JOB_NAME
-# echo "    ID:                "$JOB_ID
-# echo "    Hostname:          "$HOSTNAME
-# echo "    Working directory: "$SGE_O_WORKDIR
-# echo ""
-# echo "    Submitted using:   MixedHessian "
-# echo "***********************************************************************"
-
-# # cd into individual task directory
-# cd $SGE_O_WORKDIR/$SGE_TASK_ID
-# vulcan load {prog}
-
-# export NSLOTS={nslots}
-
-# {cline}"""
-        
-        
-        # progdict = {
-            # "molpro": "molpro -n $NSLOTS --nouse-logfile --no-xml-output -o output.dat input.dat",
-            # "psi4": "psi4 -n $NSLOTS"
-        # }
-        
-        # odict = {
-            # 'q':        q,
-            # 'nslots':   self.options.nslots,
-            # 'jarray':   '1-{}'.format(job_num),
-            # 'progname': progname,
-            # 'prog':     prog,
-            # 'tc':       str(job_num),
-            # 'cline':    progdict[progname]
-        # }
-        # out = vulcan_template.format(**odict)
         v_template = vulcan_template(self.options,len(dispList),progname,prog)
         out = v_template.run()
         with open('displacements.sh','w') as file:
             file.write(out)
-        # subprocess.call('qsub displacements.sh', stderr=sys.stdout.buffer, shell=True)
         
         pipe = subprocess.PIPE
-        # process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True, encoding='UTF-8'
+        
         process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True)
+        self.outRegex = re.compile(r'Your\s*job\-array\s*(\d*)')
+        self.job_id = int(re.search(self.outRegex,str(process.stdout)).group(1))
+        self.jobFinRegex = re.compile(r'taskid')
+        while(True):
+            qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], stdout=pipe, stderr=pipe)
+            qacct_string = str(qacct_proc.stdout)
+            job_match = re.findall(self.jobFinRegex,qacct_string)
+            # print('job_match:')
+            # print(len(job_match))
+            # print('dispList:')
+            # print(len(dispList))
+            if len(job_match) == len(dispList):
+                break
+            time.sleep(10)
+
         output = str(process.stdout)
         error = str(process.stderr)  
         
@@ -206,33 +170,41 @@ class MixedHessian(object):
             After this point, all of the jobs will have finished, and its time to reap the energies
             as well as checking for sucesses on all of the jobs
         """
-        Reap_obj = Reap(progname,self.zmat)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart)
         Reap_obj.run()
+        os.chdir('..')
 
         """
             This section will compute the force constants using a python script
         """
-        fc = ForceConstant(self.zmat ,self.options.rdisp ,self.options.adisp, Reap_obj.energiesDict)
+        # fc = ForceConstant(self.zmat ,self.options.rdisp ,self.options.adisp, Reap_obj.energiesDict)
+        fc = ForceConstant(self.zmat, transdisp, Reap_obj.energiesDict)
         fc.run()
-        print(fc.FC)
+
+        """
+            This is temporary to fit with the INTDER units. Delete when you make your own GF matrix method.
+        """
+        fc.FC *= 4.35974394
+        # print(fc.FC)
 
         """
             Now to generate the e.m file, then to generate the force constants!
         """
-        os.chdir('../mma')
-        EM = GenEM(self.zmat)
-        EM.run()
-        FC_obj = GenFC(self.options.rdisp,self.options.adisp,self.zmat)
-        FC_obj.run()
-        os.system('./FC.wls')
+        # os.chdir('../mma')
+        # EM = GenEM(self.zmat)
+        # EM.run()
+        # FC_obj = GenFC(self.options.rdisp,self.options.adisp,self.zmat)
+        # FC_obj.run()
+        # os.system('./FC.wls')
         
         """
             And now we scoot back over to the Intder directory to run the final hessian!
         """
-        os.chdir('../Intder')
+        # os.chdir('../Intder')
+        os.chdir('Intder')
         FinalIntder = intder_final(self.zmat)
         FinalIntder.run()
-        Fin_Int = Final_Intder()
+        Fin_Int = Final_Intder(fc.FC)
         Fin_Int.run()
         shutil.copy('intder.out','../MixedHessOutput.dat')
         os.chdir('..')

@@ -81,7 +81,7 @@ class TransDisp(object):
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
             self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
 
-        print(self.INTC(self.refCarts))
+        # print(self.INTC(self.refCarts))
         self.DispCart["ref"] /= 0.5291772085936
         # print(self.DispCart['1_plus'])
         # print(self.DispCart['1_minus'])

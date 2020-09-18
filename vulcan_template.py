@@ -22,11 +22,12 @@ class vulcan_template(object):
             'tc':       str(job_num),           
             'cline':    self.progdict[progname]      
         }
+# This can be inserted back in if the sync keyword is sorted
+#$ -sync y
         self.vulcan_template = """#!/bin/sh
 #$ -q {q}
 #$ -N MixedHess
 #$ -S /bin/sh
-#$ -sync y
 #$ -cwd
 #$ -t {jarray}
 #$ -tc {tc}

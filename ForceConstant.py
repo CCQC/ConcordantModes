@@ -11,10 +11,9 @@ from numpy import linalg as LA
 """
 
 class ForceConstant(object):
-    def __init__(self,zmat,rdisp,adisp,energiesDict):
+    def __init__(self,zmat,disp,energiesDict):
         self.zmat = zmat
-        self.rdisp = rdisp # For now, we will use rdisp as our displacement size
-        self.adisp = adisp
+        self.disp = disp
         self.energiesDict = energiesDict
 
     def run(self):
@@ -23,11 +22,9 @@ class ForceConstant(object):
         for i in range((len(self.energiesDict)-1)//2):
             e_p = self.energiesDict[str(i+1) + '_plus']
             e_m = self.energiesDict[str(i+1) + '_minus']
-            # self.FC = np.append(self.FC,self.fcCalc(e_p,e_m,e_r,self.rdisp*0.5291772085936**2))
-            self.FC = np.append(self.FC,self.fcCalc(e_p,e_m,e_r,self.rdisp))
-        # self.FC = self.FC/(0.5291772085936**2)
+            self.FC = np.append(self.FC,self.fcCalc(e_p,e_m,e_r,self.disp.s_disp[i]))
 
     def fcCalc(self,e_p,e_m,e_r,h):
-        fc = (e_p - 2*e_r + e_m)/h**2
+        fc = (e_p - 2*e_r + e_m)/(h**2)
         return fc
 

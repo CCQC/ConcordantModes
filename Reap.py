@@ -4,9 +4,10 @@ import shutil
 import re
 
 class Reap(object):
-    def __init__(self, progname, zmat):
+    def __init__(self, progname, zmat, dispcart):
         self.progname = progname
         self.zmat = zmat
+        self.dispcart = dispcart
 
     def run(self):
         # Define energy search regex
@@ -17,16 +18,16 @@ class Reap(object):
         
         rootdir = os.getcwd()
         n_atoms = len(self.zmat.atomList)
-        dispCart = "dispcart" 
+        # dispCart = "dispcart" 
         
-        os.chdir(rootdir)
+        # os.chdir(rootdir)
         
-        os.chdir('../mma')
-        with open(dispCart,'r') as file:
-            disp = file.readlines()
-        os.chdir(rootdir)
+        # os.chdir('../mma')
+        # with open(dispCart,'r') as file:
+            # disp = file.readlines()
+        # os.chdir(rootdir)
         
-        n_disp = int((len(disp))/(n_atoms+1))
+        n_disp = len(self.dispcart)
         self.Energies = np.array([])
         
         progname = self.progname

@@ -19,42 +19,10 @@ class intder_final(object):
             template = file.readlines()
         os.chdir(root)
         
-        # os.chdir('../zmatFiles')
-        # # Read in the ZMAT data
-        # with open('atomList','r') as file:
-            # atoms = file.read()
-        # with open('bondIndices','r') as file:
-            # bonds = file.read()
-        # with open('angleIndices','r') as file:
-            # angles = file.read()
-        # with open('torsionIndices','r') as file:
-            # torsions = file.read()
-        # with open('Cartesians','r') as file:
-            # cartesians = file.read()
-        # os.chdir(root)
-        
         with open('SymAdaptInts.dat','r') as file:
             SymAdaptInts = file.readlines()
         
         # split the data into arrays
-        
-        # atoms = atoms.split('\n') 
-        # # print(bonds.split('\n'))
-        # bonds = bonds.split('\n')
-        # for i in range(len(bonds)):
-            # bonds[i] = bonds[i].split(' ')
-        # # print(angles.split('\n'))
-        # angles = angles.split('\n')
-        # for i in range(len(angles)):
-            # angles[i] = angles[i].split(' ')
-        # # print(torsions.split('\n'))
-        # torsions = torsions.split('\n') 
-        # for i in range(len(torsions)):
-            # torsions[i] = torsions[i].split(' ')
-        # # print(cartesians.split('\n'))
-        # cartesians = cartesians.split('\n')
-        # for i in range(len(cartesians)):
-            # cartesians[i] = cartesians[i].split(' ')
         
         # Now we can build the intder.inp file
         template[-1] = '{:5d}'.format(1) + template[-1][35:]

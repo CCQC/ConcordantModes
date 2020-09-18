@@ -2,7 +2,6 @@
 #$ -q gen3.q,gen4.q,gen6.q,debug.q
 #$ -N MixedHess
 #$ -S /bin/sh
-#$ -sync y
 #$ -cwd
 #$ -t 1-7
 #$ -tc 7
