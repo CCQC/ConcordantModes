@@ -1,8 +1,8 @@
 # MixedHessian
-This will be a method that is an automation of several scripts, which allow the user to compute an approximate high cardinality basis hessian from a mostly lower cardinality basis hessian. 
+This method allowsthe user to compute an approximate higher level of theory hessian from a lower level of theory hessian, using a well scaling number of single point energies
+at the higher level of theory.
 So, one could compute frequencies at a CCSD(T)/cc-pVDZ level of theory, then compute the diagonal, 
 symmetry adapted internal coordinate force constants at a CCSD(T)/cc-pVTZ level of theory, to get a very good approximation to CCSD(T)/cc-pVTZ frequencies.
 
-As of right now, the user must be on the Vulcan cluster, and the following line must be present in the user's .bashrc file. 
+As of right now, the user must be on the Vulcan cluster.
 
-export WolframKernel=/opt/mathematica/bin/WolframKernel
