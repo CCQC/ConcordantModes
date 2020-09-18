@@ -16,25 +16,9 @@ class Reap(object):
         psi4Success = re.compile(r"\*\*\* Psi4 exiting successfully. Buy a developer a beer!")
         
         rootdir = os.getcwd()
-        # os.chdir('../zmatFiles')
-        # with open("atomList",'r') as file:
-            # atoms = file.read()
-        
-        # os.chdir(rootdir)
-        
-        # atoms = atoms.split('\n')
         n_atoms = len(self.zmat.atomList)
         dispCart = "dispcart" 
         
-        # os.chdir('..')
-        # # Read in the program
-        # if os.path.exists('prog.dat'):
-            # with open("prog.dat","r") as file:
-                # data = file.read()
-            # p = data.split('\n')
-            # progname = p[1]
-        # else:
-            # progname = 'molpro'
         os.chdir(rootdir)
         
         os.chdir('../mma')
@@ -43,10 +27,8 @@ class Reap(object):
         os.chdir(rootdir)
         
         n_disp = int((len(disp))/(n_atoms+1))
-        Energies = np.array([])
+        self.Energies = np.array([])
         
-        # print('Prog at reap is: ')
-        # print(progname)
         progname = self.progname
         for i in range(n_disp):
             os.chdir("./"+str(i+1))
@@ -65,19 +47,22 @@ class Reap(object):
             else:
                 print('Specified program not supported: ' + progname)
                 raise RuntimeError
-            Energies = np.append(Energies,energy[0])
+            self.Energies = np.append(self.Energies,energy[0])
             os.chdir('..')
         
+        self.energiesDict = {}
+        self.energiesDict['ref'] = float(self.Energies[0])
+        for i in range(n_disp - 1):
+            j = i % 2
+            k = i // 2
+            if j == 0:
+                self.energiesDict[str(k+1)+'_plus'] = float(self.Energies[i+1])
+            if j == 1:
+                self.energiesDict[str(k+1)+'_minus'] = float(self.Energies[i+1])
+
         outputString = ''
-        for i in Energies:
+        for i in self.Energies:
             outputString += i + '\n'
         
         with open('e.dat','w') as file:
             file.write(outputString)
-        
-        # with open('e.dat','r') as file:
-            # energyData = file.readlines()
-        
-        # print(energyData)
-        # for i in energyData:
-            # print(i[:-2])

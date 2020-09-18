@@ -25,7 +25,7 @@ u1 = 1/Sqrt[2];
 re = Import[rootdir <> "/symVariables.csv"][[1]];
 
 rdisp = 0.005;
-adisp = 0.01;
+adisp = 0.005;
 
 rr = {rdisp,rdisp,adisp};
 conv = HART;

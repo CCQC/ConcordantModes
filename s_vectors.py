@@ -32,7 +32,7 @@ class s_vectors(object):
             then out-of-plane motions (Eventually)
         """
         # Toggle this to convert from bohr to angstrom
-        # self.carts = 0.5291772085936*self.carts
+        self.carts = 0.5291772085936*self.carts
         """
             First, bonds.
         """

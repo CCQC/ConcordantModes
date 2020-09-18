@@ -22,6 +22,7 @@ class TransDisp(object):
         self.B = self.s_vectors.B
         self.zmat = zmat
         self.refCarts = zmat.Cartesians.copy()
+        self.refCarts = np.array(self.refCarts).astype(float)*0.5291772085936
         self.u = np.identity(3*len(zmat.atomList))
         self.rdisp = rdisp
         self.adisp = adisp
@@ -54,6 +55,7 @@ class TransDisp(object):
         self.s_coord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
             self.s_disp = np.append(self.s_disp,self.rdisp)
+            # self.s_disp = np.append(self.s_disp,self.rdisp/0.5291772085936)
             self.s_coord = np.append(self.s_coord,self.zmat.variableDictionary[self.zmat.bondVariables[i]])
         for i in range(len(self.zmat.angleIndices)):
             self.s_disp = np.append(self.s_disp,self.adisp)
@@ -68,19 +70,22 @@ class TransDisp(object):
 
         """ Transform the internal coordinate displacements to normal mode internal coord disps. """
         self.n_disp = np.dot(self.s_tensor,self.s_disp)
-        # self.n_disp = np.dot(self.eig_inv,self.s_disp)
-        # self.n_coord = np.dot(self.eig_inv,self.s_coord)
 
         self.n_coord = self.INTC(self.refCarts)
 
-        # for i in range(1):
         for i in range(len(self.n_disp)):
             disp = np.zeros(len(self.n_disp))
-            disp[i] = self.rdisp
+            # disp[i] = self.rdisp
+            disp[i] = self.s_disp[i].copy()
             # disp[i] = self.n_disp[i].copy()
-            self.DispCart['+'+str(i)] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
-        
-        raise RuntimeError
+            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
+            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
+
+        print(self.INTC(self.refCarts))
+        self.DispCart["ref"] /= 0.5291772085936
+        # print(self.DispCart['1_plus'])
+        # print(self.DispCart['1_minus'])
+        # raise RuntimeError
 
     def INTC(self,carts):
         intCoord = np.array([])
@@ -126,25 +131,14 @@ class TransDisp(object):
 
     def CoordConvert(self,n_disp,n_coord,refCarts,max_iter,tolerance):
         newN = n_coord + n_disp
-        # print(n_coord)
-        # print(newN)
         newCarts = np.array(refCarts).astype(float)
-        print(self.INTC(newCarts))
-        print(n_coord)
         for i in range(max_iter):
-            print(i)
             cartDisp = np.dot(self.A,n_disp)
-            # print(n_disp)
             cartDispShaped = np.reshape(cartDisp,(-1,3))
-            print(cartDispShaped)
-            print(newCarts)
             newCarts += cartDispShaped
-            print(newCarts)
             coordCheck = self.INTC(newCarts)
-            # print(newN)
-            # print(coordCheck)
             n_disp = newN - coordCheck
             if LA.norm(n_disp) < tolerance:
                 break
-        return newCarts
+        return newCarts/0.5291772085936
 

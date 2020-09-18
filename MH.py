@@ -3,21 +3,23 @@ import sys
 import shutil
 import os
 import subprocess
-from MixedHessian.DirectoryTree import DirectoryTree
+from MixedHessian.DirectoryTree      import DirectoryTree
 from MixedHessian.Final_intder_input import intder_final
-from MixedHessian.Gen_Final_Intder import Final_Intder
-from MixedHessian.GenFC import GenFC
-from MixedHessian.GenEM import GenEM
-from MixedHessian.GenLoad import GenLoad
-from MixedHessian.GrabEig import GrabEig
-from MixedHessian.GrabSym import GrabSym
-from MixedHessian.init_intder_input import intder_init
-from MixedHessian.Reap import Reap
-from MixedHessian.s_vectors import s_vectors
-from MixedHessian.TED_intder_input import intder_100
-from MixedHessian.TED import TED
-from MixedHessian.TransDisp import TransDisp
-from MixedHessian.ZMAT_parse import ZMAT
+from MixedHessian.ForceConstant      import ForceConstant
+from MixedHessian.Gen_Final_Intder   import Final_Intder
+from MixedHessian.GenFC              import GenFC
+from MixedHessian.GenEM              import GenEM
+from MixedHessian.GenLoad            import GenLoad
+from MixedHessian.GrabEig            import GrabEig
+from MixedHessian.GrabSym            import GrabSym
+from MixedHessian.init_intder_input  import intder_init
+from MixedHessian.Reap               import Reap
+from MixedHessian.s_vectors          import s_vectors
+from MixedHessian.TED_intder_input   import intder_100
+from MixedHessian.TED                import TED
+from MixedHessian.TransDisp          import TransDisp
+from MixedHessian.vulcan_template    import vulcan_template
+from MixedHessian.ZMAT_parse         import ZMAT
 
 class MixedHessian(object):
     def __init__(self, options):
@@ -63,8 +65,6 @@ class MixedHessian(object):
         GrabE.run()
         ted = TED()
         ted.run()
-        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,GrabE.eigs)
-        transdisp.run()
         
         """
             move some of the INTDER initial files, then generate and run the 100 INTDER job
@@ -95,6 +95,12 @@ class MixedHessian(object):
         os.chdir('..')
         
         """
+            This should replace the first part of the mathematica intdif script
+        """
+        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,GrabE.eigs)
+        transdisp.run()
+        
+        """
             Now for the Mathematica portion of our adventure
         """
         if os.path.exists(rootdir + '/mma'):
@@ -118,82 +124,97 @@ class MixedHessian(object):
         """
             The displacements have been generated, now we have to run them!
         """
-        Dir_obj = DirectoryTree(progname, self.options.basis, self.options.charge, self.options.spin, self.zmat)
+        Dir_obj = DirectoryTree(progname, self.options.basis, self.options.charge, self.options.spin, self.zmat, transdisp)
         Dir_obj.run()
         os.chdir(rootdir + '/Disps')
         dispList = []
         for i in os.listdir(rootdir + '/Disps'):
             dispList.append(i)
         
-        q = self.options.queue
-        job_num = len(dispList)
+        # q = self.options.queue
+        # job_num = len(dispList)
         
         """
             This portion is highly cumbersome and will have to split out into another script eventually,
             but for now I just want my code to work. :D
         """
 
-        vulcan_template = """#!/bin/sh
-#$ -q {q}
-#$ -N MixedHess
-#$ -S /bin/sh
-#$ -sync y
-#$ -cwd
-#$ -t {jarray}
-#$ -tc {tc}
+        # vulcan_template = """#!/bin/sh
+# #$ -q {q}
+# #$ -N MixedHess
+# #$ -S /bin/sh
+# #$ -sync y
+# #$ -cwd
+# #$ -t {jarray}
+# #$ -tc {tc}
 
-. /etc/profile.d/modules.sh
+# . /etc/profile.d/modules.sh
 
-# Disable production of core dump files
-ulimit -c 0
+# # Disable production of core dump files
+# ulimit -c 0
 
-echo ""
-echo "***********************************************************************"
-echo " Starting job:"
-echo ""
-echo "    Name:              "$JOB_NAME
-echo "    ID:                "$JOB_ID
-echo "    Hostname:          "$HOSTNAME
-echo "    Working directory: "$SGE_O_WORKDIR
-echo ""
-echo "    Submitted using:   MixedHessian "
-echo "***********************************************************************"
+# echo ""
+# echo "***********************************************************************"
+# echo " Starting job:"
+# echo ""
+# echo "    Name:              "$JOB_NAME
+# echo "    ID:                "$JOB_ID
+# echo "    Hostname:          "$HOSTNAME
+# echo "    Working directory: "$SGE_O_WORKDIR
+# echo ""
+# echo "    Submitted using:   MixedHessian "
+# echo "***********************************************************************"
 
-# cd into individual task directory
-cd $SGE_O_WORKDIR/$SGE_TASK_ID
-vulcan load {prog}
+# # cd into individual task directory
+# cd $SGE_O_WORKDIR/$SGE_TASK_ID
+# vulcan load {prog}
 
-export NSLOTS={nslots}
+# export NSLOTS={nslots}
 
-{cline}"""
+# {cline}"""
         
         
-        progdict = {
-            "molpro": "molpro -n $NSLOTS --nouse-logfile --no-xml-output -o output.dat input.dat",
-            "psi4": "psi4 -n $NSLOTS"
-        }
+        # progdict = {
+            # "molpro": "molpro -n $NSLOTS --nouse-logfile --no-xml-output -o output.dat input.dat",
+            # "psi4": "psi4 -n $NSLOTS"
+        # }
         
-        odict = {
-            'q':        q,
-            'nslots':   self.options.nslots,
-            'jarray':   '1-{}'.format(job_num),
-            'progname': progname,
-            'prog':     prog,
-            'tc':       str(job_num),
-            'cline':    progdict[progname]
-        }
-        out = vulcan_template.format(**odict)
-        
+        # odict = {
+            # 'q':        q,
+            # 'nslots':   self.options.nslots,
+            # 'jarray':   '1-{}'.format(job_num),
+            # 'progname': progname,
+            # 'prog':     prog,
+            # 'tc':       str(job_num),
+            # 'cline':    progdict[progname]
+        # }
+        # out = vulcan_template.format(**odict)
+        v_template = vulcan_template(self.options,len(dispList),progname,prog)
+        out = v_template.run()
         with open('displacements.sh','w') as file:
             file.write(out)
-        subprocess.call('qsub displacements.sh', stderr=sys.stdout.buffer, shell=True)
+        # subprocess.call('qsub displacements.sh', stderr=sys.stdout.buffer, shell=True)
         
+        pipe = subprocess.PIPE
+        # process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True, encoding='UTF-8'
+        process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True)
+        output = str(process.stdout)
+        error = str(process.stderr)  
+        
+
         """
             After this point, all of the jobs will have finished, and its time to reap the energies
             as well as checking for sucesses on all of the jobs
         """
         Reap_obj = Reap(progname,self.zmat)
         Reap_obj.run()
+
+        """
+            This section will compute the force constants using a python script
+        """
+        fc = ForceConstant(self.zmat ,self.options.rdisp ,self.options.adisp, Reap_obj.energiesDict)
+        fc.run()
+        print(fc.FC)
 
         """
             Now to generate the e.m file, then to generate the force constants!

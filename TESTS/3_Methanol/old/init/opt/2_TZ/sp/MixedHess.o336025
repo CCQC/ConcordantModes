@@ -1,0 +1,24 @@
+
+***********************************************************************
+ Starting job:
+
+    Name:              MixedHess
+    ID:                336025
+    Hostname:          n044
+    Working directory: /home/vulcan/mel64643/research/5_Mixed_H/3_Methanol_Test/1_init/opt/2_TZ/sp
+
+    Submitted using:   submit -N MixedHess debug.q cfour@2.0~mpi
+***********************************************************************
+module load  cfour-2.0-intel-13.0.0-yhj426etc3g7hslvbmpgvdymp2w76rob
+ Running cfour on n044
+ Running calculation...
+ @GETMEM-I,  Allocated    6675 MB of main memory.
+Not a Frequency Job, No Conversion Necessary.
+ Saving data and cleaning up...
+JOBARC
+JAINDX
+FJOBARC
+MOLDEN
+NEWMOS
+den.dat
+ Job complete on n044.

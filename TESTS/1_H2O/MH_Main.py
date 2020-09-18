@@ -16,6 +16,7 @@ options_kwargs = {
   # 'output_name'       : "output.dat",
   'queue'             : "gen3.q,gen4.q,gen6.q,debug.q",
   'program'           : "psi4@master",
+  'adisp'             : 0.005,
   'basis'             : "cc-pVTZ"
   # 'program'           : "molpro@2010.1.67+mpi",
   # 'template_file_path': "template.dat",

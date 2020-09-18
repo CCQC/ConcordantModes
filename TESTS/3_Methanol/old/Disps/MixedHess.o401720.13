@@ -1,0 +1,12 @@
+
+***********************************************************************
+ Starting job:
+
+    Name:              MixedHess
+    ID:                401720
+    Hostname:          n035
+    Working directory: /home/vulcan/mel64643/bin/MixedHessian/TESTS/3_Methanol/old/Disps
+
+    Submitted using:   MixedHessian 
+***********************************************************************
+module load  psi4-master-intel-16.0.1-avducsgnonqrcpftiesq432gagal6y7r

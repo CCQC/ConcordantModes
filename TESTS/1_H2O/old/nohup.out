@@ -1,0 +1,31 @@
+
+General::obspkg: 
+   VectorAnalysis` is now obsolete. The legacy version being loaded may
+     conflict with current functionality. See the Compatibility Guide for
+     updating information.
+
+General::compat: 
+   Combinatorica Graph and Permutations functionality has been superseded by
+    preloaded functionality. The package now being loaded may conflict with
+    this. Please see the Compatibility Guide for details.
+{1.7961501993211249, 1.4312592441883532, 2.5636034348214257*^-19}
+{-7.887512865067947*^-11, -9.701164693787234*^-8, 2.5636034348214257*^-19}
+Without symmetry 7 displaced geometries are required
+
+With symmetry 7 displaced geometries are required
+
+
+General::obspkg: 
+   VectorAnalysis` is now obsolete. The legacy version being loaded may
+     conflict with current functionality. See the Compatibility Guide for
+     updating information.
+
+General::compat: 
+   Combinatorica Graph and Permutations functionality has been superseded by
+    preloaded functionality. The package now being loaded may conflict with
+    this. Please see the Compatibility Guide for details.
+The energies at the displaced geometries:
+MatrixForm[{{-76.34578231037396, -76.34578030045076, -76.34578029457798, -76.34575820213942, -76.3457578019834, -76.34568302318583, -76.34568302318597}}]
+  basis=cc-pVTZ
+
+This program took 35.81749153137207 seconds to run.
