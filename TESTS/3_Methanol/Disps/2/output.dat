@@ -30,10 +30,10 @@
     -----------------------------------------------------------------------
 
 
-    Psi4 started on: Friday, 18 September 2020 06:15PM
+    Psi4 started on: Saturday, 19 September 2020 05:49PM
 
-    Process ID: 17208
-    Host:       n009
+    Process ID: 18491
+    Host:       n006
     PSIDATADIR: /opt/psi/4/master/share/psi4
     Memory:     500.0 MiB
     Threads:    1
@@ -72,8 +72,8 @@ energy('ccsd(t)')
 
 Scratch directory: /tmp/
 
-*** tstart() called on n009
-*** at Fri Sep 18 18:15:45 2020
+*** tstart() called on n006
+*** at Sat Sep 19 17:50:00 2020
 
    => Loading Basis Set <=
 
@@ -290,14 +290,14 @@ Properties computed using the SCF density matrix
      X:    -0.9709      Y:    -1.4936      Z:    -0.0086     Total:     1.7815
 
 
-*** tstop() called on n009 at Fri Sep 18 18:15:51 2020
+*** tstop() called on n006 at Sat Sep 19 17:50:06 2020
 Module time:
-	user time   =       6.21 seconds =       0.10 minutes
-	system time =       0.08 seconds =       0.00 minutes
+	user time   =       6.18 seconds =       0.10 minutes
+	system time =       0.07 seconds =       0.00 minutes
 	total time  =          6 seconds =       0.10 minutes
 Total time:
-	user time   =       6.21 seconds =       0.10 minutes
-	system time =       0.08 seconds =       0.00 minutes
+	user time   =       6.18 seconds =       0.10 minutes
+	system time =       0.07 seconds =       0.00 minutes
 	total time  =          6 seconds =       0.10 minutes
  MINTS: Wrapper to libmints.
    by Justin Turney
@@ -323,8 +323,8 @@ Total time:
         Stored in file 33.
 
 
-*** tstart() called on n009
-*** at Fri Sep 18 18:15:56 2020
+*** tstart() called on n006
+*** at Sat Sep 19 17:50:10 2020
 
 
 	Wfn Parameters:
@@ -399,15 +399,15 @@ Total time:
 	Two-electron energy          =     81.61204097798864
 	Reference energy             =   -115.08941279742066
 
-*** tstop() called on n009 at Fri Sep 18 18:16:27 2020
+*** tstop() called on n006 at Sat Sep 19 17:50:41 2020
 Module time:
-	user time   =      23.91 seconds =       0.40 minutes
-	system time =       5.74 seconds =       0.10 minutes
+	user time   =      23.88 seconds =       0.40 minutes
+	system time =       5.91 seconds =       0.10 minutes
 	total time  =         31 seconds =       0.52 minutes
 Total time:
-	user time   =      33.60 seconds =       0.56 minutes
-	system time =       6.14 seconds =       0.10 minutes
-	total time  =         42 seconds =       0.70 minutes
+	user time   =      33.44 seconds =       0.56 minutes
+	system time =       6.32 seconds =       0.11 minutes
+	total time  =         41 seconds =       0.68 minutes
             **************************
             *                        *
             *        CCENERGY        *
@@ -536,7 +536,7 @@ MP2 correlation energy -0.4574281433479334
       * CCSD(T) total energy                  = -115.580781619283187
 
 
-    Psi4 stopped on: Friday, 18 September 2020 06:18PM
-    Psi4 wall time for execution: 0:02:54.88
+    Psi4 stopped on: Saturday, 19 September 2020 05:52PM
+    Psi4 wall time for execution: 0:02:55.73
 
 *** Psi4 exiting successfully. Buy a developer a beer!

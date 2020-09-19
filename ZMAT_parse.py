@@ -2,6 +2,7 @@ import numpy as np
 import os
 import shutil
 import re
+from . import masses
 
 class ZMAT(object):
     def __init__(self):
@@ -144,10 +145,6 @@ class ZMAT(object):
             for i in range(len(self.torsionVariables)-1):
                 torsionVariablesOutput += self.torsionVariables[i] + '\n'
             torsionVariablesOutput += self.torsionVariables[len(self.torsionVariables)-1]
-        # Write out the variables and their values
-        # self.bondVariables = list(dict.fromkeys(self.bondVariables))
-        # self.angleVariables = list(dict.fromkeys(self.angleVariables))
-        # self.torsionVariables = list(dict.fromkeys(self.torsionVariables))
         
         flatAngles = np.array(self.angleVariables)
         flatAngles = np.unique(flatAngles)
@@ -157,53 +154,5 @@ class ZMAT(object):
             self.variableDictionary[i] = str(float(self.variableDictionary[i]) * (np.pi/180))
         for i in flatTorsions:
             self.variableDictionary[i] = str(float(self.variableDictionary[i]) * (np.pi/180))
-        
-        # variables = np.array(self.bondVariables)
-        # variables = np.append(variables,self.angleVariables)
-        # variables = np.append(variables,self.torsionVariables)
-        # if len(self.variableDictionary) > 0:
-            # if len(variables) > 0:
-                # for i in range(len(variables)-1):
-                    # variableDictionaryOutput += variables[i] + ' ' + self.variableDictionary[variables[i]] + '\n'
-                # variableDictionaryOutput += variables[len(variables)-1] + ' ' + self.variableDictionary[variables[len(variables)-1]]
-        
-        # # Write the cartesian output
-        # if len(self.Cartesians) > 0:
-            # for i in range(len(self.Cartesians)):
-                # for j in range(len(self.Cartesians[i])-1):
-                    # cartesianOutput += self.Cartesians[i][j] + ' '
-                # cartesianOutput += self.Cartesians[i][len(self.Cartesians[i])-1] + '\n'
-        # cartesianOutput = cartesianOutput[:-1]
-        
-        # root = os.getcwd()
-        # if os.path.exists(root + '/zmatFiles'):
-            # shutil.rmtree(root + '/zmatFiles')
-        
-        # os.mkdir('zmatFiles')
-        # os.chdir('zmatFiles')
-        
-        
-        # with open('atomList','w') as file:
-            # file.write(atomListOutput)
-        # with open('bondIndices','w') as file:
-            # file.write(bondIndicesOutput)
-        # with open('bondVariables','w') as file:
-            # file.write(bondVariablesOutput)
-        # with open('angleIndices','w') as file:
-            # file.write(angleIndicesOutput)
-        # with open('angleVariables','w') as file:
-            # file.write(angleVariablesOutput)
-        # with open('torsionIndices','w') as file:
-            # file.write(torsionIndicesOutput)
-        # with open('torsionVariables','w') as file:
-            # file.write(torsionVariablesOutput)
-        # with open('variableDictionary','w') as file:
-            # file.write(variableDictionaryOutput)
-        # with open('Cartesians','w') as file:
-            # file.write(cartesianOutput)
-
-
-
-
-
-
+       
+        self.masses = [masses.get_mass(label) for label in self.atomList]

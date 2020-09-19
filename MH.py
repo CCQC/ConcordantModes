@@ -4,13 +4,15 @@ import shutil
 import os
 import re
 import subprocess
+import numpy as np
 from MixedHessian.DirectoryTree      import DirectoryTree
 from MixedHessian.Final_intder_input import intder_final
 from MixedHessian.ForceConstant      import ForceConstant
+from MixedHessian.G_Matrix           import G_Matrix
 from MixedHessian.Gen_Final_Intder   import Final_Intder
-from MixedHessian.GenFC              import GenFC
-from MixedHessian.GenEM              import GenEM
-from MixedHessian.GenLoad            import GenLoad
+# from MixedHessian.GenFC              import GenFC
+# from MixedHessian.GenEM              import GenEM
+# from MixedHessian.GenLoad            import GenLoad
 from MixedHessian.GrabEig            import GrabEig
 from MixedHessian.GrabSym            import GrabSym
 from MixedHessian.init_intder_input  import intder_init
@@ -45,7 +47,21 @@ class MixedHessian(object):
         """
         s_vec = s_vectors(self.zmat)
         s_vec.run()
-        
+
+        """
+            Compute G-Matrix
+        """
+        L = np.identity(len(s_vec.B))
+        g_mat = G_Matrix(L, self.zmat, s_vec)
+        g_mat.run()
+        # print(g_mat.G)
+
+        """
+            Next step, transform cartesian F-mat to internal F-mat.
+        """
+
+
+
         """
             Next block, generate and then run intder initial
         """
