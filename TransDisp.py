@@ -14,6 +14,13 @@ from numpy import linalg as LA
     
     u can simply be the I_3N identity matrix, so long as frequency intensities are
     not desired.
+
+    If this is the case, then A simply becomes the following:
+
+    A = B^T(BB^T)^-1.
+
+    Where in fact, BB^T = G (non-mass-weighted)
+
 """
 
 class TransDisp(object):
@@ -35,17 +42,21 @@ class TransDisp(object):
         self.eig_inv = inv(self.eigs.copy())
         for i in range(len(self.eig_inv)):
             self.eig_inv[i] = self.eig_inv[i]/LA.norm(self.eig_inv[i])
+        # print('Intder _U_ matrix:')
+        # print(self.eig_inv)
         
         """
-            Construct 'A' 
+            Construct 'A', the commented lines may be useful for getting intensities later. 
         """
-        self.A = (self.u).dot(self.B.transpose())
-        self.A = (self.B).dot(self.A)
+        # self.A = (self.u).dot(self.B.transpose())
+        # self.A = (self.B).dot(self.A)
+        self.A = (self.B).dot(self.B.transpose())
         self.A = LA.inv(self.A)
         self.A = (self.B.transpose()).dot(self.A)
-        self.A = (self.u).dot(self.A)
+        """ Similar to the first two commented lines, this will be necessary for intensities. """
+        # self.A = (self.u).dot(self.A)
         """ This step modifies A to convert from normal coords to carts. """
-        self.A = np.dot((self.A),inv(self.eig_inv)).round(decimals=12)
+        self.A = np.dot(self.A,inv(self.eig_inv)).round(decimals=12)
         """
             Next, we will have to determine our desired Normal mode internal coordinate displacements
         """

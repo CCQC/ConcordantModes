@@ -3,7 +3,7 @@ from numpy.linalg import inv
 from numpy import linalg as LA
 
 """
-    This script will be used to compute the G-matrix of the GF-Matrix Method.
+    This class will be used to compute the G-matrix of the GF-Matrix Method.
     It should be constructed to give the flexibility of transformation via the L-matrix.
 """
 
@@ -18,6 +18,12 @@ class G_Matrix(object):
         b_len = len(self.zmat.bondIndices)
         a_len = len(self.zmat.angleIndices)
         t_len = len(self.zmat.torsionIndices)
+        """
+            These for-loops are constructed as such to take advantage of the inherent symmetry of the G-Matrix, 
+            as well as how I have decided to store the s-vectors. It may work best to mass weight the s-vectors
+            back in the s_vectors.py file so that they may be simply dotted in this step, however that is not
+            necessary to the fundamental workings of the code for now.
+        """
         for i in range(b_len):
             for j in range(b_len):
                 overlap_indices = np.intersect1d(self.zmat.bondIndices[i],self.zmat.bondIndices[j]).astype(int)
@@ -72,5 +78,6 @@ class G_Matrix(object):
         G_Mat_Element = 0.
         for i in overlap_indices:
             G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])/self.zmat.masses[i-1]
+            # G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])
         
         return G_Mat_Element

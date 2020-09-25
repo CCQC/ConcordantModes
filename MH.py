@@ -5,14 +5,17 @@ import os
 import re
 import subprocess
 import numpy as np
+from numpy import linalg as LA
+from numpy.linalg import inv
+from scipy.linalg import fractional_matrix_power
 from MixedHessian.DirectoryTree      import DirectoryTree
 from MixedHessian.Final_intder_input import intder_final
+from MixedHessian.F_Convert          import F_conv
+from MixedHessian.F_Read             import F_Read
 from MixedHessian.ForceConstant      import ForceConstant
 from MixedHessian.G_Matrix           import G_Matrix
+from MixedHessian.GF_Method          import GF_Method
 from MixedHessian.Gen_Final_Intder   import Final_Intder
-# from MixedHessian.GenFC              import GenFC
-# from MixedHessian.GenEM              import GenEM
-# from MixedHessian.GenLoad            import GenLoad
 from MixedHessian.GrabEig            import GrabEig
 from MixedHessian.GrabSym            import GrabSym
 from MixedHessian.init_intder_input  import intder_init
@@ -42,6 +45,7 @@ class MixedHessian(object):
             shutil.rmtree(rootdir + '/zmatFiles')
         self.zmat = ZMAT()
         self.zmat.run()
+        
         """
             This is a new addition, the hope is to compute s-vectors right off the bat!
         """
@@ -49,107 +53,122 @@ class MixedHessian(object):
         s_vec.run()
 
         """
+            Read in FC matrix in cartesians, then convert to internals.
+        """
+
+        f_read = F_Read("FCMFINAL")
+        f_read.run()
+        f_conv = F_conv(np.identity(len(f_read.FC_mat)), f_read.FC_mat, "cart", s_vec, self.zmat)
+        f_conv.run()
+
+
+        """
             Compute G-Matrix
         """
         L = np.identity(len(s_vec.B))
         g_mat = G_Matrix(L, self.zmat, s_vec)
         g_mat.run()
-        # print(g_mat.G)
+        # raise RuntimeError
 
         """
-            Next step, transform cartesian F-mat to internal F-mat.
+            Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         """
+        self.tol = 1e-14
+        print("Initial Frequencies:")
+        # init_GF = GF_Method(np.identity(len(g_mat.G)),g_mat.G.copy(),f_conv.F.copy(),1e-14,"Initial")
+        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.tol)
+        init_GF.run()
+        # raise RuntimeError
 
-
+        """
+            Now for the TED check.
+        """
+        self.G = np.dot(np.dot(inv(init_GF.L),g_mat.G),np.transpose(inv(init_GF.L)))
+        self.G[np.abs(self.G) < self.tol] = 0
+        self.F = np.dot(np.dot(np.transpose(init_GF.L),f_conv.F),init_GF.L)
+        self.F[np.abs(self.F) < self.tol] = 0
+        print("TED Frequencies:")
+        # TED_GF = GF_Method(init_GF.L,g_mat.G.copy(),f_conv.F.copy(),1e-14,"TED")
+        TED_GF = GF_Method(self.G,self.F,self.tol)
+        TED_GF.run()
+        # print('Transformed Force Constants')
+        # print(np.dot(np.dot(np.transpose(init_GF.L),f_conv.F),init_GF.L))
 
         """
             Next block, generate and then run intder initial
         """
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')
-        os.mkdir('Intder')
-        shutil.copy('FCMFINAL','Intder/file15')
-        os.chdir('Intder')
-        self.intder_init = intder_init(self.zmat)
-        self.intder_init.run()
-        os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
+        # os.mkdir('Intder')
+        # shutil.copy('FCMFINAL','Intder/file15')
+        # os.chdir('Intder')
+        # self.intder_init = intder_init(self.zmat)
+        # self.intder_init.run()
+        # os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
+        # # raise RuntimeError
        
         
-        """
-            Some post processing of INTDER initial to generate the SALCS for intder 100
-        """
-        GrabE = GrabEig()
-        GrabE.run()
-        ted = TED()
-        ted.run()
+        # """
+            # Some post processing of INTDER initial to generate the SALCS for intder 100
+        # """
+        # GrabE = GrabEig()
+        # GrabE.run()
+        # ted = TED()
+        # ted.run()
         
-        """
-            move some of the INTDER initial files, then generate and run the 100 INTDER job
-        """
-        shutil.move('intder.inp','init_intder.inp')
-        shutil.move('intder.out','init_intder.out')
+        # """
+            # move some of the INTDER initial files, then generate and run the 100 INTDER job
+        # """
+        # shutil.move('intder.inp','init_intder.inp')
+        # shutil.move('intder.out','init_intder.out')
+        # shutil.copy('file15','init_file15')
+        # shutil.copy('file16','init_file16')
         
-        self.intder_100 = intder_100(self.zmat)
-        self.intder_100.run()
-        os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
+        # self.intder_100 = intder_100(self.zmat)
+        # self.intder_100.run()
+        # os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
+        # # raise RuntimeError
         
-        """
-            script that grabs the Normal internal coordinate values
-        """
-        grabSym = GrabSym()
-        grabSym.run()
+        # """
+            # script that grabs the Normal internal coordinate values
+        # """
+        # grabSym = GrabSym()
+        # grabSym.run()
         
-        """
-            Move some INTDER files around, then move onto the next thing
-        """
-        shutil.copy('intder.out','../intderTEDcheck.out')
-        shutil.copy('eigen.csv','../')
-        shutil.copy('symVariables.csv','../')
-        shutil.move('intder.inp','100_intder.inp')
-        shutil.move('intder.out','100_intder.out')
-        shutil.move('file15','old_file15')
+        # """
+            # Move some INTDER files around, then move onto the next thing
+        # """
+        # shutil.copy('intder.out','../intderTEDcheck.out')
+        # shutil.copy('eigen.csv','../')
+        # shutil.copy('symVariables.csv','../')
+        # shutil.move('intder.inp','100_intder.inp')
+        # shutil.move('intder.out','100_intder.out')
+        # shutil.move('file15','100_file15')
+        # shutil.copy('file16','100_file16')
         
-        os.chdir('..')
+        # os.chdir('..')
         
         """
             This should replace the first part of the mathematica intdif script
         """
-        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,GrabE.eigs)
+        # transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L)
         transdisp.run()
         
-        """
-            Now for the Mathematica portion of our adventure
-        """
-        if os.path.exists(rootdir + '/mma'):
-            shutil.rmtree(rootdir + '/mma')
-        # os.mkdir('mma')
-        # os.chdir('mma')
-        """
-            Unfortunately, Intdif must be in the same directory as the mathematica script...for now
-        """
-        # shutil.copy(packagepath + '/Temporary_Scripts/Intdif2008.m','.')
-        # shutil.copy('../eigen.csv','.')
-        # shutil.copy('../symVariables.csv','.')
-        # Load_obj = GenLoad(self.options.rdisp,self.options.adisp,self.zmat)
-        # Load_obj.run()
-        # os.system('./Load.wls')
-        # os.chdir('..')
-        
-        prog = self.options.program
-        progname = prog.split('@')[0]
 
         """
             The displacements have been generated, now we have to run them!
         """
+        
+        prog = self.options.program
+        progname = prog.split('@')[0]
+        
         Dir_obj = DirectoryTree(progname, self.options.basis, self.options.charge, self.options.spin, self.zmat, transdisp)
         Dir_obj.run()
         os.chdir(rootdir + '/Disps')
         dispList = []
         for i in os.listdir(rootdir + '/Disps'):
             dispList.append(i)
-        
-        # q = self.options.queue
-        # job_num = len(dispList)
         
         """
             This code generates the submit script for the displacements, submits an array, then checks if all jobs have finished every 10 seconds. :D
@@ -170,10 +189,6 @@ class MixedHessian(object):
             qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], stdout=pipe, stderr=pipe)
             qacct_string = str(qacct_proc.stdout)
             job_match = re.findall(self.jobFinRegex,qacct_string)
-            # print('job_match:')
-            # print(len(job_match))
-            # print('dispList:')
-            # print(len(dispList))
             if len(job_match) == len(dispList):
                 break
             time.sleep(10)
@@ -201,29 +216,35 @@ class MixedHessian(object):
             This is temporary to fit with the INTDER units. Delete when you make your own GF matrix method.
         """
         fc.FC *= 4.35974394
-        # print(fc.FC)
+        print('Computed Force Constants:')
+        print(fc.FC)
 
         """
-            Now to generate the e.m file, then to generate the force constants!
+            I will need to make a method just for reading in force constants, for now the diagonals will do.
         """
-        # os.chdir('../mma')
-        # EM = GenEM(self.zmat)
-        # EM.run()
-        # FC_obj = GenFC(self.options.rdisp,self.options.adisp,self.zmat)
-        # FC_obj.run()
-        # os.system('./FC.wls')
+        
+        self.F = np.diag(fc.FC)
+        self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),np.transpose(transdisp.eig_inv))
+        self.G[np.abs(self.G) < self.tol] = 0
+
+        """
+            Final GF Matrix run
+        """
+        
+        print("Final Frequencies:")
+        Final_GF = GF_Method(self.G,self.F,self.tol)
+        Final_GF.run()
         
         """
             And now we scoot back over to the Intder directory to run the final hessian!
         """
-        # os.chdir('../Intder')
-        os.chdir('Intder')
-        FinalIntder = intder_final(self.zmat)
-        FinalIntder.run()
-        Fin_Int = Final_Intder(fc.FC)
-        Fin_Int.run()
-        shutil.copy('intder.out','../MixedHessOutput.dat')
-        os.chdir('..')
+        # os.chdir('Intder')
+        # FinalIntder = intder_final(self.zmat)
+        # FinalIntder.run()
+        # Fin_Int = Final_Intder(fc.FC)
+        # Fin_Int.run()
+        # shutil.copy('intder.out','../MixedHessOutput.dat')
+        # os.chdir('..')
         
         t2 = time.time()
         

@@ -1,8 +1,8 @@
-ZMAT
+ZMAT begin
  H                                                                              
  O 1 R                                                                          
  H 2 R 1 A
-***                                                                               
-Variables
+
  R    =        1.810017290509182                                                
- A    =      103.728140247463088                                                
+ A    =      103.728140247463088    
+ZMAT end 
