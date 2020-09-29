@@ -11,6 +11,7 @@ class Reap(object):
 
     def run(self):
         # Define energy search regex
+        # molproEnergy = re.compile(r"\!RHF\-RCCSD\(T\) energy\s+(\-\d+\.\d+)")
         molproEnergy = re.compile(r"\!RHF\-UCCSD\(T\) energy\s+(\-\d+\.\d+)")
         molproSuccess = re.compile(r"Variable memory released")
         psi4Energy = re.compile(r"CCSD\(T\)\s*total\s*energy\s+=\s+(\-\d+\.\d+)")

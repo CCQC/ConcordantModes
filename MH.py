@@ -9,23 +9,17 @@ from numpy import linalg as LA
 from numpy.linalg import inv
 from scipy.linalg import fractional_matrix_power
 from MixedHessian.DirectoryTree      import DirectoryTree
-from MixedHessian.Final_intder_input import intder_final
 from MixedHessian.F_Convert          import F_conv
 from MixedHessian.F_Read             import F_Read
 from MixedHessian.ForceConstant      import ForceConstant
 from MixedHessian.G_Matrix           import G_Matrix
 from MixedHessian.GF_Method          import GF_Method
-from MixedHessian.Gen_Final_Intder   import Final_Intder
-from MixedHessian.GrabEig            import GrabEig
-from MixedHessian.GrabSym            import GrabSym
-from MixedHessian.init_intder_input  import intder_init
 from MixedHessian.Reap               import Reap
 from MixedHessian.s_vectors          import s_vectors
-from MixedHessian.TED_intder_input   import intder_100
-from MixedHessian.TED                import TED
 from MixedHessian.TransDisp          import TransDisp
 from MixedHessian.vulcan_template    import vulcan_template
 from MixedHessian.ZMAT_parse         import ZMAT
+from MixedHessian.ZMAT_interp        import ZMAT_interp
 
 class MixedHessian(object):
     def __init__(self, options):
@@ -45,7 +39,10 @@ class MixedHessian(object):
             shutil.rmtree(rootdir + '/zmatFiles')
         self.zmat = ZMAT()
         self.zmat.run()
-        
+        self.finalZmat = ZMAT_interp()
+        self.finalZmat.run()
+        # raise RuntimeError
+
         """
             This is a new addition, the hope is to compute s-vectors right off the bat!
         """
@@ -58,15 +55,14 @@ class MixedHessian(object):
 
         f_read = F_Read("FCMFINAL")
         f_read.run()
-        f_conv = F_conv(np.identity(len(f_read.FC_mat)), f_read.FC_mat, "cart", s_vec, self.zmat)
+        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat)
         f_conv.run()
 
 
         """
             Compute G-Matrix
         """
-        L = np.identity(len(s_vec.B))
-        g_mat = G_Matrix(L, self.zmat, s_vec)
+        g_mat = G_Matrix(self.zmat, s_vec)
         g_mat.run()
         # raise RuntimeError
 
@@ -75,7 +71,6 @@ class MixedHessian(object):
         """
         self.tol = 1e-14
         print("Initial Frequencies:")
-        # init_GF = GF_Method(np.identity(len(g_mat.G)),g_mat.G.copy(),f_conv.F.copy(),1e-14,"Initial")
         init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.tol)
         init_GF.run()
         # raise RuntimeError
@@ -87,72 +82,20 @@ class MixedHessian(object):
         self.G[np.abs(self.G) < self.tol] = 0
         self.F = np.dot(np.dot(np.transpose(init_GF.L),f_conv.F),init_GF.L)
         self.F[np.abs(self.F) < self.tol] = 0
+        
         print("TED Frequencies:")
-        # TED_GF = GF_Method(init_GF.L,g_mat.G.copy(),f_conv.F.copy(),1e-14,"TED")
         TED_GF = GF_Method(self.G,self.F,self.tol)
         TED_GF.run()
-        # print('Transformed Force Constants')
-        # print(np.dot(np.dot(np.transpose(init_GF.L),f_conv.F),init_GF.L))
 
-        """
-            Next block, generate and then run intder initial
-        """
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')
-        # os.mkdir('Intder')
-        # shutil.copy('FCMFINAL','Intder/file15')
-        # os.chdir('Intder')
-        # self.intder_init = intder_init(self.zmat)
-        # self.intder_init.run()
-        # os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
-        # # raise RuntimeError
-       
-        
-        # """
-            # Some post processing of INTDER initial to generate the SALCS for intder 100
-        # """
-        # GrabE = GrabEig()
-        # GrabE.run()
-        # ted = TED()
-        # ted.run()
-        
-        # """
-            # move some of the INTDER initial files, then generate and run the 100 INTDER job
-        # """
-        # shutil.move('intder.inp','init_intder.inp')
-        # shutil.move('intder.out','init_intder.out')
-        # shutil.copy('file15','init_file15')
-        # shutil.copy('file16','init_file16')
-        
-        # self.intder_100 = intder_100(self.zmat)
-        # self.intder_100.run()
-        # os.system('/home/vulcan/mel64643/bin/MixedHessian/Temporary_Scripts/INTDER < intder.inp > intder.out')
-        # # raise RuntimeError
-        
-        # """
-            # script that grabs the Normal internal coordinate values
-        # """
-        # grabSym = GrabSym()
-        # grabSym.run()
-        
-        # """
-            # Move some INTDER files around, then move onto the next thing
-        # """
-        # shutil.copy('intder.out','../intderTEDcheck.out')
-        # shutil.copy('eigen.csv','../')
-        # shutil.copy('symVariables.csv','../')
-        # shutil.move('intder.inp','100_intder.inp')
-        # shutil.move('intder.out','100_intder.out')
-        # shutil.move('file15','100_file15')
-        # shutil.copy('file16','100_file16')
-        
-        # os.chdir('..')
         
         """
             This should replace the first part of the mathematica intdif script
         """
-        # transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L)
+        s_vec = s_vectors(self.finalZmat)
+        s_vec.run()
+        transdisp = TransDisp(s_vec,self.finalZmat,self.options.rdisp,self.options.adisp,init_GF.L)
         transdisp.run()
         
 
@@ -201,15 +144,14 @@ class MixedHessian(object):
             After this point, all of the jobs will have finished, and its time to reap the energies
             as well as checking for sucesses on all of the jobs
         """
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart)
+        Reap_obj = Reap(progname,self.finalZmat,transdisp.DispCart)
         Reap_obj.run()
         os.chdir('..')
 
         """
             This section will compute the force constants using a python script
         """
-        # fc = ForceConstant(self.zmat ,self.options.rdisp ,self.options.adisp, Reap_obj.energiesDict)
-        fc = ForceConstant(self.zmat, transdisp, Reap_obj.energiesDict)
+        fc = ForceConstant(self.finalZmat, transdisp, Reap_obj.energiesDict)
         fc.run()
 
         """
@@ -224,6 +166,8 @@ class MixedHessian(object):
         """
         
         self.F = np.diag(fc.FC)
+        g_mat = G_Matrix(self.finalZmat, s_vec)
+        g_mat.run()
         self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),np.transpose(transdisp.eig_inv))
         self.G[np.abs(self.G) < self.tol] = 0
 
@@ -234,17 +178,6 @@ class MixedHessian(object):
         print("Final Frequencies:")
         Final_GF = GF_Method(self.G,self.F,self.tol)
         Final_GF.run()
-        
-        """
-            And now we scoot back over to the Intder directory to run the final hessian!
-        """
-        # os.chdir('Intder')
-        # FinalIntder = intder_final(self.zmat)
-        # FinalIntder.run()
-        # Fin_Int = Final_Intder(fc.FC)
-        # Fin_Int.run()
-        # shutil.copy('intder.out','../MixedHessOutput.dat')
-        # os.chdir('..')
         
         t2 = time.time()
         

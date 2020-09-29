@@ -4,15 +4,11 @@ from numpy import linalg as LA
 
 """
     This class may be used to convert a cartesian F-matrix to an internal F-Matrix,
-    and vice versa. I may simply construct this with an added 'L' matrix which may
-    further transform between cartesian and normal coordinate F-matrices.
-    In this program to go back to converting between internals and cartesians one
-    must simply supply the identity matrix for the 'L' matrix.
+    and vice versa. 
 """
 
 class F_conv(object):
-    def __init__(self, L, F, Coord, s_vec, zmat):
-        self.L = L
+    def __init__(self, F, s_vec, zmat):
         self.F = F
         self.Coord = Coord
         self.s_vec = s_vec
@@ -29,5 +25,5 @@ class F_conv(object):
         self.F = np.einsum('ia,jb,ab->ij',self.A_T,self.A_T,self.F)
         self.F = self.F/(0.5291772085936**2)
         self.F *= 4.35974394
-        print('F-Matrix:')
-        print(self.F)
+        # print('F-Matrix:')
+        # print(self.F)

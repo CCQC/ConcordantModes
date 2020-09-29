@@ -8,8 +8,8 @@ from numpy import linalg as LA
 """
 
 class G_Matrix(object):
-    def __init__(self, L, zmat, s_vectors):
-        self.L         = L
+    def __init__(self, zmat, s_vectors):
+        # self.L         = L
         self.zmat      = zmat
         self.s_vectors = s_vectors
         self.G         = np.zeros((len(self.s_vectors.B),len(self.s_vectors.B)))
@@ -66,8 +66,8 @@ class G_Matrix(object):
         """
             Transform G with L-Matrix
         """
-        L_inv = inv(self.L)
-        self.G = np.dot(np.dot(L_inv,self.G),np.transpose(L_inv))
+        # L_inv = inv(self.L)
+        # self.G = np.dot(np.dot(L_inv,self.G),np.transpose(L_inv))
         tol = 1e-12
         self.G[np.abs(self.G) < tol] = 0
 
