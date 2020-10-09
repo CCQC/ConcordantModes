@@ -16,4 +16,4 @@ set {
   maxiter 300
 }
 
-energy('ccsd(t)')
+energy('mp2')

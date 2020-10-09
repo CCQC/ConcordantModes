@@ -29,7 +29,8 @@ class TransDisp(object):
         self.B = self.s_vectors.B
         self.zmat = zmat
         self.refCarts = zmat.Cartesians.copy()
-        self.refCarts = np.array(self.refCarts).astype(float)*0.5291772085936
+        # self.refCarts = np.array(self.refCarts).astype(float)*0.5291772085936
+        self.refCarts = np.array(self.refCarts).astype(float)
         self.u = np.identity(3*len(zmat.atomList))
         self.rdisp = rdisp
         self.adisp = adisp
@@ -42,8 +43,6 @@ class TransDisp(object):
         self.eig_inv = inv(self.eigs.copy())
         for i in range(len(self.eig_inv)):
             self.eig_inv[i] = self.eig_inv[i]/LA.norm(self.eig_inv[i])
-        # print('Intder _U_ matrix:')
-        # print(self.eig_inv)
         
         """
             Construct 'A', the commented lines may be useful for getting intensities later. 
@@ -92,11 +91,7 @@ class TransDisp(object):
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
             self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
 
-        # print(self.INTC(self.refCarts))
-        self.DispCart["ref"] /= 0.5291772085936
-        # print(self.DispCart['1_plus'])
-        # print(self.DispCart['1_minus'])
-        # raise RuntimeError
+        # self.DispCart["ref"] /= 0.5291772085936
 
     def INTC(self,carts):
         intCoord = np.array([])
@@ -151,5 +146,6 @@ class TransDisp(object):
             n_disp = newN - coordCheck
             if LA.norm(n_disp) < tolerance:
                 break
-        return newCarts/0.5291772085936
+        return newCarts
+        # return newCarts/0.5291772085936
 

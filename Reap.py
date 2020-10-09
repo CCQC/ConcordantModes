@@ -4,29 +4,19 @@ import shutil
 import re
 
 class Reap(object):
-    def __init__(self, progname, zmat, dispcart):
+    def __init__(self, progname, zmat, dispcart, options):
         self.progname = progname
         self.zmat = zmat
         self.dispcart = dispcart
+        self.options = options
 
     def run(self):
         # Define energy search regex
-        # molproEnergy = re.compile(r"\!RHF\-RCCSD\(T\) energy\s+(\-\d+\.\d+)")
-        molproEnergy = re.compile(r"\!RHF\-UCCSD\(T\) energy\s+(\-\d+\.\d+)")
-        molproSuccess = re.compile(r"Variable memory released")
-        psi4Energy = re.compile(r"CCSD\(T\)\s*total\s*energy\s+=\s+(\-\d+\.\d+)")
-        psi4Success = re.compile(r"\*\*\* Psi4 exiting successfully. Buy a developer a beer!")
-        
+        energyRegex = re.compile(self.options.energyRegex)
+        successRegex = re.compile(self.options.successRegex)
+
         rootdir = os.getcwd()
         n_atoms = len(self.zmat.atomList)
-        # dispCart = "dispcart" 
-        
-        # os.chdir(rootdir)
-        
-        # os.chdir('../mma')
-        # with open(dispCart,'r') as file:
-            # disp = file.readlines()
-        # os.chdir(rootdir)
         
         n_disp = len(self.dispcart)
         self.Energies = np.array([])
@@ -36,20 +26,15 @@ class Reap(object):
             os.chdir("./"+str(i+1))
             with open("output.dat",'r') as file:
                 data = file.read()
-            if progname == 'molpro':
-                if not re.search(molproSuccess,data):
-                    print('Energy failed at ' + str(i+1))
-                    raise RuntimeError
-                energy = re.findall(molproEnergy,data)
-            elif progname == 'psi4':
-                if not re.search(psi4Success,data):
-                    print('Energy failed at ' + str(i+1))
-                    raise RuntimeError
-                energy = re.findall(psi4Energy,data)
+            if not re.search(successRegex,data):
+                print('Energy failed at ' + str(i+1))
+                raise RuntimeError
+            energy = re.findall(energyRegex,data)
+            if progname == 'molpro' or progname == 'psi4':
+                self.Energies = np.append(self.Energies,energy[0])
             else:
                 print('Specified program not supported: ' + progname)
                 raise RuntimeError
-            self.Energies = np.append(self.Energies,energy[0])
             os.chdir('..')
         
         self.energiesDict = {}
@@ -61,10 +46,3 @@ class Reap(object):
                 self.energiesDict[str(k+1)+'_plus'] = float(self.Energies[i+1])
             if j == 1:
                 self.energiesDict[str(k+1)+'_minus'] = float(self.Energies[i+1])
-
-        outputString = ''
-        for i in self.Energies:
-            outputString += i + '\n'
-        
-        with open('e.dat','w') as file:
-            file.write(outputString)

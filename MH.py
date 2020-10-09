@@ -24,6 +24,20 @@ from MixedHessian.ZMAT_interp        import ZMAT_interp
 class MixedHessian(object):
     def __init__(self, options):
         self.options = options
+        """ 
+            This constant is from:
+            https://physics.nist.gov/cgi-bin/cuu/Value?hr 
+            If this link dies, find the new link on NIST
+            for the Hartree to Joule conversion and pop
+            it in there.
+            There is a standard uncertainty of 0.0000000000085
+            to this value.
+        """
+        self.mdyne_Hart = 4.3597447222071
+        """
+            Standard uncertainty of 0.00000000080
+        """
+        self.Bohr_Ang = 0.529177210903
 
     def run(self):
         t1 = time.time()
@@ -55,16 +69,15 @@ class MixedHessian(object):
 
         f_read = F_Read("FCMFINAL")
         f_read.run()
-        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat)
+        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False)
         f_conv.run()
-
+        # raise RuntimeError
 
         """
             Compute G-Matrix
         """
         g_mat = G_Matrix(self.zmat, s_vec)
         g_mat.run()
-        # raise RuntimeError
 
         """
             Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
@@ -106,7 +119,7 @@ class MixedHessian(object):
         prog = self.options.program
         progname = prog.split('@')[0]
         
-        Dir_obj = DirectoryTree(progname, self.options.basis, self.options.charge, self.options.spin, self.zmat, transdisp)
+        Dir_obj = DirectoryTree(progname, self.zmat, transdisp)
         Dir_obj.run()
         os.chdir(rootdir + '/Disps')
         dispList = []
@@ -144,7 +157,7 @@ class MixedHessian(object):
             After this point, all of the jobs will have finished, and its time to reap the energies
             as well as checking for sucesses on all of the jobs
         """
-        Reap_obj = Reap(progname,self.finalZmat,transdisp.DispCart)
+        Reap_obj = Reap(progname,self.finalZmat,transdisp.DispCart,self.options)
         Reap_obj.run()
         os.chdir('..')
 
@@ -157,7 +170,8 @@ class MixedHessian(object):
         """
             This is temporary to fit with the INTDER units. Delete when you make your own GF matrix method.
         """
-        fc.FC *= 4.35974394
+        # fc.FC *= 4.35974394
+        # fc.FC /= 0.5291772085936**2
         print('Computed Force Constants:')
         print(fc.FC)
 
@@ -178,7 +192,14 @@ class MixedHessian(object):
         print("Final Frequencies:")
         Final_GF = GF_Method(self.G,self.F,self.tol)
         Final_GF.run()
+        for i in range(len(Final_GF.Freq)):
+            print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(Final_GF.Freq[i]))
+        print("ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
+                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
         
+        cart_conv = F_conv(self.F, s_vec, self.finalZmat, "cartesian", True)
+        cart_conv.run()
+
         t2 = time.time()
         
         print('This program took ' + str(t2-t1) + ' seconds to run.')

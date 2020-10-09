@@ -1,16 +1,14 @@
 import fileinput
 import os
+import re
 import shutil
 
 
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,basis,charge,spin,zmat,disps):
+    def __init__(self,progname,zmat,disps):
         self.progname = progname
-        self.basis = basis
-        self.charge = charge
-        self.spin = spin
         self.zmat = zmat
         self.disps = disps # This should be the 'TransDisp' object
 
@@ -18,18 +16,31 @@ class DirectoryTree(object):
         """
             Modify this later so that f-strings are used for the geometry... but for now it works!
         """
+        self.psi4GeomRegex = re.compile(r"molecule\s+\{")
+        self.molproGeomRegex = re.compile(r"geometry\s+=\s+\{")
+        self.endGeomRegex = re.compile(r"}")
         if prog == 'molpro':
-            data.insert(7,' ' + n_at + " \n" )
+            ind1 = 0
+            for i in range(len(data)):
+                if re.search(self.molproGeomRegex,data[i]):
+                    ind1 = i
+            for i in range(len(data)-ind1-1):
+                if re.search(self.endGeomRegex,data[i+ind1+1]):
+                    ind2 = i+ind1+1
+                    break
             for i in range(int(n_at)):
-                data.insert(9+i , ' ' + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
-                # data.insert(9+i , ' ' + at[i] + ' ' + str(dispp[i][0]) + ' ' + str(dispp[i][1]) + ' ' + str(dispp[i][2]) + '\n')
+                data.insert(ind2+i, ' ' + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
         elif prog == 'psi4':
-            data[5] = '  ' + str(self.charge) + ' ' + str(self.spin) + '\n'
-            if self.spin != 1:
-                data[11] = '  reference uhf\n'
+            ind1 = 0
+            for i in range(len(data)):
+                if re.search(self.psi4GeomRegex,data[i]):
+                    ind1 = i
+            for i in range(len(data)-ind1-1):
+                if re.search(self.endGeomRegex,data[i+ind1+1]):
+                    ind2 = i+ind1+1
+                    break
             for i in range(int(n_at)):
-                data.insert(6+i , '  ' + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
-                # data.insert(6+i , '  ' + at[i] + ' ' + str(dispp[i][0]) + ' ' + str(dispp[i][1]) + ' ' + str(dispp[i][2]) + '\n')
+                data.insert(ind2+i, '  ' + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
         return data
 
     def run(self):
@@ -44,45 +55,14 @@ class DirectoryTree(object):
         progname = self.progname
 
         n_atoms = len(self.zmat.atomList)
-        # dispCart = "dispcart" 
         
-        # os.chdir('mma')
-        
-        # with open(dispCart,'r') as file:
-            # disp = file.readlines()
-   
-        # os.chdir(root)
-        
-        basis = self.basis
-
-        # n_disp = int((len(disp))/(n_atoms+1))
-        
-        # for i in range(n_disp):
-            # disp_dict['disp'].append(i + 1)
-            # disp_dict['geom'].append([])
-            # for j in range(n_atoms):
-                # disp_dict['geom'][i].append(disp[i*(n_atoms + 1) + j + 1])
-        
-        os.chdir(packagepath + '/templates')
-
-        basis_string = ''
-        if progname == 'molpro':
-            with open('input.dat','r') as file:
+        if progname == 'molpro' or progname == 'psi4':
+            with open('template.dat','r') as file:
                 data = file.readlines()
-        elif progname == 'psi4':
-            with open('psi4_template.dat','r') as file:
-                data = file.readlines()
-            basis_string += '  '
         else:
             print('Specified program not supported: ' + progname)
             raise RuntimeError
         
-        # raise RuntimeError
-        basis_string += 'basis=' + basis + '\n'
-        data[10] = basis_string
-        # print(data[10])
-        os.chdir(root)
-
         data_buff = data.copy()
         if os.path.exists(os.getcwd() + '/Disps'):
             shutil.rmtree('Disps',ignore_errors=True)

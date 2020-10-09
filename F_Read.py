@@ -19,4 +19,3 @@ class F_Read(object):
 
         self.FC_mat = re.findall(self.FC_regex,fc)
         self.FC_mat = np.reshape(self.FC_mat,(int(np.sqrt(len(self.FC_mat))),-1)).astype(float)
-        # print(self.FC_mat)

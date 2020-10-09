@@ -31,7 +31,8 @@ class GF_Method(object):
         print(self.eig_v)
         print('E-vecs:')
         print(self.L)
-        self.Freq = np.sqrt(self.eig_v, dtype=np.complex)*1302.791
+        # self.Freq = np.sqrt(self.eig_v, dtype=np.complex)*1302.791
+        self.Freq = np.sqrt(self.eig_v, dtype=np.complex)*5140.487143896534
         for i in range(len(self.Freq)):
             if np.real(self.Freq[i]) > 0.:
                 self.Freq[i] = np.real(self.Freq[i])

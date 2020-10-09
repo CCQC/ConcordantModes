@@ -12,11 +12,11 @@ class ZMAT_interp(object):
         # Define some regexes
         zmatBeginRegex  = re.compile(r"ZMAT begin")
         zmatEndRegex    = re.compile(r"ZMAT end")
-        firstAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s+\n")
-        secondAtomRegex = re.compile("^\s*([A-Z][a-z]*)\s(\d+)\s([A-Za-z0-9_]+)\s*\n")
-        thirdAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s(\d+)\s([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
-        fullAtomRegex   = re.compile("^\s*([A-Z][a-z]*)\s(\d+)\s([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
-        variableRegex   = re.compile("^\s*([A-Za-z0-9_]+)\s*\=\s*(-?\d+\.\d+)\s*\n")
+        firstAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s*\n")
+        secondAtomRegex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
+        thirdAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
+        fullAtomRegex   = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
+        variableRegex   = re.compile("\s*([A-Za-z0-9_]+)\s*\=\s*(-?\d+\.\d+)\s*\n")
         cartBeginRegex  = re.compile(r"cart begin")
         cartEndRegex    = re.compile(r"cart end")
         # cartesianRegex  = re.compile("^\s+[A-Z][A-Za-z]*\s+\d+\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n")
@@ -54,20 +54,26 @@ class ZMAT_interp(object):
         self.torsionVariables   = []
         self.variableDictionary = {}
         # Now to reap the ZMAT data 
+        count = 0
         for i in range(len(output)):
             # This case if we are at the first atom of the ZMAT
-            if re.search(firstAtomRegex,output[i]):
+            if re.search(firstAtomRegex,output[i]) and count < 1:
+                print(count)
+                print(re.findall(firstAtomRegex,output[i]))
                 self.atomList.append(re.findall(firstAtomRegex,output[i])[0])
                 firstIndex = i
+                count += 1
             # Second atom of the ZMAT, will have one bond term
             if re.search(secondAtomRegex,output[i]):
                 List = re.findall(secondAtomRegex,output[i])[0]
+                print(List)
                 self.atomList.append(List[0])
                 self.bondIndices.append([str(i-firstIndex+1),List[1]])
                 self.bondVariables.append(List[2])
             # Third atom of the ZMAT, will have bond and angle term
             if re.search(thirdAtomRegex,output[i]):
                 List = re.findall(thirdAtomRegex,output[i])[0]
+                print(List)
                 self.atomList.append(List[0])
                 self.bondIndices.append([str(i-firstIndex+1),List[1]])
                 self.bondVariables.append(List[2])
@@ -76,6 +82,7 @@ class ZMAT_interp(object):
             # All remaining ZMAT atoms, will have bond, angle, and torsion term
             if re.search(fullAtomRegex,output[i]):
                 List = re.findall(fullAtomRegex,output[i])[0]
+                print(List)
                 self.atomList.append(List[0])
                 self.bondIndices.append([str(i-firstIndex+1),List[1]])
                 self.bondVariables.append(List[2])

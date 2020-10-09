@@ -8,7 +8,9 @@ class Options(object):
         self.basis = kwargs.pop('basis', "cc-pVDZ")
         self.charge = kwargs.pop('charge', 0)
         self.spin = kwargs.pop('spin', 1)
-
+        self.successRegex = kwargs.pop('successRegex','')
+        self.energyRegex = kwargs.pop('energyRegex','')
+        
         ## These options may be helpful in the future, or maybe not!
         # self.input_name = kwargs.pop("input_name", "input.dat")
         # self.output_name = kwargs.pop("output_name", "output.dat")
