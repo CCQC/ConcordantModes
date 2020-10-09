@@ -14,6 +14,8 @@ class GF_Method(object):
         self.G   = G
         self.F   = F
         self.tol = tol
+        self.amu_elMass = 5.48579909065*(10**(-4))
+        self.Hartree_wavenum = 219474.6313708
         # self.stage = stage
 
     def run(self):
@@ -31,14 +33,16 @@ class GF_Method(object):
         print(self.eig_v)
         print('E-vecs:')
         print(self.L)
+        self.eig_v *= self.amu_elMass
         # self.Freq = np.sqrt(self.eig_v, dtype=np.complex)*1302.791
-        self.Freq = np.sqrt(self.eig_v, dtype=np.complex)*5140.487143896534
+        self.Freq = np.sqrt(self.eig_v, dtype=np.complex)
         for i in range(len(self.Freq)):
             if np.real(self.Freq[i]) > 0.:
                 self.Freq[i] = np.real(self.Freq[i])
             else:
                 self.Freq[i] = -np.imag(self.Freq[i])
         self.Freq = self.Freq.astype(float)
+        self.Freq *= self.Hartree_wavenum
         print('Frequencies:')
         print(self.Freq)
         self.TED = np.multiply(self.L,np.transpose(inv(self.L)))*100
