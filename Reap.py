@@ -30,6 +30,8 @@ class Reap(object):
                 print('Energy failed at ' + str(i+1))
                 raise RuntimeError
             energy = re.findall(energyRegex,data)
+            print(i)
+            print(energy[0])
             if progname == 'molpro' or progname == 'psi4':
                 self.Energies = np.append(self.Energies,energy[0])
             else:

@@ -6,7 +6,7 @@ from . import masses
 
 class ZMAT(object):
     def __init__(self):
-        pass
+        self.amu_elMass = 5.48579909065*(10**(-4))
 
     def run(self):
         # Define some regexes
@@ -86,7 +86,26 @@ class ZMAT(object):
             # Now to reap the variables and their values
             if re.search(variableRegex,output[i]):
                 List = re.findall(variableRegex,output[i])[0]
-                self.variableDictionary[List[0]] = List[1]
+                self.variableDictionary[List[0]] = float(List[1])
+        
+        """ 
+            And now we must temper the torsion angles! For consistency's sake we will
+            force them to lie between -90 deg and +270 deg.
+        """
+        for i in range(len(self.torsionVariables)):
+            Condition1 = float(self.variableDictionary[self.torsionVariables[i]]) <= -90.
+            Condition2 = float(self.variableDictionary[self.torsionVariables[i]]) >= 270.
+            buff = np.floor(abs(float(self.variableDictionary[self.torsionVariables[i]])/360))
+            if Condition1:
+                self.variableDictionary[self.torsionVariables[i]] = float(self.variableDictionary[self.torsionVariables[i]])
+                self.variableDictionary[self.torsionVariables[i]] += 360.*buff
+                if float(self.variableDictionary[self.torsionVariables[i]]) <= -90.:
+                    self.variableDictionary[self.torsionVariables[i]] += 360.
+            elif Condition2:
+                self.variableDictionary[self.torsionVariables[i]] = float(self.variableDictionary[self.torsionVariables[i]])
+                self.variableDictionary[self.torsionVariables[i]] -= 360.*buff
+                if float(self.variableDictionary[self.torsionVariables[i]]) >= 270.:
+                    self.variableDictionary[self.torsionVariables[i]] -= 360.
         
         # Make a cartesian output slice
         for i in range(len(tempOutput)):
@@ -102,57 +121,26 @@ class ZMAT(object):
                 self.Cartesians.append(temp[0])
             if i > (cartIndex + len(self.atomList) + 1):
                 break
-        
-        atomListOutput           = ''
-        bondIndicesOutput        = ''
-        bondVariablesOutput      = ''
-        angleIndicesOutput       = ''
-        angleVariablesOutput     = ''
-        torsionIndicesOutput     = ''
-        torsionVariablesOutput   = ''
-        variableDictionaryOutput = ''
-        cartesianOutput          = ''
-        
-        # Write the atom list output
-        if len(self.atomList) > 0:
-            for i in range(len(self.atomList)-1):
-                atomListOutput += self.atomList[i] + '\n'
-            atomListOutput += self.atomList[len(self.atomList)-1]
-        
-        # Write the bond outputs
-        if len(self.bondIndices) > 0:
-            for i in range(len(self.bondIndices)-1):
-                bondIndicesOutput += self.bondIndices[i][0] + ' ' + self.bondIndices[i][1] + '\n'
-            bondIndicesOutput += self.bondIndices[len(self.bondIndices)-1][0] + ' ' + self.bondIndices[len(self.bondIndices)-1][1]
-            for i in range(len(self.bondVariables)-1):
-                bondVariablesOutput += self.bondVariables[i] + '\n'
-            bondVariablesOutput += self.bondVariables[len(self.bondVariables)-1]
-        
-        # Write the angle outputs
-        if len(self.angleIndices) > 0:
-            for i in range(len(self.angleIndices)-1):
-                angleIndicesOutput += self.angleIndices[i][0] + ' ' + self.angleIndices[i][1] + ' ' + self.angleIndices[i][2] + '\n'
-            angleIndicesOutput += self.angleIndices[len(self.angleIndices)-1][0] + ' ' + self.angleIndices[len(self.angleIndices)-1][1] + ' ' + self.angleIndices[len(self.angleIndices)-1][2]
-            for i in range(len(self.angleVariables)-1):
-                angleVariablesOutput += self.angleVariables[i] + '\n'
-            angleVariablesOutput += self.angleVariables[len(self.angleVariables)-1]
-        
-        # Write the torsion outputs
-        if len(self.torsionIndices) > 0:
-            for i in range(len(self.torsionIndices)-1):
-                torsionIndicesOutput += self.torsionIndices[i][0] + ' ' + self.torsionIndices[i][1] + ' ' + self.torsionIndices[i][2] + ' ' + self.torsionIndices[i][3] + '\n'
-            torsionIndicesOutput += self.torsionIndices[len(self.torsionIndices)-1][0] + ' ' + self.torsionIndices[len(self.torsionIndices)-1][1] + ' ' + self.torsionIndices[len(self.torsionIndices)-1][2] + ' ' + self.torsionIndices[len(self.torsionIndices)-1][3]
-            for i in range(len(self.torsionVariables)-1):
-                torsionVariablesOutput += self.torsionVariables[i] + '\n'
-            torsionVariablesOutput += self.torsionVariables[len(self.torsionVariables)-1]
-        
+
+        """
+            Convert the angle and torsion variables to np arrays and remove duplicates
+        """
         flatAngles = np.array(self.angleVariables)
         flatAngles = np.unique(flatAngles)
         flatTorsions = np.array(self.torsionVariables)
         flatTorsions = np.unique(flatTorsions)
+
+        """
+            Convert angles and torsions to radians
+        """
         for i in flatAngles:
-            self.variableDictionary[i] = str(float(self.variableDictionary[i]) * (np.pi/180))
+            self.variableDictionary[i] = float(self.variableDictionary[i])*(np.pi/180)
         for i in flatTorsions:
-            self.variableDictionary[i] = str(float(self.variableDictionary[i]) * (np.pi/180))
+            self.variableDictionary[i] = float(self.variableDictionary[i])*(np.pi/180)
        
+        """
+            The proper masses are pulled from the masses.py file
+        """
         self.masses = [masses.get_mass(label) for label in self.atomList]
+        for i in range(len(self.masses)):
+            self.masses[i] = self.masses[i]/self.amu_elMass

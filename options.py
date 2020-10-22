@@ -3,7 +3,7 @@ class Options(object):
         self.queue = kwargs.pop("queue", "gen4.q")
         self.nslots = kwargs.pop("nslots", 1)
         self.program = kwargs.pop('program', "molpro@2010.1.67+mpi")
-        self.rdisp = kwargs.pop('rdisp', 0.005)
+        self.rdisp = kwargs.pop('rdisp', 0.01)
         self.adisp = kwargs.pop('adisp', 0.01)
         self.basis = kwargs.pop('basis', "cc-pVDZ")
         self.charge = kwargs.pop('charge', 0)

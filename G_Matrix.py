@@ -9,7 +9,6 @@ from numpy import linalg as LA
 
 class G_Matrix(object):
     def __init__(self, zmat, s_vectors):
-        # self.L         = L
         self.zmat      = zmat
         self.s_vectors = s_vectors
         self.G         = np.zeros((len(self.s_vectors.B),len(self.s_vectors.B)))
@@ -66,8 +65,6 @@ class G_Matrix(object):
         """
             Transform G with L-Matrix
         """
-        # L_inv = inv(self.L)
-        # self.G = np.dot(np.dot(L_inv,self.G),np.transpose(L_inv))
         tol = 1e-12
         self.G[np.abs(self.G) < tol] = 0
 
@@ -76,8 +73,12 @@ class G_Matrix(object):
     """
     def compute_element(self,s_1,s_2,overlap_indices):
         G_Mat_Element = 0.
+        G_Mat = 0.
         for i in overlap_indices:
             G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])/self.zmat.masses[i-1]
+            G_Mat += np.dot(s_1[i-1],s_2[i-1])
             # G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])
-        
+        # print(overlap_indices)
+        # print("G_Mat: ")
+        # print(G_Mat)
         return G_Mat_Element

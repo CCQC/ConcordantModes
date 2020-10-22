@@ -46,11 +46,11 @@ class MixedHessian(object):
         
         packagepath = os.path.realpath(__file__)
         packagepath = packagepath[:-len('/MH.py')]
+        if os.path.exists(rootdir + '/zmatFiles'):
+            shutil.rmtree(rootdir + '/zmatFiles')
         """
             Parse the output to get all pertinent ZMAT info
         """
-        if os.path.exists(rootdir + '/zmatFiles'):
-            shutil.rmtree(rootdir + '/zmatFiles')
         self.zmat = ZMAT()
         self.zmat.run()
         self.finalZmat = ZMAT_interp()
@@ -104,7 +104,7 @@ class MixedHessian(object):
             shutil.rmtree(rootdir + '/Intder')
         
         """
-            This should replace the first part of the mathematica intdif script
+            Recompute the B-Tensors to match the final geometry, then generate the displacements.
         """
         s_vec = s_vectors(self.finalZmat)
         s_vec.run()
@@ -166,20 +166,19 @@ class MixedHessian(object):
         """
         fc = ForceConstant(self.finalZmat, transdisp, Reap_obj.energiesDict)
         fc.run()
-
-        """
-            This is temporary to fit with the INTDER units. Delete when you make your own GF matrix method.
-        """
-        # fc.FC *= 4.35974394
-        # fc.FC /= 0.5291772085936**2
         print('Computed Force Constants:')
         print(fc.FC)
 
         """
             I will need to make a method just for reading in force constants, for now the diagonals will do.
         """
-        
         self.F = np.diag(fc.FC)
+
+        """
+            Recompute the G-matrix with the new geometry, and then transform the G-matrix using the 
+            lower level of theory eigenvalue matrix. This will not fully diagonalize the G-matrix
+            if a different geometry is used between the two.
+        """
         g_mat = G_Matrix(self.finalZmat, s_vec)
         g_mat.run()
         self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),np.transpose(transdisp.eig_inv))
@@ -188,18 +187,67 @@ class MixedHessian(object):
         """
             Final GF Matrix run
         """
-        
         print("Final Frequencies:")
         Final_GF = GF_Method(self.G,self.F,self.tol)
         Final_GF.run()
+
+        """
+            This code below is a rudimentary table of the TED for the final frequencies.
+            Actually right now it uses the initial L-matrix, which may need to be modified
+            by the final L-matrix.
+        """
+        tableOutput = "     Frequency #:"
+        for i in range(len(Final_GF.Freq)):
+            tableOutput += "{:8d}".format(i+1)
+        tableOutput += '\n'
+        tableOutput += "-----------------"
+        for i in range(len(Final_GF.Freq)):
+            tableOutput += "--------"
+        tableOutput += '\n'
+        tableOutput += "       Frequency: "
+        for i in range(len(Final_GF.Freq)):
+            tableOutput += " " + "{:8.1f}".format(Final_GF.Freq[i])
+        tableOutput += '\n'
+        tableOutput += "-----------------"
+        for i in range(len(Final_GF.Freq)):
+            tableOutput += "--------"
+        tableOutput += '\n'
+        for i in range(len(init_GF.TED)):
+            if i < len(self.zmat.bondIndices):
+                tableOutput += "      " + str(self.zmat.atomList[int(self.zmat.bondIndices[i][0])-1]) + str(self.zmat.bondIndices[i][0]) + " " \
+                        + str(self.zmat.atomList[int(self.zmat.bondIndices[i][1])-1]) + str(self.zmat.bondIndices[i][1]) + " STRE: " 
+            elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices):
+                k = i - len(self.zmat.bondIndices)
+                tableOutput += "   " + str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0]) + " " \
+                        + str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1]) + " " \
+                        + str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2]) + " BEND: " 
+            elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices):
+                k = i - len(self.zmat.bondIndices) - len(self.zmat.angleIndices)
+                tableOutput += str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0]) + " " \
+                        + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1]) + " " \
+                        + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2]) + " " \
+                        + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3]) + " TORS: " 
+            for j in range(len(init_GF.TED)):
+                tableOutput += "{:8.1f}".format(init_GF.TED[j][i])
+            tableOutput += '\n'
+        print(tableOutput)
+
+        """
+            This code prints out the frequencies in order of energy as well as the ZPVE in several different units.
+        """
         for i in range(len(Final_GF.Freq)):
             print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(Final_GF.Freq[i]))
         print("ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
                 + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
         
+        """
+            This code converts the force constants back into cartesian coordinates and writes out
+            an "output.default.hess" file, which is of the same format as FCMFINAL.
+        """
         cart_conv = F_conv(self.F, s_vec, self.finalZmat, "cartesian", True)
         cart_conv.run()
 
         t2 = time.time()
         
+        # print(Final_GF.Freq - init_GF.Freq)
         print('This program took ' + str(t2-t1) + ' seconds to run.')
