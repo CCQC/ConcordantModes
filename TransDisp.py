@@ -28,7 +28,7 @@ class TransDisp(object):
         self.s_vectors = s_vectors
         self.B = self.s_vectors.B
         self.zmat = zmat
-        self.refCarts = zmat.Cartesians.copy()
+        self.refCarts = zmat.CartesiansFinal.copy()
         self.refCarts = np.array(self.refCarts).astype(float)
         self.u = np.identity(3*len(zmat.atomList))
         self.rdisp = rdisp
@@ -65,13 +65,13 @@ class TransDisp(object):
         self.s_coord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
             self.s_disp = np.append(self.s_disp,self.rdisp)
-            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionary[self.zmat.bondVariables[i]])
+            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.bondVariables[i]])
         for i in range(len(self.zmat.angleIndices)):
             self.s_disp = np.append(self.s_disp,self.adisp)
-            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionary[self.zmat.angleVariables[i]])
+            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]])
         for i in range(len(self.zmat.torsionIndices)):
             self.s_disp = np.append(self.s_disp,self.adisp)
-            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionary[self.zmat.torsionVariables[i]])
+            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]])
         self.s_coord = self.s_coord.astype(float)
        
         print(self.s_coord)
@@ -105,8 +105,8 @@ class TransDisp(object):
             x2 = np.array(carts[int(self.zmat.angleIndices[i][1])-1]).astype(float)
             x3 = np.array(carts[int(self.zmat.angleIndices[i][2])-1]).astype(float)
             a = self.calcAngle(x1,x2,x3)
-            Condition1 = float(self.zmat.variableDictionary[self.zmat.angleVariables[i]]) > 180.
-            Condition2 = float(self.zmat.variableDictionary[self.zmat.angleVariables[i]]) < 0
+            Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]]) > 180.
+            Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]]) < 0.
             if Condition1 or Condition2:
                 a = 2*np.pi - a
             intCoord = np.append(intCoord,a)
@@ -116,8 +116,8 @@ class TransDisp(object):
             x3 = np.array(carts[int(self.zmat.torsionIndices[i][2])-1]).astype(float)
             x4 = np.array(carts[int(self.zmat.torsionIndices[i][3])-1]).astype(float)
             t = self.calcTors(x1,x2,x3,x4)
-            Condition1 = float(self.zmat.variableDictionary[self.zmat.torsionVariables[i]]) > 90. and float(self.zmat.variableDictionary[self.zmat.torsionVariables[i]]) <= 270.
-            Condition2 = float(self.zmat.variableDictionary[self.zmat.torsionVariables[i]]) < -90. and float(self.zmat.variableDictionary[self.zmat.torsionVariables[i]]) >= -270.
+            Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) <= 270.
+            Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) >= -270.
             if Condition1 or Condition2:
                 t += np.pi
             # diff = self.zmat.variableDictionary[self.zmat.torsionVariables[i]] - t*180/np.pi 

@@ -12,11 +12,11 @@ from numpy import linalg as LA
 
 
 class s_vectors(object):
-    def __init__(self,zmat):
+    def __init__(self,zmat,carts):
         self.s_STRE_dict    = {}
         self.s_BEND_dict    = {}
         self.s_TORS_dict    = {}
-        self.carts          = np.array(zmat.Cartesians).astype(np.float) 
+        self.carts          = carts
         self.bondIndices    = np.array(zmat.bondIndices).astype(np.int) 
         self.angleIndices   = np.array(zmat.angleIndices).astype(np.int) 
         self.torsionIndices = np.array(zmat.torsionIndices).astype(np.int) 

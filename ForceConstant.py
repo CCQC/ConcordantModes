@@ -11,8 +11,7 @@ from numpy import linalg as LA
 """
 
 class ForceConstant(object):
-    def __init__(self,zmat,disp,energiesDict):
-        self.zmat = zmat
+    def __init__(self,disp,energiesDict):
         self.disp = disp
         self.energiesDict = energiesDict
 

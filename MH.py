@@ -18,8 +18,9 @@ from MixedHessian.Reap               import Reap
 from MixedHessian.s_vectors          import s_vectors
 from MixedHessian.TransDisp          import TransDisp
 from MixedHessian.vulcan_template    import vulcan_template
-from MixedHessian.ZMAT_parse         import ZMAT
-from MixedHessian.ZMAT_interp        import ZMAT_interp
+# from MixedHessian.ZMAT_parse         import ZMAT
+# from MixedHessian.ZMAT_interp        import ZMAT_interp
+from MixedHessian.ZMAT_interp        import ZMAT
 
 class MixedHessian(object):
     def __init__(self, options):
@@ -53,14 +54,14 @@ class MixedHessian(object):
         """
         self.zmat = ZMAT()
         self.zmat.run()
-        self.finalZmat = ZMAT_interp()
-        self.finalZmat.run()
+        # self.finalZmat = ZMAT_interp()
+        # self.finalZmat.run()
         # raise RuntimeError
 
         """
-            This is a new addition, the hope is to compute s-vectors right off the bat!
+            Compute the initial s-vectors
         """
-        s_vec = s_vectors(self.zmat)
+        s_vec = s_vectors(self.zmat,self.zmat.CartesiansInit)
         s_vec.run()
 
         """
@@ -106,9 +107,9 @@ class MixedHessian(object):
         """
             Recompute the B-Tensors to match the final geometry, then generate the displacements.
         """
-        s_vec = s_vectors(self.finalZmat)
+        s_vec = s_vectors(self.zmat,self.zmat.CartesiansFinal)
         s_vec.run()
-        transdisp = TransDisp(s_vec,self.finalZmat,self.options.rdisp,self.options.adisp,init_GF.L)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L)
         transdisp.run()
         
 
@@ -157,14 +158,14 @@ class MixedHessian(object):
             After this point, all of the jobs will have finished, and its time to reap the energies
             as well as checking for sucesses on all of the jobs
         """
-        Reap_obj = Reap(progname,self.finalZmat,transdisp.DispCart,self.options)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options)
         Reap_obj.run()
         os.chdir('..')
 
         """
             This section will compute the force constants using a python script
         """
-        fc = ForceConstant(self.finalZmat, transdisp, Reap_obj.energiesDict)
+        fc = ForceConstant(transdisp, Reap_obj.energiesDict)
         fc.run()
         print('Computed Force Constants:')
         print(fc.FC)
@@ -179,7 +180,7 @@ class MixedHessian(object):
             lower level of theory eigenvalue matrix. This will not fully diagonalize the G-matrix
             if a different geometry is used between the two.
         """
-        g_mat = G_Matrix(self.finalZmat, s_vec)
+        g_mat = G_Matrix(self.zmat, s_vec)
         g_mat.run()
         self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),np.transpose(transdisp.eig_inv))
         self.G[np.abs(self.G) < self.tol] = 0
@@ -244,7 +245,7 @@ class MixedHessian(object):
             This code converts the force constants back into cartesian coordinates and writes out
             an "output.default.hess" file, which is of the same format as FCMFINAL.
         """
-        cart_conv = F_conv(self.F, s_vec, self.finalZmat, "cartesian", True)
+        cart_conv = F_conv(self.F, s_vec, self.zmat, "cartesian", True)
         cart_conv.run()
 
         t2 = time.time()
