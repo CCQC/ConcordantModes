@@ -10,6 +10,8 @@ class Options(object):
         self.spin = kwargs.pop('spin', 1)
         self.successRegex = kwargs.pop('successRegex','')
         self.energyRegex = kwargs.pop('energyRegex','')
+        self.cartInsert = kwargs.pop('cartInsert',-1)
+        self.calc = kwargs.pop('calc',True)
         
         ## These options may be helpful in the future, or maybe not!
         # self.input_name = kwargs.pop("input_name", "input.dat")

@@ -3,6 +3,7 @@ import os
 import shutil
 import re
 from . import masses
+from MixedHessian.int2cart import int2cart
 
 # class ZMAT_interp(object):
 class ZMAT(object):
@@ -144,10 +145,32 @@ class ZMAT(object):
                 self.variableDictionaryFinal[self.torsionVariables[i]] -= 360.*buff
                 if float(self.variableDictionaryFinal[self.torsionVariables[i]]) >= 270.:
                     self.variableDictionaryFinal[self.torsionVariables[i]] -= 360.
+
+        """
+            The masses are assigned to the respective atom from the masses.py file
+        """
+        self.masses = [masses.get_mass(label) for label in self.atomList]
+        for i in range(len(self.masses)):
+            self.masses[i] = self.masses[i]/self.amu_elMass
        
         """
-            This code slices out the Cartesian coordinates
+            Calculate Cartesians using ZMATs: Sadly this will have to go on the backburner.
+            The cartesians must match those used to generate the cartesian force constants or you're gonna have a bad time.
         """
+        # cartInit = int2cart(self,self.variableDictionaryInit)
+        # cartFinal = int2cart(self,self.variableDictionaryFinal)
+        # cartInit.run()
+        # cartFinal.run()
+        # self.CartesiansInit = cartInit.Carts
+        # self.CartesiansFinal = cartFinal.Carts
+        # print(self.CartesiansInit)
+        # print(self.CartesiansFinal)
+        
+        """
+            Read in the input cartesian coordinates
+        """
+        self.CartesiansInit = []
+        self.CartesiansFinal = []
         cartRange = []
         
         for i in range(len(output)):
@@ -175,9 +198,6 @@ class ZMAT(object):
         else:
             cartOutputInit  = cartOutput.copy()
         
-        # Find the cartesian coordinates, in bohr
-        self.CartesiansInit = []
-        self.CartesiansFinal = []
         for i in range(len(cartOutputInit)):
             if re.search(cartesianRegex,cartOutputInit[i]):
                 temp = re.findall(cartesianRegex,cartOutputInit[i])
@@ -192,10 +212,11 @@ class ZMAT(object):
             self.CartesiansFinal = np.array(self.CartesiansFinal).astype(float)
         else:
             self.CartesiansFinal = self.CartesiansInit.copy()
+        
+        print(self.CartesiansInit)
+        print(self.CartesiansFinal)
 
-        """
-            The masses are assigned to the respective atom from the masses.py file
-        """
-        self.masses = [masses.get_mass(label) for label in self.atomList]
-        for i in range(len(self.masses)):
-            self.masses[i] = self.masses[i]/self.amu_elMass
+
+        # print(self.bondVariables)
+        # print(self.torsionIndices)
+        # raise RuntimeError

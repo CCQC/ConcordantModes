@@ -7,40 +7,29 @@ import shutil
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,zmat,disps):
+    def __init__(self,progname,zmat,disps,insertionIndex):
         self.progname = progname
         self.zmat = zmat
+        self.insertionIndex = insertionIndex
         self.disps = disps # This should be the 'TransDisp' object
 
-    def Make_Input(self,data,dispp,n_at,at,prog):	
+    def Make_Input(self,data,dispp,n_at,at,index):	
+    # def Make_Input(self,data,dispp,n_at,at,prog):	
         """
-            Modify this later so that f-strings are used for the geometry... but for now it works!
+            I'm going to generalize this so that the user just puts in the insertion index,
+            and the geometry is placed there. Then the user can use any program/input file that this
+            package is coded for.
         """
-        self.psi4GeomRegex = re.compile(r"molecule\s+\{")
-        self.molproGeomRegex = re.compile(r"geometry\s+=\s+\{")
-        self.endGeomRegex = re.compile(r"}")
-        if prog == 'molpro':
-            ind1 = 0
-            for i in range(len(data)):
-                if re.search(self.molproGeomRegex,data[i]):
-                    ind1 = i
-            for i in range(len(data)-ind1-1):
-                if re.search(self.endGeomRegex,data[i+ind1+1]):
-                    ind2 = i+ind1+1
-                    break
+        space = ' '
+        if self.progname == 'cfour':
+            space = ''
+        if index == -1:
+            print('The user needs to specify a different value for the cartInsert keyword.')
+            raise RuntimeError
+        else:
             for i in range(int(n_at)):
-                data.insert(ind2+i, ' ' + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
-        elif prog == 'psi4':
-            ind1 = 0
-            for i in range(len(data)):
-                if re.search(self.psi4GeomRegex,data[i]):
-                    ind1 = i
-            for i in range(len(data)-ind1-1):
-                if re.search(self.endGeomRegex,data[i+ind1+1]):
-                    ind2 = i+ind1+1
-                    break
-            for i in range(int(n_at)):
-                data.insert(ind2+i, '  ' + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
+                data.insert(index+i, space + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
+        
         return data
 
     def run(self):
@@ -56,7 +45,7 @@ class DirectoryTree(object):
 
         n_atoms = len(self.zmat.atomList)
         
-        if progname == 'molpro' or progname == 'psi4':
+        if progname == 'molpro' or progname == 'psi4' or progname =='cfour':
             with open('template.dat','r') as file:
                 data = file.readlines()
         else:
@@ -70,8 +59,15 @@ class DirectoryTree(object):
         os.chdir('./Disps')
         os.mkdir("1")
         os.chdir("./1")
-        data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),self.zmat.atomList,progname)
-        with open('input.dat','w') as file:
+        data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        # data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),self.zmat.atomList,progname)
+        inp = ''
+        if self.progname == 'cfour':
+            inp = 'ZMAT'
+        else:
+            inp = 'input.dat'
+
+        with open(inp, 'w') as file:
             file.writelines(data)
         data = data_buff.copy()
         os.chdir('..')
@@ -81,9 +77,9 @@ class DirectoryTree(object):
             os.mkdir(str(i+2))
             os.chdir("./" + str(i+2))
             if j == 0:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,progname)
+                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
             if j == 1:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,progname)
+                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
             with open('input.dat','w') as file:
                file.writelines(data)
             data = data_buff.copy()

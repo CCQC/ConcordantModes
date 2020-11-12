@@ -20,7 +20,8 @@ from MixedHessian.TransDisp          import TransDisp
 from MixedHessian.vulcan_template    import vulcan_template
 # from MixedHessian.ZMAT_parse         import ZMAT
 # from MixedHessian.ZMAT_interp        import ZMAT_interp
-from MixedHessian.ZMAT_interp        import ZMAT
+from MixedHessian.ZMAT               import ZMAT
+from MixedHessian.int2cart           import int2cart
 
 class MixedHessian(object):
     def __init__(self, options):
@@ -54,6 +55,8 @@ class MixedHessian(object):
         """
         self.zmat = ZMAT()
         self.zmat.run()
+        # self.i2c = int2cart(self.zmat,self.zmat.variableDictionaryInit)
+        # self.i2c.run()
         # self.finalZmat = ZMAT_interp()
         # self.finalZmat.run()
         # raise RuntimeError
@@ -120,44 +123,48 @@ class MixedHessian(object):
         prog = self.options.program
         progname = prog.split('@')[0]
         
-        Dir_obj = DirectoryTree(progname, self.zmat, transdisp)
-        Dir_obj.run()
-        os.chdir(rootdir + '/Disps')
-        dispList = []
-        for i in os.listdir(rootdir + '/Disps'):
-            dispList.append(i)
-        
-        """
-            This code generates the submit script for the displacements, submits an array, then checks if all jobs have finished every 10 seconds. :D
-        """
+        """ ''"""
+        if self.options.calc:
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert)
+            Dir_obj.run()
+            os.chdir(rootdir + '/Disps')
+            dispList = []
+            for i in os.listdir(rootdir + '/Disps'):
+                dispList.append(i)
+            
+            """
+                This code generates the submit script for the displacements, submits an array, then checks if all jobs have finished every 10 seconds. :D
+            """
 
-        v_template = vulcan_template(self.options,len(dispList),progname,prog)
-        out = v_template.run()
-        with open('displacements.sh','w') as file:
-            file.write(out)
-        
-        pipe = subprocess.PIPE
-        
-        process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True)
-        self.outRegex = re.compile(r'Your\s*job\-array\s*(\d*)')
-        self.job_id = int(re.search(self.outRegex,str(process.stdout)).group(1))
-        self.jobFinRegex = re.compile(r'taskid')
-        while(True):
-            qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], stdout=pipe, stderr=pipe)
-            qacct_string = str(qacct_proc.stdout)
-            job_match = re.findall(self.jobFinRegex,qacct_string)
-            if len(job_match) == len(dispList):
-                break
-            time.sleep(10)
+            v_template = vulcan_template(self.options,len(dispList),progname,prog)
+            out = v_template.run()
+            with open('displacements.sh','w') as file:
+                file.write(out)
+            
+            pipe = subprocess.PIPE
+            
+            process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True)
+            self.outRegex = re.compile(r'Your\s*job\-array\s*(\d*)')
+            self.job_id = int(re.search(self.outRegex,str(process.stdout)).group(1))
+            self.jobFinRegex = re.compile(r'taskid')
+            while(True):
+                qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], stdout=pipe, stderr=pipe)
+                qacct_string = str(qacct_proc.stdout)
+                job_match = re.findall(self.jobFinRegex,qacct_string)
+                if len(job_match) == len(dispList):
+                    break
+                time.sleep(10)
 
-        output = str(process.stdout)
-        error = str(process.stderr)  
+            output = str(process.stdout)
+            error = str(process.stderr)  
         
 
         """
             After this point, all of the jobs will have finished, and its time to reap the energies
             as well as checking for sucesses on all of the jobs
         """
+        if not self.options.calc:
+            os.chdir("Disps")
         Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options)
         Reap_obj.run()
         os.chdir('..')
