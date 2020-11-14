@@ -32,7 +32,7 @@ class Reap(object):
             energy = re.findall(energyRegex,data)
             # print(i)
             # print(energy[0])
-            if progname == 'molpro' or progname == 'psi4':
+            if progname == 'molpro' or progname == 'psi4' or progname == 'cfour':
                 self.Energies = np.append(self.Energies,energy[0])
             else:
                 print('Specified program not supported: ' + progname)

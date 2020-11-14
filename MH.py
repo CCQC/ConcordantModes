@@ -112,7 +112,7 @@ class MixedHessian(object):
         """
         s_vec = s_vectors(self.zmat,self.zmat.CartesiansFinal)
         s_vec.run()
-        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L,True)
         transdisp.run()
         
 

@@ -56,13 +56,15 @@ echo "***********************************************************************"
 cd $SGE_O_WORKDIR/$SGE_TASK_ID
 vulcan load {cline}
 
+scratch=$TMPDIR/$USER/$JOB_ID
+
 # Set variables
 export OMP_NUM_THREADS=4
-export NSLOTS=4
+export NSLOTS=1
 prefix=/opt/vulcan/opt/vulcan/linux-x86_64/intel-13.0.0/cfour-2.0-yhj426etc3g7hslvbmpgvdymp2w76rob
 
 # Copy job data
-cp $SGE_O_WORKDIR/ZMAT $scratch/ZMAT
+cp $SGE_O_WORKDIR/$SGE_TASK_ID/ZMAT $scratch/ZMAT
 cp $prefix/basis/GENBAS $scratch
 cp $prefix/basis/ECPDATA $scratch
 if [ -e JAINDX ]; then cp JAINDX $scratch ; fi
@@ -80,17 +82,17 @@ echo " Running cfour on `hostname`"
 echo " Running calculation..."
 
 cd $scratch
-xcfour >& $SGE_O_WORKDIR/output.dat
+xcfour >& $SGE_O_WORKDIR/$SGE_TASK_ID/output.dat
 xja2fja
-/opt/scripts/cfour2avogadro $SGE_O_WORKDIR/output.dat
+/opt/scripts/cfour2avogadro $SGE_O_WORKDIR/$SGE_TASK_ID/output.dat
 
 echo " Saving data and cleaning up..."
-if [ -e ZMATnew ]; then cp -f ZMATnew $SGE_O_WORKDIR/ZMATnew ; fi
+if [ -e ZMATnew ]; then cp -f ZMATnew $SGE_O_WORKDIR/$SGE_TASK_ID/ZMATnew ; fi
 
 # Create a job data archive file
-tar --transform "s,^,Job_Data_$JOB_ID/," -vcf $SGE_O_WORKDIR/Job_Data_$JOB_ID.tar OPTARC FCMINT FCMFINAL ZMATnew JMOL.plot JOBARC JAINDX FJOBARC DIPDER HESSIAN MOLDEN NEWMOS AVOGADROplot.log den.dat
-if [ -e zmat001 ]; then tar --transform "s,^,Job_Data_$JOB_ID/," -vrf $SGE_O_WORKDIR/Job_Data_$JOB_ID.tar zmat* ; fi
-gzip $SGE_O_WORKDIR/Job_Data_$JOB_ID.tar
+tar --transform "s,^,Job_Data_$JOB_ID/," -vcf $SGE_O_WORKDIR/$SGE_TASK_ID/Job_Data_$JOB_ID.tar OPTARC FCMINT FCMFINAL ZMATnew JMOL.plot JOBARC JAINDX FJOBARC DIPDER HESSIAN MOLDEN NEWMOS AVOGADROplot.log den.dat
+if [ -e zmat001 ]; then tar --transform "s,^,Job_Data_$JOB_ID/," -vrf $SGE_O_WORKDIR/$SGE_TASK_ID/Job_Data_$JOB_ID.tar zmat* ; fi
+gzip $SGE_O_WORKDIR/$SGE_TASK_ID/Job_Data_$JOB_ID.tar
 
 echo " Job complete on `hostname`." """
         else:

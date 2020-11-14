@@ -24,20 +24,21 @@ from numpy import linalg as LA
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,rdisp,adisp,eigs):
-        self.s_vectors = s_vectors
-        self.B = self.s_vectors.B
-        self.zmat = zmat
-        self.refCarts = zmat.CartesiansFinal.copy()
-        self.refCarts = np.array(self.refCarts).astype(float)
-        self.u = np.identity(3*len(zmat.atomList))
-        self.rdisp = rdisp
-        self.adisp = adisp
-        self.eigs = eigs
-        self.DispCart = {}
+    def __init__(self,s_vectors,zmat,rdisp,adisp,eigs,Conv):
+        self.Conv            = Conv
+        self.s_vectors       = s_vectors
+        self.zmat            = zmat
+        self.refCarts        = zmat.CartesiansFinal.copy()
+        self.refCarts        = np.array(self.refCarts).astype(float)
+        self.u               = np.identity(3*len(zmat.atomList))
+        self.rdisp           = rdisp
+        self.adisp           = adisp
+        self.eigs            = eigs
+        self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
 
     def run(self):
+        self.B = self.s_vectors.B
         """ Invert the L-matrix and then normalize the rows. """
         self.eig_inv = inv(self.eigs.copy())
         for i in range(len(self.eig_inv)):
@@ -81,7 +82,7 @@ class TransDisp(object):
         """ Transform the internal coordinate displacements to normal mode internal coord disps. """
         # self.n_disp = np.dot(self.s_tensor,self.s_disp)
 
-        self.n_coord = self.INTC(self.refCarts)
+        self.n_coord = self.INTC(self.refCarts,self.eig_inv)
 
         for i in range(len(self.s_disp)):
             # disp = np.zeros(len(self.n_disp))
@@ -94,7 +95,7 @@ class TransDisp(object):
             self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
 
 
-    def INTC(self,carts):
+    def INTC(self,carts,eig_inv):
         intCoord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
             x1 = np.array(carts[int(self.zmat.bondIndices[i][0])-1]).astype(float)
@@ -105,10 +106,11 @@ class TransDisp(object):
             x2 = np.array(carts[int(self.zmat.angleIndices[i][1])-1]).astype(float)
             x3 = np.array(carts[int(self.zmat.angleIndices[i][2])-1]).astype(float)
             a = self.calcAngle(x1,x2,x3)
-            Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]]) > 180.
-            Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]]) < 0.
-            if Condition1 or Condition2:
-                a = 2*np.pi - a
+            if self.Conv:
+                Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]]) > 180.
+                Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]]) < 0.
+                if Condition1 or Condition2:
+                    a = 2*np.pi - a
             intCoord = np.append(intCoord,a)
         for i in range(len(self.zmat.torsionIndices)):
             x1 = np.array(carts[int(self.zmat.torsionIndices[i][0])-1]).astype(float)
@@ -116,13 +118,18 @@ class TransDisp(object):
             x3 = np.array(carts[int(self.zmat.torsionIndices[i][2])-1]).astype(float)
             x4 = np.array(carts[int(self.zmat.torsionIndices[i][3])-1]).astype(float)
             t = self.calcTors(x1,x2,x3,x4)
-            Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) <= 270.
-            Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) >= -270.
-            if Condition1 or Condition2:
-                t += np.pi
-            # diff = self.zmat.variableDictionary[self.zmat.torsionVariables[i]] - t*180/np.pi 
+            if self.Conv:
+                """ Modify these conditions to check computed result against  """
+                Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 135. and t*180./np.pi < -135.
+                Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -135. and t*180./np.pi > 135.
+                # Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) <= 270.
+                # Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) >= -270.
+                if Condition1:
+                    t += 2*np.pi
+                if Condition2:
+                    t -= 2*np.pi
             intCoord = np.append(intCoord,t)
-        intCoord = np.dot(self.eig_inv,intCoord)
+        intCoord = np.dot(eig_inv,intCoord)
         return intCoord
 
     def calcBond(self,x1,x2):
@@ -138,8 +145,9 @@ class TransDisp(object):
         e1 = (x2-x1)/self.calcBond(x1,x2)
         e2 = (x3-x2)/self.calcBond(x2,x3)
         e3 = (x4-x3)/self.calcBond(x3,x4)
-        t = np.dot(-e1,np.cross(-e2,e3))/(np.dot(np.cross(-e1,e2),np.cross(-e2,e3)))
-        t = np.arctan(t)
+        s  = np.dot(-e1,np.cross(-e2,e3))
+        c  = np.dot(np.cross(-e1,e2),np.cross(-e2,e3))
+        t = np.arctan2(s,c)
         return t
 
     def CoordConvert(self,n_disp,n_coord,refCarts,max_iter,tolerance):
@@ -153,7 +161,7 @@ class TransDisp(object):
             # print("cartDisp:")
             # print(cartDispShaped)
             newCarts += cartDispShaped
-            coordCheck = self.INTC(newCarts)
+            coordCheck = self.INTC(newCarts,self.eig_inv)
             # print(newN)
             n_disp = newN - coordCheck
             if LA.norm(n_disp) < tolerance:

@@ -14,7 +14,6 @@ class DirectoryTree(object):
         self.disps = disps # This should be the 'TransDisp' object
 
     def Make_Input(self,data,dispp,n_at,at,index):	
-    # def Make_Input(self,data,dispp,n_at,at,prog):	
         """
             I'm going to generalize this so that the user just puts in the insertion index,
             and the geometry is placed there. Then the user can use any program/input file that this
@@ -52,6 +51,9 @@ class DirectoryTree(object):
             print('Specified program not supported: ' + progname)
             raise RuntimeError
         
+        init = False
+        if os.path.exists(root+'initden.dat'):
+            init = True
         data_buff = data.copy()
         if os.path.exists(os.getcwd() + '/Disps'):
             shutil.rmtree('Disps',ignore_errors=True)
@@ -60,7 +62,6 @@ class DirectoryTree(object):
         os.mkdir("1")
         os.chdir("./1")
         data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-        # data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),self.zmat.atomList,progname)
         inp = ''
         if self.progname == 'cfour':
             inp = 'ZMAT'
@@ -70,6 +71,8 @@ class DirectoryTree(object):
         with open(inp, 'w') as file:
             file.writelines(data)
         data = data_buff.copy()
+        if init:
+            shutil.copy('../../initden.dat','.')
         os.chdir('..')
         for i in range(len(self.disps.DispCart)-1):
             j = i % 2
@@ -80,8 +83,10 @@ class DirectoryTree(object):
                 data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
             if j == 1:
                 data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-            with open('input.dat','w') as file:
+            with open(inp,'w') as file:
                file.writelines(data)
             data = data_buff.copy()
+            if init:
+                shutil.copy('../../initden.dat','.')
             os.chdir('..')
 
