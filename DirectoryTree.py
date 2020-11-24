@@ -2,12 +2,14 @@ import fileinput
 import os
 import re
 import shutil
+import numpy as np
 
 
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,zmat,disps,insertionIndex):
+    def __init__(self,progname,zmat,disps,insertionIndex,dispSym):
+        self.dispSym = dispSym
         self.progname = progname
         self.zmat = zmat
         self.insertionIndex = insertionIndex
@@ -52,7 +54,7 @@ class DirectoryTree(object):
             raise RuntimeError
         
         init = False
-        if os.path.exists(root+'initden.dat'):
+        if os.path.exists(root+'/initden.dat'):
             init = True
         data_buff = data.copy()
         if os.path.exists(os.getcwd() + '/Disps'):
@@ -74,19 +76,39 @@ class DirectoryTree(object):
         if init:
             shutil.copy('../../initden.dat','.')
         os.chdir('..')
-        for i in range(len(self.disps.DispCart)-1):
-            j = i % 2
-            k = i // 2
+
+        """ I need to restructure this so that it iterates over only running jobs, not the duplicates by symmetry. """
+        Sum = 0
+        self.dispSym = self.dispSym.astype(int)
+        for i in range(len(self.disps.DispCart)-np.sum(self.dispSym)-1):
+            j = Sum % 2
+            k = Sum // 2
+            # print('i: ')
+            # print(i)
+            # print('j: ')
+            # print(j)
+            # print('k: ')
+            # print(k)
+            # print('Sum: ')
+            # print(Sum)
+            # print('Sym: ')
+            # print(self.dispSym[k])
             os.mkdir(str(i+2))
             os.chdir("./" + str(i+2))
-            if j == 0:
+            if self.dispSym[k] == 0:
+                if j == 0:
+                    data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                if j == 1:
+                    data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+            elif self.dispSym[k] == 1:
                 data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-            if j == 1:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                # raise RuntimeError
+            Sum += self.dispSym[k]
+            Sum += 1
             with open(inp,'w') as file:
-               file.writelines(data)
+                file.writelines(data)
             data = data_buff.copy()
             if init:
                 shutil.copy('../../initden.dat','.')
             os.chdir('..')
-
+        # raise RuntimeError

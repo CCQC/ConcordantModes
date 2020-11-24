@@ -24,7 +24,8 @@ from numpy import linalg as LA
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,rdisp,adisp,eigs,Conv):
+    def __init__(self,s_vectors,zmat,rdisp,adisp,eigs,Conv,dispTol):
+        self.dispTol         = dispTol
         self.Conv            = Conv
         self.s_vectors       = s_vectors
         self.zmat            = zmat
@@ -75,7 +76,7 @@ class TransDisp(object):
             self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]])
         self.s_coord = self.s_coord.astype(float)
        
-        print(self.s_coord)
+        # print(self.s_coord)
         """ Weight the internal coord displacement sizes """
         # self.s_tensor = np.multiply(self.eig_inv,self.s_disp)
 
@@ -84,6 +85,8 @@ class TransDisp(object):
 
         self.n_coord = self.INTC(self.refCarts,self.eig_inv)
 
+        self.dispSym = np.zeros(len(self.s_disp))
+
         for i in range(len(self.s_disp)):
             # disp = np.zeros(len(self.n_disp))
             disp = np.zeros(len(self.s_disp))
@@ -91,8 +94,19 @@ class TransDisp(object):
             # disp[i] = self.s_disp[i].copy()
             # disp[i] = self.n_disp[i].copy()
             # print("Disp #" + str(i+1))
-            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
-            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-10)
+            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-13)
+            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-13)
+            print("Cart Disp Norms " + str(i+1) + ':')
+            norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
+            norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
+            print(norm1-norm2)
+            # print(norm1)
+            # print(norm2)
+            normDiff = np.abs(norm1-norm2)
+            if self.dispTol > normDiff:
+                self.dispSym[i] = 1
+        
+        self.dispSym = self.dispSym.astype(int)
 
 
     def INTC(self,carts,eig_inv):
@@ -122,8 +136,6 @@ class TransDisp(object):
                 """ Modify these conditions to check computed result against  """
                 Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 135. and t*180./np.pi < -135.
                 Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -135. and t*180./np.pi > 135.
-                # Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) <= 270.
-                # Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -90. and float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) >= -270.
                 if Condition1:
                     t += 2*np.pi
                 if Condition2:

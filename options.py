@@ -12,6 +12,9 @@ class Options(object):
         self.energyRegex = kwargs.pop('energyRegex','')
         self.cartInsert = kwargs.pop('cartInsert',-1)
         self.calc = kwargs.pop('calc',True)
+        self.dispTol = kwargs.pop('dispTol',1.0e-14)
+        self.dispCheck = kwargs.pop('dispCheck',False)
+        self.geomCheck = kwargs.pop('geomCheck',False)
         
         ## These options may be helpful in the future, or maybe not!
         # self.input_name = kwargs.pop("input_name", "input.dat")

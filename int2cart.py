@@ -2,7 +2,6 @@ import numpy as np
 from numpy import linalg as LA
 from . import masses
 
-# class ZMAT_interp(object):
 class int2cart(object):
     def __init__(self,zmat,varDict):
         self.zmat    = zmat
@@ -61,23 +60,11 @@ class int2cart(object):
                 cart *= self.varDict[self.zmat.bondVariables[i+2]]
                 cart += self.Carts[int(self.zmat.torsionIndices[i][1])-1]
                 self.Carts = np.append(self.Carts,np.array([cart]),axis=0)
-                # r = self.Carts[int(self.zmat.torsionIndices[i][2])-1]-self.Carts[int(self.zmat.torsionIndices[i][1])-1]
-                # r /= np.linalg.norm(r)
-                # theta = self.varDict[self.zmat.angleVariables[i+1]]*np.pi/180.
-                # tau = self.varDict[self.zmat.torsionVariables[i]]*np.pi/180.
-                # ang_rot = self.x_rot(theta)
-                # tor_rot = self.z_rot(tau)
-                # cart = self.Carts[int(self.zmat.torsionIndices[i][1])-1] + np.dot(np.dot(r,ang_rot),tor_rot)
-                # cart *= self.varDict[self.zmat.bondVariables[i+2]]
-                # self.Carts = np.append(self.Carts,np.array([cart]),axis=0)
         
-        # print(self.Carts)
         C_O_M = self.COM(self.Carts,self.zmat.masses)
         for i in range(len(self.Carts)):
             self.Carts[i] -= C_O_M
         C_O_M = self.COM(self.Carts,self.zmat.masses)
-        # print(C_O_M)
-        # print(self.Carts)
         I = self.InertiaTensor(self.Carts,self.zmat.masses)
         val, vec = LA.eigh(I)
         self.Carts = np.dot(self.Carts,vec)

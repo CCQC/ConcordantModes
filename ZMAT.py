@@ -10,6 +10,7 @@ from MixedHessian.TransDisp import TransDisp
 class ZMAT(object):
     def __init__(self):
         self.amu_elMass = 5.48579909065*(10**(-4))
+        self.dispTol = 1.0e-14
 
     def run(self):
         # Define some regexes
@@ -156,7 +157,7 @@ class ZMAT(object):
         """
             This code utilizes the INTC function from the TransDisp module to calculate the initial variable values from the cartesian coordinates.
         """
-        transdisp = TransDisp(1,self,1,1,1,False)
+        transdisp = TransDisp(1,self,1,1,1,False,self.dispTol)
         I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices))
         variables1 = transdisp.INTC(self.CartesiansInit,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I)
@@ -218,6 +219,15 @@ class ZMAT(object):
         for i in range(len(self.masses)):
             self.masses[i] = self.masses[i]/self.amu_elMass
        
+        """
+            Print off the internal coordinate and its value in Bohr/Degree
+        """
+        print("Initial Geometric Internal Coordinate Values:")
+        for i in range(len(Variables)):
+            print(Variables[i] + ": " + str(self.variableDictionaryInit[Variables[i]]))
+        print("Final Geometric Internal Coordinate Values:")
+        for i in range(len(Variables)):
+            print(Variables[i] + ": " + str(self.variableDictionaryFinal[Variables[i]]))
         # print(self.variableDictionaryInit)
         # print(self.variableDictionaryFinal)
         # raise RuntimeError

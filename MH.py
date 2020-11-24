@@ -55,6 +55,8 @@ class MixedHessian(object):
         """
         self.zmat = ZMAT()
         self.zmat.run()
+        if self.options.geomCheck:
+            raise RuntimeError
         # self.i2c = int2cart(self.zmat,self.zmat.variableDictionaryInit)
         # self.i2c.run()
         # self.finalZmat = ZMAT_interp()
@@ -112,9 +114,10 @@ class MixedHessian(object):
         """
         s_vec = s_vectors(self.zmat,self.zmat.CartesiansFinal)
         s_vec.run()
-        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L,True)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L,True,self.options.dispTol)
         transdisp.run()
-        
+        if self.options.dispCheck:
+            raise RuntimeError
 
         """
             The displacements have been generated, now we have to run them!
@@ -123,9 +126,8 @@ class MixedHessian(object):
         prog = self.options.program
         progname = prog.split('@')[0]
         
-        """ ''"""
         if self.options.calc:
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert, transdisp.dispSym)
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
@@ -165,7 +167,7 @@ class MixedHessian(object):
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.dispSym)
         Reap_obj.run()
         os.chdir('..')
 
@@ -214,12 +216,13 @@ class MixedHessian(object):
         tableOutput += '\n'
         tableOutput += "       Frequency: "
         for i in range(len(Final_GF.Freq)):
-            tableOutput += " " + "{:8.1f}".format(Final_GF.Freq[i])
+            tableOutput += " " + "{:7.1f}".format(Final_GF.Freq[i])
         tableOutput += '\n'
         tableOutput += "-----------------"
         for i in range(len(Final_GF.Freq)):
             tableOutput += "--------"
         tableOutput += '\n'
+        """ Modify table rows so that internal coord labels have a fixed length. """
         for i in range(len(init_GF.TED)):
             if i < len(self.zmat.bondIndices):
                 tableOutput += "      " + str(self.zmat.atomList[int(self.zmat.bondIndices[i][0])-1]) + str(self.zmat.bondIndices[i][0]) + " " \
@@ -236,7 +239,8 @@ class MixedHessian(object):
                         + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2]) + " " \
                         + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3]) + " TORS: " 
             for j in range(len(init_GF.TED)):
-                tableOutput += "{:8.1f}".format(init_GF.TED[j][i])
+                tableOutput += "{:8.1f}".format(init_GF.TED[i][j])
+                # tableOutput += "{:8.1f}".format(init_GF.TED[j][i])
             tableOutput += '\n'
         print(tableOutput)
 
