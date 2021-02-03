@@ -73,7 +73,13 @@ class MixedHessian(object):
             Read in FC matrix in cartesians, then convert to internals.
         """
 
-        f_read = F_Read("fc.dat")
+        if os.path.exists(rootdir + '/fc.dat'):
+            f_read = F_Read("fc.dat")
+        elif os.path.exists(rootdir + '/FCMFINAL'):
+            f_read = F_Read("FCMFINAL")
+        else:
+            print("Need to specify the force constants!")
+            raise RuntimeError
         f_read.run()
         f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False)
         f_conv.run()
