@@ -2,7 +2,7 @@ def get_mass(label):
     return atomic_masses[mass_labels.index(label.upper())]
 
 
-mass_labels = [
+mass_labels = [ "X",
     "H", "H1", "H2", "D", "H3", "T", "H4", "H5", "H6", "H7", "HE", "HE3",
     "HE4", "HE5", "HE6", "HE7", "HE8", "HE9", "HE10", "LI", "LI3", "LI4",
     "LI5", "LI6", "LI7", "LI8", "LI9", "LI10", "LI11", "LI12", "BE", "BE5",
@@ -396,7 +396,7 @@ mass_labels = [
     "UUH290", "UUH291", "UUH292", "UUS", "UUS291", "UUS292", "UUO", "UUO293"
 ]
 
-atomic_masses = [
+atomic_masses = [ 0.00,
     1.00782503207, 1.00782503207, 2.01410177785, 2.01410177785, 3.01604927767,
     3.01604927767, 4.027806424, 5.035311488, 6.044942594, 7.052749,
     4.00260325415, 3.01602931914, 4.00260325415, 5.012223624, 6.018889124,

@@ -38,13 +38,13 @@ class TransDisp(object):
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
 
-    def run(self):
+    def run(self,delArray):
+        self.delArray = delArray
         self.B = self.s_vectors.B
         """ Invert the L-matrix and then normalize the rows. """
         self.eig_inv = inv(self.eigs.copy())
         for i in range(len(self.eig_inv)):
             self.eig_inv[i] = self.eig_inv[i]/LA.norm(self.eig_inv[i])
-
         """
             Construct 'A', the commented lines may be useful for getting intensities later. 
         """
@@ -83,23 +83,25 @@ class TransDisp(object):
         """ Transform the internal coordinate displacements to normal mode internal coord disps. """
         # self.n_disp = np.dot(self.s_tensor,self.s_disp)
 
-        self.n_coord = self.INTC(self.refCarts,self.eig_inv)
+        self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.delArray)
 
-        self.dispSym = np.zeros(len(self.s_disp))
+        self.dispSym = np.zeros(len(self.s_disp)-len(self.delArray))
 
-        for i in range(len(self.s_disp)):
+        for i in range(len(self.s_disp)-len(self.delArray)):
             # disp = np.zeros(len(self.n_disp))
-            disp = np.zeros(len(self.s_disp))
+            disp = np.zeros(len(self.s_disp)-len(self.delArray))
             disp[i] = self.rdisp
             # disp[i] = self.s_disp[i].copy()
             # disp[i] = self.n_disp[i].copy()
             # print("Disp #" + str(i+1))
-            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-13)
-            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-13)
-            print("Cart Disp Norms " + str(i+1) + ':')
+            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
+            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
+            # print("Cart Disp Norms " + str(i+1) + ':')
+            # print(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
+            # print(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
             norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
             norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
-            print(norm1-norm2)
+            # print(norm1-norm2)
             # print(norm1)
             # print(norm2)
             normDiff = np.abs(norm1-norm2)
@@ -109,7 +111,7 @@ class TransDisp(object):
         self.dispSym = self.dispSym.astype(int)
 
 
-    def INTC(self,carts,eig_inv):
+    def INTC(self,carts,eig_inv,delArray):
         intCoord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
             x1 = np.array(carts[int(self.zmat.bondIndices[i][0])-1]).astype(float)
@@ -141,6 +143,7 @@ class TransDisp(object):
                 if Condition2:
                     t -= 2*np.pi
             intCoord = np.append(intCoord,t)
+        intCoord = np.delete(intCoord,delArray)
         intCoord = np.dot(eig_inv,intCoord)
         return intCoord
 
@@ -166,15 +169,10 @@ class TransDisp(object):
         newN = n_coord + n_disp
         newCarts = np.array(refCarts).astype(float)
         for i in range(max_iter):
-            # print(n_disp)
             cartDisp = np.dot(self.A,n_disp)
             cartDispShaped = np.reshape(cartDisp,(-1,3))
-            # print(i)
-            # print("cartDisp:")
-            # print(cartDispShaped)
             newCarts += cartDispShaped
-            coordCheck = self.INTC(newCarts,self.eig_inv)
-            # print(newN)
+            coordCheck = self.INTC(newCarts,self.eig_inv,self.delArray)
             n_disp = newN - coordCheck
             if LA.norm(n_disp) < tolerance:
                 break

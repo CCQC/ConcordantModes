@@ -11,17 +11,20 @@ class G_Matrix(object):
     def __init__(self, zmat, s_vectors):
         self.zmat      = zmat
         self.s_vectors = s_vectors
-        self.G         = np.zeros((len(self.s_vectors.B),len(self.s_vectors.B)))
 
-    def run(self):
+    def run(self,delArray):
+        self.G = np.zeros((len(self.s_vectors.B)+len(delArray),len(self.s_vectors.B)+len(delArray)))
+        
         b_len = len(self.zmat.bondIndices)
         a_len = len(self.zmat.angleIndices)
         t_len = len(self.zmat.torsionIndices)
+        
         """
             These for-loops are constructed as such to take advantage of the inherent symmetry of the G-Matrix, 
             as well as how I have decided to store the s-vectors. It may work best to mass weight the s-vectors
             back in the s_vectors.py file so that they may be simply dotted in this step, however that is not
             necessary to the fundamental workings of the code for now.
+
         """
         for i in range(b_len):
             for j in range(b_len):
@@ -63,22 +66,18 @@ class G_Matrix(object):
                 self.G[i+b_len+a_len][j+b_len+a_len] = G_Mat_buff
                 self.G[j+b_len+a_len][i+b_len+a_len] = G_Mat_buff
         """
-            Transform G with L-Matrix
+            Temper G
         """
         tol = 1e-12
         self.G[np.abs(self.G) < tol] = 0
-
     """
         Pretty straightforward function, computes the G-Matrix elements!
     """
     def compute_element(self,s_1,s_2,overlap_indices):
         G_Mat_Element = 0.
-        G_Mat = 0.
+        # G_Mat = 0.
         for i in overlap_indices:
-            G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])/self.zmat.masses[i-1]
-            G_Mat += np.dot(s_1[i-1],s_2[i-1])
-            # G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])
-        # print(overlap_indices)
-        # print("G_Mat: ")
-        # print(G_Mat)
+            if self.zmat.masses[i-1] > 0.1:
+                G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])/self.zmat.masses[i-1]
+                # G_Mat += np.dot(s_1[i-1],s_2[i-1])
         return G_Mat_Element

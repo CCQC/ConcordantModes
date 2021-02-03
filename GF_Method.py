@@ -23,8 +23,8 @@ class GF_Method(object):
         self.eig_v, self.L_p = LA.eigh(self.F_O)
         self.L_p[np.abs(self.L_p) < self.tol] = 0
         self.L = np.dot(self.G_O,self.L_p)
-        self.L[np.abs(self.L) < self.tol] = 0
-        # print(self.L)
+        self.L[np.abs(self.L**2) < self.tol] = 0
+        self.L = np.real(self.L)
         """ Compute the frequencies by the square root of the eigenvalues. """
         self.Freq = np.sqrt(self.eig_v, dtype=np.complex)
         """ Filter for imaginary modes. """

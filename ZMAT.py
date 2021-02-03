@@ -159,8 +159,8 @@ class ZMAT(object):
         """
         transdisp = TransDisp(1,self,1,1,1,False,self.dispTol)
         I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices))
-        variables1 = transdisp.INTC(self.CartesiansInit,I)
-        variables2 = transdisp.INTC(self.CartesiansFinal,I)
+        variables1 = transdisp.INTC(self.CartesiansInit,I,np.array([]))
+        variables2 = transdisp.INTC(self.CartesiansFinal,I,np.array([]))
         for i in range(len(self.angleIndices)+len(self.torsionIndices)):
             variables1[len(self.bondIndices)+i] *= 180./np.pi
             variables2[len(self.bondIndices)+i] *= 180./np.pi

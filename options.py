@@ -15,6 +15,7 @@ class Options(object):
         self.dispTol = kwargs.pop('dispTol',1.0e-14)
         self.dispCheck = kwargs.pop('dispCheck',False)
         self.geomCheck = kwargs.pop('geomCheck',False)
+        self.tol = kwargs.pop('tol',1.0e-14)
         
         ## These options may be helpful in the future, or maybe not!
         # self.input_name = kwargs.pop("input_name", "input.dat")
