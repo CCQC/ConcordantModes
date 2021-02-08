@@ -16,11 +16,16 @@ class ZMAT(object):
         # Define some regexes
         zmatBeginRegex  = re.compile(r"ZMAT begin")
         zmatEndRegex    = re.compile(r"ZMAT end")
+        """ These regexes are artefacts of an older implementation"""
+        # firstAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s*\n")
+        # secondAtomRegex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
+        # thirdAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
+        # fullAtomRegex   = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
+        
         firstAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s*\n")
-        secondAtomRegex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
-        thirdAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
-        fullAtomRegex   = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s+(\d+)\s+([A-Za-z0-9_]+)\s*\n")
-        # variableRegex   = re.compile("\s*([A-Za-z0-9_]+)\s*\=\s*(-?\d+\.\d+)\s*\n")
+        secondAtomRegex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s*\n")
+        thirdAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s*\n")
+        fullAtomRegex   = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
         cartBeginRegex  = re.compile(r"cart begin")
         cartEndRegex    = re.compile(r"cart end")
         cartesianRegex  = re.compile("[A-Z][A-Za-z]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n")
@@ -92,17 +97,6 @@ class ZMAT(object):
                 break
         
         zmatOutput = output[zmatRange[0]:zmatRange[1]].copy()
-        
-        # for i in range(len(zmatOutput)):
-            # divider = re.search(dividerRegex,zmatOutput[i])
-            # if divider:
-                # divideIndex = i
-                # break
-        # if divider:
-            # zmatOutputInit  = zmatOutput[:divideIndex].copy()
-            # zmatOutputFinal = zmatOutput[divideIndex+1:].copy()
-        # else:
-            # zmatOutputInit  = zmatOutput.copy()
 
         # Initialize necessary lists
         self.atomList                = []
@@ -129,25 +123,25 @@ class ZMAT(object):
                 List = re.findall(secondAtomRegex,zmatOutput[i])[0]
                 self.atomList.append(List[0])
                 self.bondIndices.append([str(i-firstIndex+1),List[1]])
-                self.bondVariables.append(List[2])
+                self.bondVariables.append("R"+str(i-firstIndex))
             # Third atom of the ZMAT, will have bond and angle term
             if re.search(thirdAtomRegex,zmatOutput[i]):
                 List = re.findall(thirdAtomRegex,zmatOutput[i])[0]
                 self.atomList.append(List[0])
                 self.bondIndices.append([str(i-firstIndex+1),List[1]])
-                self.bondVariables.append(List[2])
-                self.angleIndices.append([str(i-firstIndex+1),List[1],List[3]])
-                self.angleVariables.append(List[4])
+                self.bondVariables.append("R"+str(i-firstIndex))
+                self.angleIndices.append([str(i-firstIndex+1),List[1],List[2]])
+                self.angleVariables.append("A"+str(i-firstIndex))
             # All remaining ZMAT atoms, will have bond, angle, and torsion term
             if re.search(fullAtomRegex,zmatOutput[i]):
                 List = re.findall(fullAtomRegex,zmatOutput[i])[0]
                 self.atomList.append(List[0])
                 self.bondIndices.append([str(i-firstIndex+1),List[1]])
-                self.bondVariables.append(List[2])
-                self.angleIndices.append([str(i-firstIndex+1),List[1],List[3]])
-                self.angleVariables.append(List[4])
-                self.torsionIndices.append([str(i-firstIndex+1),List[1],List[3],List[5]])
-                self.torsionVariables.append(List[6])
+                self.bondVariables.append("R"+str(i-firstIndex))
+                self.angleIndices.append([str(i-firstIndex+1),List[1],List[2]])
+                self.angleVariables.append("A"+str(i-firstIndex))
+                self.torsionIndices.append([str(i-firstIndex+1),List[1],List[2],List[3]])
+                self.torsionVariables.append("D"+str(i-firstIndex))
             # Now to reap the variables and their values
             # if re.search(variableRegex,zmatOutput[i]):
                 # List = re.findall(variableRegex,zmatOutput[i])[0]

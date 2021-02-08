@@ -1,10 +1,7 @@
 ZMAT begin
  H                                                                              
- O 1 R                                                                          
- H 2 R 1 A
-
- R    =        1.813052588642180
- A    =      103.582169521086129
+ O 1                                                                          
+ H 2 1
 ZMAT end
 
 cart begin

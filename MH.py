@@ -18,8 +18,6 @@ from MixedHessian.Reap               import Reap
 from MixedHessian.s_vectors          import s_vectors
 from MixedHessian.TransDisp          import TransDisp
 from MixedHessian.vulcan_template    import vulcan_template
-# from MixedHessian.ZMAT_parse         import ZMAT
-# from MixedHessian.ZMAT_interp        import ZMAT_interp
 from MixedHessian.ZMAT               import ZMAT
 from MixedHessian.int2cart           import int2cart
 
