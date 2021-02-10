@@ -46,8 +46,6 @@ class MixedHessian(object):
         
         packagepath = os.path.realpath(__file__)
         packagepath = packagepath[:-len('/MH.py')]
-        # if os.path.exists(rootdir + '/zmatFiles'):
-            # shutil.rmtree(rootdir + '/zmatFiles')
         """
             Parse the output to get all pertinent ZMAT info
         """
@@ -229,38 +227,46 @@ class MixedHessian(object):
         TED = np.dot(TEDinit,TEDfinal)
         TED *= 100.
         if not len(delArray) > 0:
-            tableOutput = "     Frequency #:"
+            # tableOutput = "     Frequency #:"
+            tableOutput = "{:>26s}".format("Frequency #: ")
             for i in range(len(Final_GF.Freq)):
                 tableOutput += "{:8d}".format(i+1)
             tableOutput += '\n'
-            tableOutput += "-----------------"
+            tableOutput += "--------------------------"
             for i in range(len(Final_GF.Freq)):
                 tableOutput += "--------"
             tableOutput += '\n'
-            tableOutput += "       Frequency: "
+            tableOutput += "{:>26s}".format("Frequency: ")
             for i in range(len(Final_GF.Freq)):
                 tableOutput += " " + "{:7.1f}".format(Final_GF.Freq[i])
             tableOutput += '\n'
-            tableOutput += "-----------------"
+            tableOutput += "--------------------------"
             for i in range(len(Final_GF.Freq)):
                 tableOutput += "--------"
             tableOutput += '\n'
             """ Modify table rows so that internal coord labels have a fixed length. """
             for i in range(len(TED)):
                 if i < len(self.zmat.bondIndices):
-                    tableOutput += "      " + str(self.zmat.atomList[int(self.zmat.bondIndices[i][0])-1]) + str(self.zmat.bondIndices[i][0]) + " " \
-                            + str(self.zmat.atomList[int(self.zmat.bondIndices[i][1])-1]) + str(self.zmat.bondIndices[i][1]) + " STRE: " 
+                    tableOutput += "{:10s}".format(" ") + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.bondIndices[i][0])-1]) + str(self.zmat.bondIndices[i][0])) + " " \
+                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.bondIndices[i][1])-1]) + str(self.zmat.bondIndices[i][1])) + " STRE: " 
                 elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices):
                     k = i - len(self.zmat.bondIndices)
-                    tableOutput += "   " + str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0]) + " " \
-                            + str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1]) + " " \
-                            + str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2]) + " BEND: " 
+                    # tableOutput += "   " + str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0]) + " " \
+                            # + str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1]) + " " \
+                            # + str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2]) + " BEND: " 
+                    tableOutput += "{:5s}".format(" ") + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0])) + " " \
+                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1])) + " " \
+                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2])) + " BEND: " 
                 elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices):
                     k = i - len(self.zmat.bondIndices) - len(self.zmat.angleIndices)
-                    tableOutput += str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0]) + " " \
-                            + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1]) + " " \
-                            + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2]) + " " \
-                            + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3]) + " TORS: " 
+                    # tableOutput += str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0]) + " " \
+                            # + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1]) + " " \
+                            # + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2]) + " " \
+                            # + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3]) + " TORS: " 
+                    tableOutput += "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0])) + " " \
+                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1])) + " " \
+                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2])) + " " \
+                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3])) + " TORS: " 
                 for j in range(len(TED)):
                     tableOutput += "{:8.1f}".format(TED[i][j])
                 tableOutput += '\n'

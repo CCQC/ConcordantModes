@@ -165,6 +165,19 @@ class TransDisp(object):
         t = np.arctan2(s,c)
         return t
 
+    def calcOutOfPlane(self,x1,x2,x3,x4):
+        """ 
+            This function will compute an out of plane angle between one bond and a plane
+            formed by 3 other atoms. See page 58 of Molecular vibrations by Wilson, Cecius, and Cross
+            for more info.
+        """
+        e1 = (x1-x2)/self.calcBond(x1,x2)
+        e3 = (x3-x2)/self.calcBond(x3,x2)
+        e4 = (x4-x2)/self.calcBond(x4,x2)
+        phi = self.calcAngle(x3,x2,x4)
+        theta = np.arcsin(np.dot(np.cross(e3,e4)/np.sin(phi),e1))
+        return theta
+
     def CoordConvert(self,n_disp,n_coord,refCarts,max_iter,tolerance):
         newN = n_coord + n_disp
         newCarts = np.array(refCarts).astype(float)
