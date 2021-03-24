@@ -4,7 +4,7 @@ options_kwargs = {
   'program'           : "psi4@master",
   'energyRegex'       : r"Giraffe The Energy is\s+(\-\d+\.\d+)",
   'cartInsert'        : 7,
-  'calc'              : False,
+  # 'calc'              : False,
   'successRegex'      : r"beer"
 }
 options_obj = Options(**options_kwargs)
