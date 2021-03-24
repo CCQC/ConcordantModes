@@ -20,7 +20,22 @@ class GF_Method(object):
         self.G_O = fractional_matrix_power(self.G,0.5)
         """ Symmetrize F, diagonalize, then backtransform the eigenvectors. """
         self.F_O = np.dot(np.dot(self.G_O,self.F),self.G_O)
-        self.eig_v, self.L_p = LA.eigh(self.F_O)
+        # self.eig_v, self.L_p = LA.eigh(self.F_O)
+        self.L_p,self.eig_v,c = LA.svd(self.F_O)
+        print("Eigs:")
+        print(self.eig_v)
+        # print("Non-singular values:")
+        # print(np.flip(b,axis=0))
+        print("EigVecs:")
+        print(self.L_p)
+        # print("Eig-SVD 1:")
+        # print(np.flip(a,axis=1))
+        # print("Eig-SVD 2:")
+        # print(np.transpose(np.flip(c,axis=0)))
+        # print("SVD DIFF:")
+        # print(np.flip(a,axis=1) - np.transpose(np.flip(c,axis=0)))
+        self.eig_v = np.flip(self.eig_v,axis=0)
+        self.L_p = np.flip(self.L_p,axis=1)
         self.L_p[np.abs(self.L_p) < self.tol] = 0
         self.L = np.dot(self.G_O,self.L_p)
         self.L[np.abs(self.L**2) < self.tol] = 0
@@ -38,6 +53,8 @@ class GF_Method(object):
         self.Freq *= self.Hartree_wavenum
         print('Frequencies:')
         print(self.Freq)
+        for i in range(len(self.Freq)):
+            print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(self.Freq[i]))
         """ Compute and then print the TED. """
         self.TED = np.multiply(self.L,np.transpose(inv(self.L)))*100
         np.set_printoptions(suppress=True)

@@ -24,6 +24,7 @@ class Reap(object):
         
         progname = self.progname
         print("If something looks wrong with the final frequencies, check these energies!")
+        print("(Job number 1 == Reference energy) :D")
         for i in range(n_disp - np.sum(self.dispSym)):
             os.chdir("./"+str(i+1))
             with open("output.dat",'r') as file:
@@ -32,20 +33,24 @@ class Reap(object):
                 print('Energy failed at ' + str(i+1))
                 raise RuntimeError
             energy = re.findall(energyRegex,data)
-            # print("Giraffe energies!")
-            # print(i)
-            # print(energy[0])
             if i == 0:
                 print("Reference energy: " + str(energy[0]))
             else:
-                print("Job number " + str(i+1) + " " + str(energy[0]))
+                print("Job number " + "{:5d}".format(i+1) + ": " + str(energy[0]))
             if progname == 'molpro' or progname == 'psi4' or progname == 'cfour':
                 self.Energies = np.append(self.Energies,energy[0])
             else:
                 print('Specified program not supported: ' + progname)
                 raise RuntimeError
             os.chdir('..')
-        
+
+        print('Relative energies')
+        for i in range(len(self.Energies)):
+            if i == 0:
+                print("Reference energy: " + str(np.float(self.Energies[i])-np.float(self.Energies[0])))
+            else:
+                print("Job number " + "{:5d}".format(i+1) + ": " + "{:+1.8f}".format(np.float(self.Energies[i])-np.float(self.Energies[0])))
+
         self.energiesDict = {}
         self.energiesDict['ref'] = float(self.Energies[0])
         Sum = 0

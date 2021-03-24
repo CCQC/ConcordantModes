@@ -53,11 +53,6 @@ class MixedHessian(object):
         self.zmat.run()
         if self.options.geomCheck:
             raise RuntimeError
-        # self.i2c = int2cart(self.zmat,self.zmat.variableDictionaryInit)
-        # self.i2c.run()
-        # self.finalZmat = ZMAT_interp()
-        # self.finalZmat.run()
-        # raise RuntimeError
 
         """
             Compute the initial s-vectors
