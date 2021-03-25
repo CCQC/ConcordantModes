@@ -49,7 +49,7 @@ class MixedHessian(object):
         """
             Parse the output to get all pertinent ZMAT info
         """
-        self.zmat = ZMAT()
+        self.zmat = ZMAT(self.options)
         self.zmat.run()
         if self.options.geomCheck:
             raise RuntimeError
@@ -123,7 +123,7 @@ class MixedHessian(object):
         s_vec = s_vectors(self.zmat,self.zmat.CartesiansFinal)
         s_vec.run()
         s_vec.B = np.delete(s_vec.B,delArray,0)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.rdisp,self.options.adisp,init_GF.L,True,self.options.dispTol)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol)
         transdisp.run(delArray)
         if self.options.dispCheck:
             raise RuntimeError

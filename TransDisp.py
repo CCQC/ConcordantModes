@@ -24,7 +24,7 @@ from numpy import linalg as LA
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,rdisp,adisp,eigs,Conv,dispTol):
+    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol):
         self.dispTol         = dispTol
         self.Conv            = Conv
         self.s_vectors       = s_vectors
@@ -32,8 +32,9 @@ class TransDisp(object):
         self.refCarts        = zmat.CartesiansFinal.copy()
         self.refCarts        = np.array(self.refCarts).astype(float)
         self.u               = np.identity(3*len(zmat.atomList))
-        self.rdisp           = rdisp
-        self.adisp           = adisp
+        self.disp            = disp
+        # self.rdisp           = rdisp
+        # self.adisp           = adisp
         self.eigs            = eigs
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
@@ -57,53 +58,38 @@ class TransDisp(object):
         # self.A = (self.u).dot(self.A)
         """ This step modifies A to convert from normal coords to carts. """
         self.A = np.dot(self.A,inv(self.eig_inv)).round(decimals=12)
-        # print(self.A)
         """
             Next, we will have to determine our desired Normal mode internal coordinate displacements
         """
         
         """ Generate the internal coordinate displacement vector """
         self.s_disp = np.array([])
-        self.s_coord = np.array([])
-        for i in range(len(self.zmat.bondIndices)):
-            self.s_disp = np.append(self.s_disp,self.rdisp)
-            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.bondVariables[i]])
-        for i in range(len(self.zmat.angleIndices)):
-            self.s_disp = np.append(self.s_disp,self.adisp)
-            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]])
-        for i in range(len(self.zmat.torsionIndices)):
-            self.s_disp = np.append(self.s_disp,self.adisp)
-            self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]])
-        self.s_coord = self.s_coord.astype(float)
-       
-        # print(self.s_coord)
-        """ Weight the internal coord displacement sizes """
-        # self.s_tensor = np.multiply(self.eig_inv,self.s_disp)
-
-        """ Transform the internal coordinate displacements to normal mode internal coord disps. """
-        # self.n_disp = np.dot(self.s_tensor,self.s_disp)
+        N_int = len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices)
+        for i in range(N_int):
+            self.s_disp = np.append(self.s_disp,self.disp)
+        # self.s_coord = np.array([])
+        # for i in range(len(self.zmat.bondIndices)):
+            # self.s_disp = np.append(self.s_disp,self.rdisp)
+            # self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.bondVariables[i]])
+        # for i in range(len(self.zmat.angleIndices)):
+            # self.s_disp = np.append(self.s_disp,self.adisp)
+            # self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]])
+        # for i in range(len(self.zmat.torsionIndices)):
+            # self.s_disp = np.append(self.s_disp,self.adisp)
+            # self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]])
+        # self.s_coord = self.s_coord.astype(float)
 
         self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.delArray)
 
         self.dispSym = np.zeros(len(self.s_disp)-len(self.delArray))
 
         for i in range(len(self.s_disp)-len(self.delArray)):
-            # disp = np.zeros(len(self.n_disp))
             disp = np.zeros(len(self.s_disp)-len(self.delArray))
-            disp[i] = self.rdisp
-            # disp[i] = self.s_disp[i].copy()
-            # disp[i] = self.n_disp[i].copy()
-            # print("Disp #" + str(i+1))
+            disp[i] = self.disp
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
             self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
-            # print("Cart Disp Norms " + str(i+1) + ':')
-            # print(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
-            # print(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
             norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
             norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
-            # print(norm1-norm2)
-            # print(norm1)
-            # print(norm2)
             normDiff = np.abs(norm1-norm2)
             if self.dispTol > normDiff:
                 self.dispSym[i] = 1
