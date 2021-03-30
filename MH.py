@@ -98,20 +98,20 @@ class MixedHessian(object):
             Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         """
         print("Initial Frequencies:")
-        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol)
+        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol,self.options.projTol,self.zmat)
         init_GF.run()
         # raise RuntimeError
 
         """
             Now for the TED check.
         """
-        self.G = np.dot(np.dot(inv(init_GF.L),g_mat.G),np.transpose(inv(init_GF.L)))
+        self.G = np.dot(np.dot(LA.pinv(init_GF.L),g_mat.G),np.transpose(LA.pinv(init_GF.L)))
         self.G[np.abs(self.G) < self.options.tol] = 0
         self.F = np.dot(np.dot(np.transpose(init_GF.L),f_conv.F),init_GF.L)
         self.F[np.abs(self.F) < self.options.tol] = 0
         
         print("TED Frequencies:")
-        TED_GF = GF_Method(self.G,self.F,self.options.tol)
+        TED_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat)
         TED_GF.run()
 
         if os.path.exists(rootdir + '/Intder'):
@@ -209,7 +209,7 @@ class MixedHessian(object):
             Final GF Matrix run
         """
         print("Final Frequencies:")
-        Final_GF = GF_Method(self.G,self.F,self.options.tol)
+        Final_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat)
         Final_GF.run()
         
         """
@@ -246,18 +246,11 @@ class MixedHessian(object):
                             + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.bondIndices[i][1])-1]) + str(self.zmat.bondIndices[i][1])) + " STRE: " 
                 elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices):
                     k = i - len(self.zmat.bondIndices)
-                    # tableOutput += "   " + str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0]) + " " \
-                            # + str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1]) + " " \
-                            # + str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2]) + " BEND: " 
                     tableOutput += "{:5s}".format(" ") + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0])) + " " \
                             + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1])) + " " \
                             + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2])) + " BEND: " 
                 elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices):
                     k = i - len(self.zmat.bondIndices) - len(self.zmat.angleIndices)
-                    # tableOutput += str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0]) + " " \
-                            # + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1]) + " " \
-                            # + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2]) + " " \
-                            # + str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3]) + " TORS: " 
                     tableOutput += "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0])) + " " \
                             + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1])) + " " \
                             + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2])) + " " \

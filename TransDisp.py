@@ -43,7 +43,7 @@ class TransDisp(object):
         self.delArray = delArray
         self.B = self.s_vectors.B
         """ Invert the L-matrix and then normalize the rows. """
-        self.eig_inv = inv(self.eigs.copy())
+        self.eig_inv = LA.pinv(self.eigs.copy())
         for i in range(len(self.eig_inv)):
             self.eig_inv[i] = self.eig_inv[i]/LA.norm(self.eig_inv[i])
         """
@@ -57,34 +57,24 @@ class TransDisp(object):
         """ Similar to the first two commented lines, this will be necessary for intensities. """
         # self.A = (self.u).dot(self.A)
         """ This step modifies A to convert from normal coords to carts. """
-        self.A = np.dot(self.A,inv(self.eig_inv)).round(decimals=12)
+        self.A = np.dot(self.A,LA.pinv(self.eig_inv)).round(decimals=12)
         """
             Next, we will have to determine our desired Normal mode internal coordinate displacements
         """
         
         """ Generate the internal coordinate displacement vector """
-        self.s_disp = np.array([])
+        self.n_disp = np.array([])
         N_int = len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices)
-        for i in range(N_int):
-            self.s_disp = np.append(self.s_disp,self.disp)
-        # self.s_coord = np.array([])
-        # for i in range(len(self.zmat.bondIndices)):
-            # self.s_disp = np.append(self.s_disp,self.rdisp)
-            # self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.bondVariables[i]])
-        # for i in range(len(self.zmat.angleIndices)):
-            # self.s_disp = np.append(self.s_disp,self.adisp)
-            # self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.angleVariables[i]])
-        # for i in range(len(self.zmat.torsionIndices)):
-            # self.s_disp = np.append(self.s_disp,self.adisp)
-            # self.s_coord = np.append(self.s_coord,self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]])
-        # self.s_coord = self.s_coord.astype(float)
-
+        """ Need to use one of the dimensions of eigenvectors to generate disp-vector """
+        for i in range(len(self.eigs[0])):
+            self.n_disp = np.append(self.n_disp,self.disp)
+        
         self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.delArray)
 
-        self.dispSym = np.zeros(len(self.s_disp)-len(self.delArray))
+        self.dispSym = np.zeros(len(self.n_disp)-len(self.delArray))
 
-        for i in range(len(self.s_disp)-len(self.delArray)):
-            disp = np.zeros(len(self.s_disp)-len(self.delArray))
+        for i in range(len(self.n_disp)-len(self.delArray)):
+            disp = np.zeros(len(self.n_disp)-len(self.delArray))
             disp[i] = self.disp
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
             self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)

@@ -150,12 +150,49 @@ class ZMAT(object):
                     self.angleVariables.append("A"+str(i-firstIndex))
                     self.torsionIndices.append([str(i-firstIndex+1),List[1],List[2],List[3]])
                     self.torsionVariables.append("D"+str(i-firstIndex))
+        elif self.options.coords.upper() == "REDUNDANT":
+            count = 0
+            for i in range(len(zmatOutput)):
+                if re.search(bondRegex,zmatOutput[i]):
+                    count += 1
+                    List = re.findall(bondRegex,zmatOutput[i])[0]
+                    self.bondIndices.append(List)
+                    self.bondVariables.append("R"+str(count))
+            self.bondIndices = np.array(self.bondIndices)
+            """ Form all possible angles from bonds """
+            self.angleIndices = np.array([])
+            count = 0
+            for i in range(len(self.bondIndices)):
+                for j in range(len(self.bondIndices)-i-1):
+                    a = np.setdiff1d(self.bondIndices[i],self.bondIndices[i+j+1])
+                    b = np.intersect1d(self.bondIndices[i],self.bondIndices[i+j+1])
+                    c = np.setdiff1d(self.bondIndices[i+j+1],self.bondIndices[i])
+                    if len(a) and len(b) and len(c):
+                        d = np.array([a[0],b[0],c[0]])
+                        self.angleIndices = np.append(self.angleIndices,d)
+                        count += 1
+                        self.angleVariables.append("A"+str(count))
+            self.angleIndices = self.angleIndices.reshape((-1,3))
+            
+            """ Form all possible torsions from angles """
+            self.torsionIndices = np.array([])
+            count = 0
+            for i in range(len(self.angleIndices)):
+                for j in range(len(self.angleIndices)-i-1):
+                    a = np.setdiff1d(self.angleIndices[i],self.angleIndices[i+j+1])
+                    b = np.intersect1d(self.angleIndices[i],self.angleIndices[i+j+1])
+                    c = np.setdiff1d(self.angleIndices[i+j+1],self.angleIndices[i])
+                    if len(a) and len(b)==2 and len(c):
+                        d = np.array([a[0],b[0],b[1],c[0]])
+                        self.torsionIndices = np.append(self.torsionIndices,d)
+                        count += 1
+                        self.torsionVariables.append("D"+str(count))
+            self.torsionIndices = self.torsionIndices.reshape((-1,4))
         elif self.options.coords.upper() == "CUSTOM":
             """ 
                 This option will allow the user to specify a custom array of internal coordinates. 
                 Thus far they will still be limited to torsions for 4 index coordinates.
             """
-            print(zmatOutput)
             for i in range(len(zmatOutput)):
                 if re.search(bondRegex,zmatOutput[i]):
                     List = re.findall(bondRegex,zmatOutput[i])[0]
@@ -231,7 +268,6 @@ class ZMAT(object):
         """
             The masses are assigned to the respective atom from the masses.py file
         """
-        print(self.atomList)
         self.masses = [masses.get_mass(label) for label in self.atomList]
         for i in range(len(self.masses)):
             self.masses[i] = self.masses[i]/self.amu_elMass
@@ -245,9 +281,6 @@ class ZMAT(object):
         print("Final Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + ": " + str(self.variableDictionaryFinal[Variables[i]]))
-        # print(self.variableDictionaryInit)
-        # print(self.variableDictionaryFinal)
-        # raise RuntimeError
         """
             Calculate Cartesians using ZMATs: Sadly this will have to go on the backburner.
             The cartesians must match those used to generate the cartesian force constants or you're gonna have a bad time.

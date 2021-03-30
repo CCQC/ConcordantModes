@@ -12,6 +12,7 @@ class Options(object):
         self.geomCheck = kwargs.pop('geomCheck',False)
         self.nslots = kwargs.pop("nslots", 1)
         self.program = kwargs.pop('program', "molpro@2010.1.67+mpi")
+        self.projTol = kwargs.pop('projTol',1.0e-14)
         self.queue = kwargs.pop("queue", "gen4.q")
         self.spin = kwargs.pop('spin', 1)
         self.successRegex = kwargs.pop('successRegex','')
