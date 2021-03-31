@@ -50,12 +50,12 @@ class GF_Method(object):
         self.Freq = self.Freq.astype(float)
         """ Convert from Hartrees to wavenumbers. """
         self.Freq *= self.Hartree_wavenum
-        print('Frequencies:')
-        print(self.Freq)
+        # print('Frequencies:')
+        # print(self.Freq)
         for i in range(len(self.Freq)):
             print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(self.Freq[i]))
         """ Compute and then print the TED. """
-        print(self.L.shape)
+        # print(self.L.shape)
         self.TED = np.multiply(self.L,np.transpose(LA.pinv(self.L)))*100
         np.set_printoptions(suppress=True)
         print('Total Energy Distribution:')
@@ -105,7 +105,9 @@ class GF_Method(object):
         for i in range(len(L_T)):
             if np.dot(L_T[i],np.transpose(L_T[i])) < self.projTol:
                 delArray.append(i)
-        L_T = np.delete(L_T,delArray,0)
+        if len(delArray):
+            L_T = np.delete(L_T,delArray,0)
         self.L = np.transpose(L_T)
-        self.eig_v = np.delete(self.eig_v,delArray,0)
+        if len(delArray):
+            self.eig_v = np.delete(self.eig_v,delArray,0)
 

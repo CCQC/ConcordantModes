@@ -7,7 +7,7 @@ class Options(object):
         self.coords = kwargs.pop('coords', "ZMAT")
         self.disp = kwargs.pop('disp', 0.01)
         self.dispCheck = kwargs.pop('dispCheck',False)
-        self.dispTol = kwargs.pop('dispTol',1.0e-14)
+        self.dispTol = kwargs.pop('dispTol',0.0)
         self.energyRegex = kwargs.pop('energyRegex','')
         self.geomCheck = kwargs.pop('geomCheck',False)
         self.nslots = kwargs.pop("nslots", 1)

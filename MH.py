@@ -89,10 +89,11 @@ class MixedHessian(object):
         for i in range(len(g_mat.G)):
             if np.sum(np.absolute(g_mat.G[i])) == 0.:
                 delArray = np.append(delArray,i)
-        g_mat.G = np.delete(g_mat.G,delArray,0)
-        g_mat.G = np.delete(g_mat.G,delArray,1)
-        f_conv.F = np.delete(f_conv.F,delArray,0)
-        f_conv.F = np.delete(f_conv.F,delArray,1)
+        if len(delArray):
+            g_mat.G = np.delete(g_mat.G,delArray,0)
+            g_mat.G = np.delete(g_mat.G,delArray,1)
+            f_conv.F = np.delete(f_conv.F,delArray,0)
+            f_conv.F = np.delete(f_conv.F,delArray,1)
         
         """
             Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
@@ -122,7 +123,8 @@ class MixedHessian(object):
         """
         s_vec = s_vectors(self.zmat,self.zmat.CartesiansFinal)
         s_vec.run()
-        s_vec.B = np.delete(s_vec.B,delArray,0)
+        if len(delArray):
+            s_vec.B = np.delete(s_vec.B,delArray,0)
         transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol)
         transdisp.run(delArray)
         if self.options.dispCheck:
@@ -200,8 +202,9 @@ class MixedHessian(object):
         """
         g_mat = G_Matrix(self.zmat, s_vec)
         g_mat.run(delArray)
-        g_mat.G = np.delete(g_mat.G,delArray,0)
-        g_mat.G = np.delete(g_mat.G,delArray,1)
+        if len(delArray):
+            g_mat.G = np.delete(g_mat.G,delArray,0)
+            g_mat.G = np.delete(g_mat.G,delArray,1)
         self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),np.transpose(transdisp.eig_inv))
         self.G[np.abs(self.G) < self.options.tol] = 0
 

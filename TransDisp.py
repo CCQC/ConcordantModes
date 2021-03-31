@@ -119,7 +119,8 @@ class TransDisp(object):
                 if Condition2:
                     t -= 2*np.pi
             intCoord = np.append(intCoord,t)
-        intCoord = np.delete(intCoord,delArray)
+        if len(delArray):
+            intCoord = np.delete(intCoord,delArray)
         intCoord = np.dot(eig_inv,intCoord)
         return intCoord
 
