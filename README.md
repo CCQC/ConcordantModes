@@ -35,4 +35,4 @@ This is the main file that imports the MixedHessian options and program, and the
 To run the program, simply enter "python MH_Main.py" or "nohup python MH_Main.py &" if you would like to retain the output.
 
 fc.dat:
-This file contains the cartesian force constants of the first structure (or the only structure). These force constants must be in atomic units (Hartree/bohr^2)
+This file contains the cartesian force constants of the first structure (or the only structure). These force constants must be in units of mdyn/angstrom.
