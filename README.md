@@ -5,9 +5,7 @@ symmetry adapted internal coordinate force constants at a CCSD(T)/cc-pVTZ level 
 
 As of right now, the user must be on the Vulcan cluster.
 
-////////////////////////////////////////////////////////////
-// Dependencies
-////////////////////////////////////////////////////////////
+// Dependencies //
 
 User must have:
 Python version 3.5.4
@@ -15,9 +13,7 @@ Numpy version 1.13.1
 
 Any other versions will not be guaranteed to work.
 
-////////////////////////////////////////////////////////////
-// Quickstart Guide
-////////////////////////////////////////////////////////////
+// Quickstart Guide //
 
 An example is provided in the "Example" directory.
 
