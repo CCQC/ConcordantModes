@@ -277,10 +277,10 @@ class ZMAT(object):
         """
         print("Initial Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
-            print(Variables[i] + ": " + str(self.variableDictionaryInit[Variables[i]]))
+            print(Variables[i] + " = " + str(self.variableDictionaryInit[Variables[i]]))
         print("Final Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
-            print(Variables[i] + ": " + str(self.variableDictionaryFinal[Variables[i]]))
+            print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]]))
         """
             Calculate Cartesians using ZMATs: Sadly this will have to go on the backburner.
             The cartesians must match those used to generate the cartesian force constants or you're gonna have a bad time.

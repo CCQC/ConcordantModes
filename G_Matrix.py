@@ -75,9 +75,7 @@ class G_Matrix(object):
     """
     def compute_element(self,s_1,s_2,overlap_indices):
         G_Mat_Element = 0.
-        # G_Mat = 0.
         for i in overlap_indices:
             if self.zmat.masses[i-1] > 0.1:
                 G_Mat_Element += np.dot(s_1[i-1],s_2[i-1])/self.zmat.masses[i-1]
-                # G_Mat += np.dot(s_1[i-1],s_2[i-1])
         return G_Mat_Element

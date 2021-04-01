@@ -41,10 +41,13 @@ class F_conv(object):
                 Moving from carts to internals, the cartesians must be in units of mdyn/Ang, which
                 is then converted to Hartree/bohr^2
             """ 
-            # self.F /= self.Bohr_Ang**2
-            # self.F *= self.mdyne_Hart
             G = np.dot(self.s_vec.B,self.s_vec.B.transpose())
-            self.A_T = np.dot(inv(G),self.s_vec.B)
+            print("G-Matrix:")
+            for i in range(len(G)):
+                print(i+1)
+                print(np.sum(G[i]))
+                print(G[i])
+            self.A_T = np.dot(LA.pinv(G),self.s_vec.B)
             self.F = np.einsum('ia,jb,ab->ij',self.A_T,self.A_T,self.F)
             if self.Print:
                 self.N = len(self.zmat.atomList)*3 - 6
@@ -52,8 +55,6 @@ class F_conv(object):
         elif self.coord.lower() == "cartesian":
             self.F = np.einsum('ai,bj,ab->ij',self.s_vec.B,self.s_vec.B,self.F)
             """ These force constants are converted from Hartree/bohr^2 to mdyne/Ang """
-            # self.F /= self.Bohr_Ang**2
-            # self.F *= self.mdyne_Hart
             if self.Print:
                 self.N = len(self.zmat.atomList)*3
                 self.Print_const()
