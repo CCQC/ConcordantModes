@@ -5,7 +5,7 @@ from numpy import linalg as LA
 
 """
     This class may be used to read in force constant information from the standard
-    3-column formatted file. Idk what that format is called, but it's super standard.
+    3-column formatted file. Idk what that format is called, but it's pretty standard.
 """
 
 class F_Read(object):

@@ -188,6 +188,7 @@ class ZMAT(object):
                         count += 1
                         self.torsionVariables.append("D"+str(count))
             self.torsionIndices = self.torsionIndices.reshape((-1,4))
+
         elif self.options.coords.upper() == "CUSTOM":
             """ 
                 This option will allow the user to specify a custom array of internal coordinates. 
@@ -210,10 +211,12 @@ class ZMAT(object):
         """
             This code utilizes the INTC function from the TransDisp module to calculate the initial variable values from the cartesian coordinates.
         """
-        transdisp = TransDisp(1,self,1,1,False,self.dispTol)
+        transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options)
         I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices))
-        variables1 = transdisp.INTC(self.CartesiansInit,I,np.array([]))
-        variables2 = transdisp.INTC(self.CartesiansFinal,I,np.array([]))
+        # variables1 = transdisp.INTC(self.CartesiansInit,I,np.array([]))
+        # variables2 = transdisp.INTC(self.CartesiansFinal,I,np.array([]))
+        variables1 = transdisp.INTC(self.CartesiansInit,I,I)
+        variables2 = transdisp.INTC(self.CartesiansFinal,I,I)
         for i in range(len(self.angleIndices)+len(self.torsionIndices)):
             variables1[len(self.bondIndices)+i] *= 180./np.pi
             variables2[len(self.bondIndices)+i] *= 180./np.pi
@@ -281,6 +284,9 @@ class ZMAT(object):
         print("Final Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]]))
+        print("Final - Initial Geometric Internal Coordinate Values:")
+        for i in range(len(Variables)):
+            print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]] - self.variableDictionaryInit[Variables[i]]))
         """
             Calculate Cartesians using ZMATs: Sadly this will have to go on the backburner.
             The cartesians must match those used to generate the cartesian force constants or you're gonna have a bad time.

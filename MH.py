@@ -16,6 +16,7 @@ from MixedHessian.G_Matrix           import G_Matrix
 from MixedHessian.GF_Method          import GF_Method
 from MixedHessian.Reap               import Reap
 from MixedHessian.s_vectors          import s_vectors
+from MixedHessian.TED                import TED
 from MixedHessian.TransDisp          import TransDisp
 from MixedHessian.vulcan_template    import vulcan_template
 from MixedHessian.ZMAT               import ZMAT
@@ -44,8 +45,8 @@ class MixedHessian(object):
         
         rootdir = os.getcwd()
         
-        packagepath = os.path.realpath(__file__)
-        packagepath = packagepath[:-len('/MH.py')]
+        # packagepath = os.path.realpath(__file__)
+        # packagepath = packagepath[:-len('/MH.py')]
         """
             Parse the output to get all pertinent ZMAT info
         """
@@ -57,13 +58,22 @@ class MixedHessian(object):
         """
             Compute the initial s-vectors
         """
-        s_vec = s_vectors(self.zmat,self.zmat.CartesiansInit)
-        s_vec.run()
+        s_vec = s_vectors(self.zmat,self.options)
+        s_vec.run(self.zmat.CartesiansInit,True)
+
+        self.TED = TED(s_vec.Proj,s_vec.Proj.T,self.zmat)
+        
+        """
+            Compute G-Matrix
+        """
+        g_mat = G_Matrix(self.zmat, s_vec, self.options)
+        g_mat.run()
+        
+        G = g_mat.G.copy()
 
         """
             Read in FC matrix in cartesians, then convert to internals.
         """
-
         if os.path.exists(rootdir + '/fc.dat'):
             f_read = F_Read("fc.dat")
         elif os.path.exists(rootdir + '/FCMFINAL'):
@@ -72,47 +82,30 @@ class MixedHessian(object):
             print("Need to specify the force constants!")
             raise RuntimeError
         f_read.run()
-        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False)
+        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False, self.TED)
         f_conv.run()
-        # raise RuntimeError
-
-        """
-            Compute G-Matrix
-        """
-        g_mat = G_Matrix(self.zmat, s_vec)
-        g_mat.run(np.array([]))
-
-        """
-            Project zero rows of G-matrix from G- and F-matrices
-        """
-        delArray = np.array([])
-        for i in range(len(g_mat.G)):
-            if np.sum(np.absolute(g_mat.G[i])) == 0.:
-                delArray = np.append(delArray,i)
-        if len(delArray):
-            g_mat.G = np.delete(g_mat.G,delArray,0)
-            g_mat.G = np.delete(g_mat.G,delArray,1)
-            f_conv.F = np.delete(f_conv.F,delArray,0)
-            f_conv.F = np.delete(f_conv.F,delArray,1)
+        if self.options.coords != "ZMAT":
+            f_conv.F = np.dot(self.TED.Proj.T,np.dot(f_conv.F,self.TED.Proj))
+        if self.options.coords != "ZMAT":
+            g_mat.G = np.dot(self.TED.Proj.T,np.dot(g_mat.G,self.TED.Proj))
         
         """
             Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         """
         print("Initial Frequencies:")
-        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol,self.options.projTol,self.zmat)
+        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol,self.options.projTol,self.zmat,self.TED)
         init_GF.run()
-        # raise RuntimeError
 
         """
             Now for the TED check.
         """
-        self.G = np.dot(np.dot(LA.pinv(init_GF.L),g_mat.G),np.transpose(LA.pinv(init_GF.L)))
+        self.G = np.dot(np.dot(LA.inv(init_GF.L),g_mat.G),LA.inv(init_GF.L).T)
         self.G[np.abs(self.G) < self.options.tol] = 0
-        self.F = np.dot(np.dot(np.transpose(init_GF.L),f_conv.F),init_GF.L)
+        self.F = np.dot(np.dot(init_GF.L.T,f_conv.F),init_GF.L)
         self.F[np.abs(self.F) < self.options.tol] = 0
         
         print("TED Frequencies:")
-        TED_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat)
+        TED_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat,self.TED)
         TED_GF.run()
 
         if os.path.exists(rootdir + '/Intder'):
@@ -121,12 +114,12 @@ class MixedHessian(object):
         """
             Recompute the B-Tensors to match the final geometry, then generate the displacements.
         """
-        s_vec = s_vectors(self.zmat,self.zmat.CartesiansFinal)
-        s_vec.run()
-        if len(delArray):
-            s_vec.B = np.delete(s_vec.B,delArray,0)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol)
-        transdisp.run(delArray)
+        s_vec = s_vectors(self.zmat,self.options)
+        s_vec.run(self.zmat.CartesiansFinal,False)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options)
+        transdisp.run()
+        
+        
         if self.options.dispCheck:
             raise RuntimeError
 
@@ -183,7 +176,7 @@ class MixedHessian(object):
         os.chdir('..')
 
         """
-            This section will compute the force constants using a python script
+            Compute the force constants here, currently can only do diagonal force constants
         """
         fc = ForceConstant(transdisp, Reap_obj.energiesDict)
         fc.run()
@@ -200,76 +193,33 @@ class MixedHessian(object):
             lower level of theory eigenvalue matrix. This will not fully diagonalize the G-matrix
             if a different geometry is used between the two.
         """
-        g_mat = G_Matrix(self.zmat, s_vec)
-        g_mat.run(delArray)
-        if len(delArray):
-            g_mat.G = np.delete(g_mat.G,delArray,0)
-            g_mat.G = np.delete(g_mat.G,delArray,1)
-        self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),np.transpose(transdisp.eig_inv))
+        g_mat = G_Matrix(self.zmat, s_vec, self.options)
+        g_mat.run()
+        if self.options.coords != "ZMAT":
+            g_mat.G = np.dot(self.TED.Proj.T,np.dot(g_mat.G,self.TED.Proj))
+        self.G = np.dot(np.dot(transdisp.eig_inv,g_mat.G),transdisp.eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
 
         """
             Final GF Matrix run
         """
         print("Final Frequencies:")
-        Final_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat)
+        Final_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat,self.TED)
         Final_GF.run()
+        
+
+        """
+            This code prints out the frequencies in order of energy as well as the ZPVE in several different units.
+        """
+        print("Final ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
+                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
         
         """
             This code below is a rudimentary table of the TED for the final frequencies.
             Actually right now it uses the initial L-matrix, which may need to be modified
             by the final L-matrix.
         """
-        TEDinit = init_GF.TED.copy() / 100.
-        TEDfinal = Final_GF.TED.copy() / 100.
-        TED = np.dot(TEDinit,TEDfinal)
-        TED *= 100.
-        if not len(delArray) > 0:
-            # tableOutput = "     Frequency #:"
-            tableOutput = "{:>26s}".format("Frequency #: ")
-            for i in range(len(Final_GF.Freq)):
-                tableOutput += "{:8d}".format(i+1)
-            tableOutput += '\n'
-            tableOutput += "--------------------------"
-            for i in range(len(Final_GF.Freq)):
-                tableOutput += "--------"
-            tableOutput += '\n'
-            tableOutput += "{:>26s}".format("Frequency: ")
-            for i in range(len(Final_GF.Freq)):
-                tableOutput += " " + "{:7.1f}".format(Final_GF.Freq[i])
-            tableOutput += '\n'
-            tableOutput += "--------------------------"
-            for i in range(len(Final_GF.Freq)):
-                tableOutput += "--------"
-            tableOutput += '\n'
-            """ Modify table rows so that internal coord labels have a fixed length. """
-            for i in range(len(TED)):
-                if i < len(self.zmat.bondIndices):
-                    tableOutput += "{:10s}".format(" ") + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.bondIndices[i][0])-1]) + str(self.zmat.bondIndices[i][0])) + " " \
-                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.bondIndices[i][1])-1]) + str(self.zmat.bondIndices[i][1])) + " STRE: " 
-                elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices):
-                    k = i - len(self.zmat.bondIndices)
-                    tableOutput += "{:5s}".format(" ") + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][0])-1]) + str(self.zmat.angleIndices[k][0])) + " " \
-                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][1])-1]) + str(self.zmat.angleIndices[k][1])) + " " \
-                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.angleIndices[k][2])-1]) + str(self.zmat.angleIndices[k][2])) + " BEND: " 
-                elif i < len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices):
-                    k = i - len(self.zmat.bondIndices) - len(self.zmat.angleIndices)
-                    tableOutput += "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][0])-1]) + str(self.zmat.torsionIndices[k][0])) + " " \
-                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1])) + " " \
-                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2])) + " " \
-                            + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3])) + " TORS: " 
-                for j in range(len(TED)):
-                    tableOutput += "{:8.1f}".format(TED[i][j])
-                tableOutput += '\n'
-            print(tableOutput)
-
-        """
-            This code prints out the frequencies in order of energy as well as the ZPVE in several different units.
-        """
-        for i in range(len(Final_GF.Freq)):
-            print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(Final_GF.Freq[i]))
-        print("ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
-                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
+        self.TED.run(init_GF.L,Final_GF.Freq)
         
         """
             This code converts the force constants back into cartesian coordinates and writes out

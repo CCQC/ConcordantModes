@@ -8,12 +8,13 @@ from numpy import linalg as LA
 """
 
 class G_Matrix(object):
-    def __init__(self, zmat, s_vectors):
+    def __init__(self, zmat, s_vectors, options):
         self.zmat      = zmat
         self.s_vectors = s_vectors
+        self.options   = options
 
-    def run(self,delArray):
-        self.G = np.zeros((len(self.s_vectors.B)+len(delArray),len(self.s_vectors.B)+len(delArray)))
+    def run(self):
+        self.G = np.zeros((len(self.s_vectors.B),len(self.s_vectors.B)))
         
         b_len = len(self.zmat.bondIndices)
         a_len = len(self.zmat.angleIndices)
@@ -70,6 +71,7 @@ class G_Matrix(object):
         """
         tol = 1e-12
         self.G[np.abs(self.G) < tol] = 0
+
     """
         Pretty straightforward function, computes the G-Matrix elements!
     """

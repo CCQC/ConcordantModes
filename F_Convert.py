@@ -8,12 +8,13 @@ from numpy import linalg as LA
 """
 
 class F_conv(object):
-    def __init__(self, F, s_vec, zmat, coord, Print):
+    def __init__(self, F, s_vec, zmat, coord, Print, TED):
         self.F = F
         self.s_vec = s_vec
         self.zmat = zmat
         self.coord = coord
         self.Print = Print
+        self.TED = TED
         """ 
             This constant is from:
             https://physics.nist.gov/cgi-bin/cuu/Value?hr 
@@ -40,16 +41,17 @@ class F_conv(object):
                 So, the force constants must have the proper units off the bat to convert properly. 
                 Moving from carts to internals, the cartesians must be in units of mdyn/Ang, which
                 is then converted to Hartree/bohr^2
-            """ 
-            G = np.dot(self.s_vec.B,self.s_vec.B.transpose())
-            print("G-Matrix:")
-            for i in range(len(G)):
-                print(i+1)
-                print(np.sum(G[i]))
-                print(G[i])
-            self.A_T = np.dot(LA.pinv(G),self.s_vec.B)
+            """
+            B = np.dot(self.TED.Proj.T,self.s_vec.B)
+            BT = B.T
+            G = np.dot(B,BT)
+            self.A_T = np.dot(LA.inv(G),B)
+            self.A_T = np.dot(self.TED.Proj,self.A_T)
             self.F = np.einsum('ia,jb,ab->ij',self.A_T,self.A_T,self.F)
             if self.Print:
+                """
+                    Restructure this to be defined based off the symmetrized internal coordinate length.
+                """
                 self.N = len(self.zmat.atomList)*3 - 6
                 self.Print_const()
         elif self.coord.lower() == "cartesian":

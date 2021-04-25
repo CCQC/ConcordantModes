@@ -69,8 +69,6 @@ class int2cart(object):
         val, vec = LA.eigh(I)
         self.Carts = np.dot(self.Carts,vec)
         self.Carts[np.abs(self.Carts) < self.tol] = 0.
-        # return self.Carts
-        # raise RuntimeError
 
     def InertiaTensor(self, carts, masses):
         mass_weighted = np.multiply(np.sqrt(masses),carts.transpose())

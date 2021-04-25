@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 from numpy import linalg as LA
+from MixedHessian.s_vectors          import s_vectors
 
 
 """
@@ -24,7 +25,7 @@ from numpy import linalg as LA
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol):
+    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options):
         self.dispTol         = dispTol
         self.Conv            = Conv
         self.s_vectors       = s_vectors
@@ -33,51 +34,55 @@ class TransDisp(object):
         self.refCarts        = np.array(self.refCarts).astype(float)
         self.u               = np.identity(3*len(zmat.atomList))
         self.disp            = disp
-        # self.rdisp           = rdisp
-        # self.adisp           = adisp
+        self.TED             = TED
         self.eigs            = eigs
+        self.options         = options
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
 
-    def run(self,delArray):
-        self.delArray = delArray
-        self.B = self.s_vectors.B
+    def run(self):
+        self.B = self.s_vectors.B.copy() # (redundant internals (s) x cartesians (3N))
         """ Invert the L-matrix and then normalize the rows. """
-        self.eig_inv = LA.pinv(self.eigs.copy())
+        projTol = 1.0e-3
+        self.eig_inv = LA.inv(self.eigs) # (Normal modes (Q) x Sym internals (S) )
         for i in range(len(self.eig_inv)):
             self.eig_inv[i] = self.eig_inv[i]/LA.norm(self.eig_inv[i])
+            self.eig_inv[i][np.abs(self.eig_inv[i]) < np.max(np.abs(self.eig_inv[i]))*projTol] = 0
+            # self.eigs[i] = self.eigs.T[i]/LA.norm(self.eigs.T[i])
+            # self.eigs[i][np.abs(self.eigs.T[i]) < np.max(np.abs(self.eigs.T[i]))*projTol] = 0
+        # print(np.dot(self.eigs,self.eigs.T))
+        # print(np.dot(self.eigs.T,self.eigs))
+        # raise RuntimeError
         """
-            Construct 'A', the commented lines may be useful for getting intensities later. 
+            Compute the A-matrix to convert from normal coordinates to cartesians
         """
-        # self.A = (self.u).dot(self.B.transpose())
-        # self.A = (self.B).dot(self.A)
-        self.A = (self.B).dot(self.B.transpose())
-        self.A = LA.inv(self.A)
-        self.A = (self.B.transpose()).dot(self.A)
-        """ Similar to the first two commented lines, this will be necessary for intensities. """
-        # self.A = (self.u).dot(self.A)
-        """ This step modifies A to convert from normal coords to carts. """
-        self.A = np.dot(self.A,LA.pinv(self.eig_inv)).round(decimals=12)
+        self.A = self.ComputeA(self.s_vectors.B.copy(),self.TED.Proj,self.eig_inv)
+
+        """ Generate the reference normal coordinate structure """
+        self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.TED.Proj)
+        
         """
             Next, we will have to determine our desired Normal mode internal coordinate displacements
         """
+        self.dispSym = np.zeros(len(self.eigs))
         
-        """ Generate the internal coordinate displacement vector """
-        self.n_disp = np.array([])
-        N_int = len(self.zmat.bondIndices) + len(self.zmat.angleIndices) + len(self.zmat.torsionIndices)
-        """ Need to use one of the dimensions of eigenvectors to generate disp-vector """
-        for i in range(len(self.eigs[0])):
-            self.n_disp = np.append(self.n_disp,self.disp)
-        
-        self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.delArray)
+        L = inv(self.eig_inv)
 
-        self.dispSym = np.zeros(len(self.n_disp)-len(self.delArray))
-
-        for i in range(len(self.n_disp)-len(self.delArray)):
-            disp = np.zeros(len(self.n_disp)-len(self.delArray))
+        for i in range(len(self.eigs.T)):
+            disp = np.zeros(len(self.eigs.T))
             disp[i] = self.disp
-            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
-            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-14)
+            print("Disp #" + str(i+1))
+            print("Plus Disp:")
+            self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+            print("Normal Coordinate Value: ")
+            print(i+1)
+            print(self.n_coord[i])
+            print("Minus Disp:")
+            self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+            print("Normal Coordinate Value: ")
+            print(i+1)
+            print(self.n_coord[i])
+            """ This code is probably worthless """
             norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
             norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
             normDiff = np.abs(norm1-norm2)
@@ -86,8 +91,8 @@ class TransDisp(object):
         
         self.dispSym = self.dispSym.astype(int)
 
-
-    def INTC(self,carts,eig_inv,delArray):
+    def INTC(self,carts,eig_inv,Proj):
+        tol = 1.0e-3
         intCoord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
             x1 = np.array(carts[int(self.zmat.bondIndices[i][0])-1]).astype(float)
@@ -111,7 +116,6 @@ class TransDisp(object):
             x4 = np.array(carts[int(self.zmat.torsionIndices[i][3])-1]).astype(float)
             t = self.calcTors(x1,x2,x3,x4)
             if self.Conv:
-                """ Modify these conditions to check computed result against  """
                 Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) > 135. and t*180./np.pi < -135.
                 Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.torsionVariables[i]]) < -135. and t*180./np.pi > 135.
                 if Condition1:
@@ -119,8 +123,8 @@ class TransDisp(object):
                 if Condition2:
                     t -= 2*np.pi
             intCoord = np.append(intCoord,t)
-        if len(delArray):
-            intCoord = np.delete(intCoord,delArray)
+        intCoord = np.dot(Proj.T,intCoord)
+        # intCoord[np.abs(intCoord) < tol*np.max(np.abs(intCoord))] = 0
         intCoord = np.dot(eig_inv,intCoord)
         return intCoord
 
@@ -155,16 +159,84 @@ class TransDisp(object):
         theta = np.arcsin(np.dot(np.cross(e3,e4)/np.sin(phi),e1))
         return theta
 
-    def CoordConvert(self,n_disp,n_coord,refCarts,max_iter,tolerance):
+    def CoordConvert(self,n_disp,n_coord,refCarts,max_iter,tolerance,A):
+        tol = 1.0e-3
+        # ensureConverge = False
+        # ensureConverge = True
+        convIter = 10
+        # s_vec = s_vectors(self.zmat,self.options)
         newN = n_coord + n_disp
+        # oldNorm = LA.norm(n_disp)
         newCarts = np.array(refCarts).astype(float)
+        # refCarts = newCarts.copy()
         for i in range(max_iter):
-            cartDisp = np.dot(self.A,n_disp)
+            cartDisp = np.dot(n_disp,A)
             cartDispShaped = np.reshape(cartDisp,(-1,3))
+            print(cartDispShaped)
             newCarts += cartDispShaped
-            coordCheck = self.INTC(newCarts,self.eig_inv,self.delArray)
+            coordCheck = self.INTC(newCarts,self.eig_inv,self.TED.Proj)
+            print("coordCheck " + str(i+1))
             n_disp = newN - coordCheck
+            n_disp[np.abs(n_disp) < tol*np.max(np.abs(n_disp))] = 0
+            """
+                These lines of code are in place to aid with convergence of the displacement
+            """
+            # if oldNorm < LA.norm(n_disp) and ensureConverge:
+                # for j in range(convIter):
+                    # newCarts = refCarts.copy()
+                    # n_disp = n_disp*0.5
+                    # cartDisp = np.dot(n_disp,A)
+                    # cartDispShaped = np.reshape(cartDisp,(-1,3))
+                    # newCarts += cartDispShaped
+                    # coordCheck = self.INTC(newCarts,self.eig_inv,self.TED.Proj)
+                    # if LA.norm(newN - coordCheck) < oldNorm:
+                        # n_disp = newN - coordCheck
+                        # n_disp[np.abs(n_disp) < tol*np.max(np.abs(n_disp))] = 0
+                        # break
+            print("Q Disp Norm: ")
+            print(n_disp)
+            print(LA.norm(n_disp))
             if LA.norm(n_disp) < tolerance:
                 break
+            # refCarts = newCarts.copy()
+            # oldNorm = LA.norm(newN - self.INTC(newCarts,self.eig_inv,self.TED.Proj))
+            """
+                These lines of code also aid in convergence of the displacement
+            """
+            # s_vec.run(newCarts,False)
+            # A = self.ComputeA(s_vec.B,self.TED.Proj,self.eig_inv)
+        if LA.norm(n_disp) > tolerance:
+            print("This displacement did not converge.")
+            print("Norm:")
+            print(LA.norm(n_disp))
+            print("Tolerance:")
+            print(tolerance)
         return newCarts
 
+    def ComputeA(self,B,Proj,eig_inv):
+        """
+            Construct 'A', the commented lines may be useful for getting intensities later. 
+            The BB^T product must be linearly independent to work, so it will be projected 
+            into the symmetry adapted basis.
+        """
+        # BT = B.T # (3N x s)
+        # A = u.dot(BT)
+        # A = np.dot(B,BT) # (s x s)
+        # A = LA.pinv(A) # (s x s)
+        # A = BT.dot(A) # (3N x s)
+        # A = np.dot(A,Proj).T # (S x 3N)
+        A = LA.pinv(B)
+        L = inv(eig_inv)
+        # projTol = 1.0e-3
+        # for i in range(len(L)):
+            # L[i] = L[i]/LA.norm(L[i])
+            # L[i][np.abs(L[i]) < np.max(np.abs(L[i]))*projTol] = 0
+        
+        A = np.dot(A,Proj) # (3N x S)
+        A = A.T # (S x 3N)
+        """ Similar to the first two commented lines, this will be necessary for intensities. """
+        # self.A = (self.u).dot(self.A)
+        """ This step modifies A to convert from normal coords to carts. """
+        A = np.dot(L.T,A) # (Q x 3N)
+
+        return A

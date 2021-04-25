@@ -15,12 +15,7 @@ class DirectoryTree(object):
         self.insertionIndex = insertionIndex
         self.disps = disps # This should be the 'TransDisp' object
 
-    def Make_Input(self,data,dispp,n_at,at,index):	
-        """
-            I'm going to generalize this so that the user just puts in the insertion index,
-            and the geometry is placed there. Then the user can use any program/input file that this
-            package is coded for.
-        """
+    def Make_Input(self,data,dispp,n_at,at,index):	 
         space = ' '
         if self.progname == 'cfour':
             space = ''
@@ -83,16 +78,6 @@ class DirectoryTree(object):
         for i in range(len(self.disps.DispCart)-np.sum(self.dispSym)-1):
             j = Sum % 2
             k = Sum // 2
-            # print('i: ')
-            # print(i)
-            # print('j: ')
-            # print(j)
-            # print('k: ')
-            # print(k)
-            # print('Sum: ')
-            # print(Sum)
-            # print('Sym: ')
-            # print(self.dispSym[k])
             os.mkdir(str(i+2))
             os.chdir("./" + str(i+2))
             if self.dispSym[k] == 0:
@@ -102,7 +87,6 @@ class DirectoryTree(object):
                     data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
             elif self.dispSym[k] == 1:
                 data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-                # raise RuntimeError
             Sum += self.dispSym[k]
             Sum += 1
             with open(inp,'w') as file:
@@ -111,4 +95,3 @@ class DirectoryTree(object):
             if init:
                 shutil.copy('../../initden.dat','.')
             os.chdir('..')
-        # raise RuntimeError

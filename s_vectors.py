@@ -12,16 +12,18 @@ from numpy import linalg as LA
 
 
 class s_vectors(object):
-    def __init__(self,zmat,carts):
+    def __init__(self,zmat,options):
         self.s_STRE_dict    = {}
         self.s_BEND_dict    = {}
         self.s_TORS_dict    = {}
-        self.carts          = carts
         self.bondIndices    = np.array(zmat.bondIndices).astype(np.int) 
         self.angleIndices   = np.array(zmat.angleIndices).astype(np.int) 
         self.torsionIndices = np.array(zmat.torsionIndices).astype(np.int) 
+        self.options        = options
 
-    def run(self):
+    def run(self,carts,B_proj):
+        """ Initialize the cartesian coordinates """
+        self.carts = carts
         """
             So, first things first I'll have to code up the 
             proper equations for the first order B-Tensors
@@ -101,6 +103,24 @@ class s_vectors(object):
         """
         for i in range(len(self.s_TORS_dict)):
             self.B = np.append(self.B,np.array([self.s_TORS_dict['D'+str(i+1)].flatten()]),axis=0)
+
+
+        tol = 1e-10
+        proj_tol = 1e-3
+        """ Experimental code to acquire natural internal coordinates from diagonalized BB^T Matrix """
+        if self.options.coords.upper() != "ZMAT":
+            Proj,eigs,_ = LA.svd(self.B)
+            Proj[np.abs(Proj) < tol] = 0
+            if B_proj:
+                delArray = np.array(np.where(np.abs(eigs) < tol))
+                self.Proj = Proj.T[:len(self.B.T)-len(delArray[0])]
+                self.Proj = self.Proj.T
+                for i in range(len(self.Proj.T)):
+                    self.Proj.T[i][np.abs(self.Proj.T[i]) < np.max(np.abs(self.Proj.T[i]))*proj_tol] = 0
+        """
+            self.Proj may be used to transfrom from full set of internal coords to symmetrized internal coords.
+            self.Proj.T may be used to transform from the symmetrized set to the full set of internal coords.
+        """
 
     def compute_STRE(self,bondIndices,carts,r):
         s = (carts[bondIndices[0]-1] - carts[bondIndices[1]-1])/r

@@ -22,7 +22,6 @@ class ForceConstant(object):
             e_p = self.energiesDict[str(i+1) + '_plus']
             e_m = self.energiesDict[str(i+1) + '_minus']
             self.FC = np.append(self.FC,self.fcCalc(e_p,e_m,e_r,self.disp.disp))
-            # self.FC = np.append(self.FC,self.fcCalc(e_p,e_m,e_r,self.disp.s_disp[i]))
 
     def fcCalc(self,e_p,e_m,e_r,h):
         fc = (e_p - 2*e_r + e_m)/(h**2)

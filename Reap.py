@@ -12,7 +12,9 @@ class Reap(object):
         self.dispSym = dispSym
 
     def run(self):
-        # Define energy search regex
+        """
+            Define energy search regex
+        """
         energyRegex = re.compile(self.options.energyRegex)
         successRegex = re.compile(self.options.successRegex)
 
