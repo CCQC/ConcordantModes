@@ -205,19 +205,18 @@ class MixedHessian(object):
         Final_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat,self.TED)
         Final_GF.run()
         
-
-        """
-            This code prints out the frequencies in order of energy as well as the ZPVE in several different units.
-        """
-        print("Final ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
-                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
-        
         """
             This code below is a rudimentary table of the TED for the final frequencies.
             Actually right now it uses the initial L-matrix, which may need to be modified
             by the final L-matrix.
         """
         self.TED.run(init_GF.L,Final_GF.Freq)
+
+        """
+            This code prints out the frequencies in order of energy as well as the ZPVE in several different units.
+        """
+        print("Final ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
+                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
         
         """
             This code converts the force constants back into cartesian coordinates and writes out

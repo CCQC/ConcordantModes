@@ -71,17 +71,17 @@ class TransDisp(object):
         for i in range(len(self.eigs.T)):
             disp = np.zeros(len(self.eigs.T))
             disp[i] = self.disp
-            print("Disp #" + str(i+1))
-            print("Plus Disp:")
+            # print("Disp #" + str(i+1))
+            # print("Plus Disp:")
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-            print("Normal Coordinate Value: ")
-            print(i+1)
-            print(self.n_coord[i])
-            print("Minus Disp:")
+            # print("Normal Coordinate Value: ")
+            # print(i+1)
+            # print(self.n_coord[i])
+            # print("Minus Disp:")
             self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-            print("Normal Coordinate Value: ")
-            print(i+1)
-            print(self.n_coord[i])
+            # print("Normal Coordinate Value: ")
+            # print(i+1)
+            # print(self.n_coord[i])
             """ This code is probably worthless """
             norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
             norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
@@ -174,7 +174,7 @@ class TransDisp(object):
             cartDispShaped = np.reshape(cartDisp,(-1,3))
             newCarts += cartDispShaped
             coordCheck = self.INTC(newCarts,self.eig_inv,self.TED.Proj)
-            print("coordCheck " + str(i+1))
+            # print("coordCheck " + str(i+1))
             n_disp = newN - coordCheck
             n_disp[np.abs(n_disp) < tol*np.max(np.abs(n_disp))] = 0
             """
@@ -192,9 +192,9 @@ class TransDisp(object):
                         # n_disp = newN - coordCheck
                         # n_disp[np.abs(n_disp) < tol*np.max(np.abs(n_disp))] = 0
                         # break
-            print("Q Disp Norm: ")
-            print(n_disp)
-            print(LA.norm(n_disp))
+            # print("Q Disp Norm: ")
+            # print(n_disp)
+            # print(LA.norm(n_disp))
             if LA.norm(n_disp) < tolerance:
                 break
             # refCarts = newCarts.copy()

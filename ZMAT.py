@@ -227,7 +227,7 @@ class ZMAT(object):
                 indices.append(self.angleIndices[i].tolist())
             for i in range(len(self.torsionIndices)):
                 indices.append(self.torsionIndices[i].tolist())
-            print(indices)
+            # print(indices)
 
         for i in range(len(variables1)):
             self.variableDictionaryInit[Variables[i]] = variables1[i]
@@ -289,18 +289,18 @@ class ZMAT(object):
         print("Initial Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryInit[Variables[i]]))
-            if self.options.coords.upper() == "REDUNDANT":
-                print(indices[i])
+            # if self.options.coords.upper() == "REDUNDANT":
+                # print(indices[i])
         print("Final Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]]))
-            if self.options.coords.upper() == "REDUNDANT":
-                print(indices[i])
+            # if self.options.coords.upper() == "REDUNDANT":
+                # print(indices[i])
         print("Final - Initial Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]] - self.variableDictionaryInit[Variables[i]]))
-            if self.options.coords.upper() == "REDUNDANT":
-                print(indices[i])
+            # if self.options.coords.upper() == "REDUNDANT":
+                # print(indices[i])
         """
             Calculate Cartesians using ZMATs: Sadly this will have to go on the backburner.
             The cartesians must match those used to generate the cartesian force constants or you're gonna have a bad time.
