@@ -4,12 +4,13 @@ import shutil
 import re
 
 class Reap(object):
-    def __init__(self, progname, zmat, dispcart, options, dispSym):
+    def __init__(self, progname, zmat, dispcart, options, n_coord):
         self.progname = progname
         self.zmat = zmat
         self.dispcart = dispcart
         self.options = options
-        self.dispSym = dispSym
+        self.n_coord = n_coord
+        self.dispSym = [0]
 
     def run(self):
         """
@@ -59,13 +60,17 @@ class Reap(object):
         for i in range(n_disp - np.sum(self.dispSym) - 1):
             j = Sum % 2
             k = Sum // 2
-            if self.dispSym[k] == 0:
-                if j == 0:
-                    self.energiesDict[str(k+1)+'_plus'] = float(self.Energies[i+1])
-                if j == 1:
-                    self.energiesDict[str(k+1)+'_minus'] = float(self.Energies[i+1])
-            elif self.dispSym[k] == 1:
+            if j == 0:
                 self.energiesDict[str(k+1)+'_plus'] = float(self.Energies[i+1])
+            if j == 1:
                 self.energiesDict[str(k+1)+'_minus'] = float(self.Energies[i+1])
+            # if self.dispSym[k] == 0:
+                # if j == 0:
+                    # self.energiesDict[str(k+1)+'_plus'] = float(self.Energies[i+1])
+                # if j == 1:
+                    # self.energiesDict[str(k+1)+'_minus'] = float(self.Energies[i+1])
+            # elif self.dispSym[k] == 1:
+                # self.energiesDict[str(k+1)+'_plus'] = float(self.Energies[i+1])
+                # self.energiesDict[str(k+1)+'_minus'] = float(self.Energies[i+1])
             Sum += 1
-            Sum += self.dispSym[k]
+            # Sum += self.dispSym[k]

@@ -6,12 +6,12 @@ from . import masses
 from MixedHessian.int2cart import int2cart
 from MixedHessian.TransDisp import TransDisp
 
-# class ZMAT_interp(object):
 class ZMAT(object):
     def __init__(self,options):
         self.amu_elMass = 5.48579909065*(10**(-4))
         self.dispTol    = 1.0e-14
         self.options    = options
+        self.Bohr_Ang   = 0.529177210903
 
     def run(self):
         # Define some regexes
@@ -36,7 +36,7 @@ class ZMAT(object):
         cartesianAtomRegex = re.compile("([A-Z][A-Za-z]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n")
         dividerRegex       = re.compile("^\s*\-\-\-\s*\n")
         
-        # Read in the ZMAT file
+        """ Read in the ZMAT file """
         with open("zmat",'r') as file:
             output = file.readlines()
         
@@ -89,7 +89,11 @@ class ZMAT(object):
             self.CartesiansFinal = np.array(self.CartesiansFinal).astype(float)
         else:
             self.CartesiansFinal = self.CartesiansInit.copy()
-        
+       
+        if self.options.cartCoords.upper() == "ANGSTROM":
+            self.CartesiansInit /= self.Bohr_Ang
+            self.CartesiansFinal /= self.Bohr_Ang
+
         """ Slice out the ZMAT from the input """
         zmatRange = []
         
@@ -106,7 +110,7 @@ class ZMAT(object):
         
         zmatOutput = output[zmatRange[0]:zmatRange[1]].copy()
 
-        # Initialize necessary lists
+        """ Initialize necessary lists """
         self.bondIndices             = []
         self.bondVariables           = []
         self.angleIndices            = []
@@ -119,31 +123,26 @@ class ZMAT(object):
         count = 0
         if self.options.coords.upper() == "ZMAT":
             """ This code reaps ZMAT data"""
-            # for i in range(len(zmatOutputInit)):
             for i in range(len(zmatOutput)):
-                # This case if we are at the first atom of the ZMAT
+                """ This case if we are at the first atom of the ZMAT """
                 if re.search(firstAtomRegex,zmatOutput[i]) and count < 1:
-                    # self.atomList.append(re.findall(firstAtomRegex,zmatOutput[i])[0])
                     firstIndex = i
                     count += 1
-                # Second atom of the ZMAT, will have one bond term
+                """ Second atom of the ZMAT, will have one bond term """
                 if re.search(secondAtomRegex,zmatOutput[i]):
                     List = re.findall(secondAtomRegex,zmatOutput[i])[0]
-                    # self.atomList.append(List[0])
                     self.bondIndices.append([str(i-firstIndex+1),List[1]])
                     self.bondVariables.append("R"+str(i-firstIndex))
-                # Third atom of the ZMAT, will have bond and angle term
+                """ Third atom of the ZMAT, will have bond and angle term """
                 if re.search(thirdAtomRegex,zmatOutput[i]):
                     List = re.findall(thirdAtomRegex,zmatOutput[i])[0]
-                    # self.atomList.append(List[0])
                     self.bondIndices.append([str(i-firstIndex+1),List[1]])
                     self.bondVariables.append("R"+str(i-firstIndex))
                     self.angleIndices.append([str(i-firstIndex+1),List[1],List[2]])
                     self.angleVariables.append("A"+str(i-firstIndex))
-                # All remaining ZMAT atoms, will have bond, angle, and torsion term
+                """ All remaining ZMAT atoms, will have bond, angle, and torsion term """
                 if re.search(fullAtomRegex,zmatOutput[i]):
                     List = re.findall(fullAtomRegex,zmatOutput[i])[0]
-                    # self.atomList.append(List[0])
                     self.bondIndices.append([str(i-firstIndex+1),List[1]])
                     self.bondVariables.append("R"+str(i-firstIndex))
                     self.angleIndices.append([str(i-firstIndex+1),List[1],List[2]])
@@ -213,14 +212,23 @@ class ZMAT(object):
         """
         transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options)
         I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices))
-        # variables1 = transdisp.INTC(self.CartesiansInit,I,np.array([]))
-        # variables2 = transdisp.INTC(self.CartesiansFinal,I,np.array([]))
         variables1 = transdisp.INTC(self.CartesiansInit,I,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I,I)
         for i in range(len(self.angleIndices)+len(self.torsionIndices)):
             variables1[len(self.bondIndices)+i] *= 180./np.pi
             variables2[len(self.bondIndices)+i] *= 180./np.pi
-        Variables = np.append(self.bondVariables,np.append(self.angleVariables,self.torsionVariables))
+        Variables = np.append(self.bondVariables,np.append(self.angleVariables,self.torsionVariables))    
+        
+        if self.options.coords.upper() == "REDUNDANT":
+            indices = []
+            for i in range(len(self.bondIndices)):
+                indices.append(self.bondIndices[i].tolist())
+            for i in range(len(self.angleIndices)):
+                indices.append(self.angleIndices[i].tolist())
+            for i in range(len(self.torsionIndices)):
+                indices.append(self.torsionIndices[i].tolist())
+            print(indices)
+
         for i in range(len(variables1)):
             self.variableDictionaryInit[Variables[i]] = variables1[i]
 
@@ -281,12 +289,18 @@ class ZMAT(object):
         print("Initial Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryInit[Variables[i]]))
+            if self.options.coords.upper() == "REDUNDANT":
+                print(indices[i])
         print("Final Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]]))
+            if self.options.coords.upper() == "REDUNDANT":
+                print(indices[i])
         print("Final - Initial Geometric Internal Coordinate Values:")
         for i in range(len(Variables)):
             print(Variables[i] + " = " + str(self.variableDictionaryFinal[Variables[i]] - self.variableDictionaryInit[Variables[i]]))
+            if self.options.coords.upper() == "REDUNDANT":
+                print(indices[i])
         """
             Calculate Cartesians using ZMATs: Sadly this will have to go on the backburner.
             The cartesians must match those used to generate the cartesian force constants or you're gonna have a bad time.

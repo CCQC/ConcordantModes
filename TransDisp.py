@@ -172,7 +172,6 @@ class TransDisp(object):
         for i in range(max_iter):
             cartDisp = np.dot(n_disp,A)
             cartDispShaped = np.reshape(cartDisp,(-1,3))
-            print(cartDispShaped)
             newCarts += cartDispShaped
             coordCheck = self.INTC(newCarts,self.eig_inv,self.TED.Proj)
             print("coordCheck " + str(i+1))
@@ -227,11 +226,6 @@ class TransDisp(object):
         # A = np.dot(A,Proj).T # (S x 3N)
         A = LA.pinv(B)
         L = inv(eig_inv)
-        # projTol = 1.0e-3
-        # for i in range(len(L)):
-            # L[i] = L[i]/LA.norm(L[i])
-            # L[i][np.abs(L[i]) < np.max(np.abs(L[i]))*projTol] = 0
-        
         A = np.dot(A,Proj) # (3N x S)
         A = A.T # (S x 3N)
         """ Similar to the first two commented lines, this will be necessary for intensities. """

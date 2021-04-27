@@ -45,8 +45,6 @@ class MixedHessian(object):
         
         rootdir = os.getcwd()
         
-        # packagepath = os.path.realpath(__file__)
-        # packagepath = packagepath[:-len('/MH.py')]
         """
             Parse the output to get all pertinent ZMAT info
         """
@@ -61,7 +59,7 @@ class MixedHessian(object):
         s_vec = s_vectors(self.zmat,self.options)
         s_vec.run(self.zmat.CartesiansInit,True)
 
-        self.TED = TED(s_vec.Proj,s_vec.Proj.T,self.zmat)
+        self.TED = TED(s_vec.Proj,self.zmat)
         
         """
             Compute G-Matrix
@@ -171,7 +169,7 @@ class MixedHessian(object):
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.dispSym)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord)
         Reap_obj.run()
         os.chdir('..')
 
@@ -223,10 +221,12 @@ class MixedHessian(object):
         
         """
             This code converts the force constants back into cartesian coordinates and writes out
-            an "output.default.hess" file, which is of the same format as FCMFINAL.
+            an "output.default.hess" file, which is of the same format as FCMFINAL of CFOUR.
+
+            One further note. I will likely have to convert my force constants within the F_Conv back to internal coordinates first.
         """
-        cart_conv = F_conv(self.F, s_vec, self.zmat, "cartesian", True)
-        cart_conv.run()
+        # cart_conv = F_conv(self.F, s_vec, self.zmat, "cartesian", True)
+        # cart_conv.run()
 
         t2 = time.time()
         

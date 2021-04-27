@@ -10,18 +10,22 @@ from scipy.linalg import fractional_matrix_power
 """
 
 class TED(object):
-    def __init__(self, Proj, Proj_inv, zmat):
+    def __init__(self, Proj, zmat):
         self.Proj     = Proj
-        self.Proj_inv = Proj_inv
         self.zmat     = zmat
 
     def run(self, eigs, Freq):
         """
             Need to properly form this TED equation.
         """
-        # TED = np.multiply(np.dot(self.L_proj,eigs),np.dot(self.R_proj,np.transpose(LA.inv(eigs))))*100
+        projEigs = np.dot(self.Proj,eigs)
+        projEigsInv = LA.pinv(projEigs)
+        TED = np.multiply(projEigs,projEigsInv.T)*100
         self.table_print(Freq,TED)
 
+    """
+        I will likely want to add two other tables. One that displays the TED of the modes in terms of symmetry adapted coordinates. And another that displays the TED of internals within each symmetry adapted coordinate.
+    """
     def table_print(self, Freq, TED):
         tableOutput = "{:>26s}".format("Frequency #: ")
         for i in range(len(Freq)):
@@ -55,6 +59,13 @@ class TED(object):
                         + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][1])-1]) + str(self.zmat.torsionIndices[k][1])) + " " \
                         + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][2])-1]) + str(self.zmat.torsionIndices[k][2])) + " " \
                         + "{:4s}".format(str(self.zmat.atomList[int(self.zmat.torsionIndices[k][3])-1]) + str(self.zmat.torsionIndices[k][3])) + " TORS: " 
-            for j in range(len(TED[0])):
+            if len(Freq) != len(TED[0]):
+                print("Something has gone terribly wrong. Your Total Energy distribution should have the same number of columns as frequencies, but it does not.")
+                print("TED columns: " + str(len(TED[0])))
+                print("# Frequencies: " + str(len(Freq)))
+                raise RuntimeError
+            for j in range(len(Freq)):
                 tableOutput += "{:8.1f}".format(TED[i][j])
             tableOutput += '\n'
+
+        print(tableOutput)

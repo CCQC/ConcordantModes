@@ -2,6 +2,7 @@ class Options(object):
     def __init__(self, **kwargs):
         self.basis = kwargs.pop('basis', "cc-pVDZ")
         self.calc = kwargs.pop('calc',True)
+        self.cartCoords = kwargs.pop('cartCoords', "Bohr")
         self.cartInsert = kwargs.pop('cartInsert',-1)
         self.charge = kwargs.pop('charge', 0)
         self.coords = kwargs.pop('coords', "ZMAT")

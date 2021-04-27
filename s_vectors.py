@@ -111,12 +111,14 @@ class s_vectors(object):
         if self.options.coords.upper() != "ZMAT":
             Proj,eigs,_ = LA.svd(self.B)
             Proj[np.abs(Proj) < tol] = 0
+            print("Proj singular values:")
+            print(eigs)
             if B_proj:
-                delArray = np.array(np.where(np.abs(eigs) < tol))
-                self.Proj = Proj.T[:len(self.B.T)-len(delArray[0])]
+                projArray = np.array(np.where(np.abs(eigs) > tol))
+                self.Proj = Proj.T[:len(projArray[0])]
                 self.Proj = self.Proj.T
-                for i in range(len(self.Proj.T)):
-                    self.Proj.T[i][np.abs(self.Proj.T[i]) < np.max(np.abs(self.Proj.T[i]))*proj_tol] = 0
+                # for i in range(len(self.Proj.T)):
+                    # self.Proj.T[i][np.abs(self.Proj.T[i]) < np.max(np.abs(self.Proj.T[i]))*proj_tol] = 0
         """
             self.Proj may be used to transfrom from full set of internal coords to symmetrized internal coords.
             self.Proj.T may be used to transform from the symmetrized set to the full set of internal coords.
