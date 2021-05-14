@@ -39,7 +39,7 @@ class ZMAT(object):
         """ Read in the ZMAT file """
         with open("zmat",'r') as file:
             output = file.readlines()
-        
+
         """
             Read in the input cartesian coordinates
         """
