@@ -210,6 +210,9 @@ class MixedHessian(object):
             Actually right now it uses the initial L-matrix, which may need to be modified
             by the final L-matrix.
         """
+        print('////////////////////////////////////////////')
+        print("//{:^40s}//".format('Total Energy Distribution'))
+        print('////////////////////////////////////////////')
         self.TED.run(init_GF.L,Final_GF.Freq)
 
         """
