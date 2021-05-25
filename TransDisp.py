@@ -61,6 +61,10 @@ class TransDisp(object):
         """ Generate the reference normal coordinate structure """
         self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.TED.Proj)
         
+        print("Normal Coordinate Values:")
+        for i in range(len(self.n_coord)):
+            print("Normal Coordinate #{:<4n}: {: 3.3f}".format(i+1,self.n_coord[i]))
+        
         """
             Next, we will have to determine our desired Normal mode internal coordinate displacements
         """
@@ -68,6 +72,7 @@ class TransDisp(object):
         
         L = inv(self.eig_inv)
 
+        """ Now we actually generate the displacements """
         for i in range(len(self.eigs.T)):
             disp = np.zeros(len(self.eigs.T))
             disp[i] = self.disp
@@ -83,13 +88,13 @@ class TransDisp(object):
             # print(i+1)
             # print(self.n_coord[i])
             """ This code is probably worthless """
-            norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
-            norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
-            normDiff = np.abs(norm1-norm2)
-            if self.dispTol > normDiff:
-                self.dispSym[i] = 1
+            # norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
+            # norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
+            # normDiff = np.abs(norm1-norm2)
+            # if self.dispTol > normDiff:
+                # self.dispSym[i] = 1
         
-        self.dispSym = self.dispSym.astype(int)
+        # self.dispSym = self.dispSym.astype(int)
 
     def INTC(self,carts,eig_inv,Proj):
         tol = 1.0e-3

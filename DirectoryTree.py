@@ -49,8 +49,11 @@ class DirectoryTree(object):
             raise RuntimeError
         
         init = False
+        genbas = False
         if os.path.exists(root+'/initden.dat'):
             init = True
+        if os.path.exists(root+'/GENBAS'):
+            genbas = True
         data_buff = data.copy()
         if os.path.exists(os.getcwd() + '/Disps'):
             shutil.rmtree('Disps',ignore_errors=True)
@@ -70,6 +73,8 @@ class DirectoryTree(object):
         data = data_buff.copy()
         if init:
             shutil.copy('../../initden.dat','.')
+        if genbas:
+            shutil.copy('../../GENBAS','.')
         os.chdir('..')
 
         """ I need to restructure this so that it iterates over only running jobs, not the duplicates by symmetry. """
@@ -94,4 +99,6 @@ class DirectoryTree(object):
             data = data_buff.copy()
             if init:
                 shutil.copy('../../initden.dat','.')
+            if genbas:
+                shutil.copy('../../GENBAS','.')
             os.chdir('..')

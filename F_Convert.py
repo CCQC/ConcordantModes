@@ -52,7 +52,7 @@ class F_conv(object):
                 """
                     Restructure this to be defined based off the symmetrized internal coordinate length.
                 """
-                self.N = len(self.zmat.atomList)*3 - 6
+                self.N = len(G)
                 self.Print_const()
         elif self.coord.lower() == "cartesian":
             self.F = np.einsum('ai,bj,ab->ij',self.s_vec.B,self.s_vec.B,self.F)

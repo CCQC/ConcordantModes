@@ -119,6 +119,8 @@ class s_vectors(object):
                 self.Proj = self.Proj.T
                 # for i in range(len(self.Proj.T)):
                     # self.Proj.T[i][np.abs(self.Proj.T[i]) < np.max(np.abs(self.Proj.T[i]))*proj_tol] = 0
+        else:
+            self.Proj = np.eye(len(self.B))
         """
             self.Proj may be used to transfrom from full set of internal coords to symmetrized internal coords.
             self.Proj.T may be used to transform from the symmetrized set to the full set of internal coords.
