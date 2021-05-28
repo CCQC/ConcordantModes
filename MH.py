@@ -129,7 +129,8 @@ class MixedHessian(object):
         progname = prog.split('@')[0]
         
         if self.options.calc:
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert, transdisp.dispSym)
+            # Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert, transdisp.dispSym)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert)
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
@@ -211,9 +212,9 @@ class MixedHessian(object):
             by the final L-matrix.
         """
         print('////////////////////////////////////////////')
-        print("//{:^40s}//".format('Total Energy Distribution'))
+        print("//{:^40s}//".format(' Final TED'))
         print('////////////////////////////////////////////')
-        self.TED.run(init_GF.L,Final_GF.Freq)
+        self.TED.run(np.dot(init_GF.L,Final_GF.L),Final_GF.Freq)
 
         """
             This code prints out the frequencies in order of energy as well as the ZPVE in several different units.

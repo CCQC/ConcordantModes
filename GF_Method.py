@@ -45,4 +45,7 @@ class GF_Method(object):
             print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(self.Freq[i]))
         """ Compute and then print the TED. """
         # np.set_printoptions(suppress=True)
-        print('Total Energy Distribution:')
+        print('////////////////////////////////////////////')
+        print("//{:^40s}//".format('Total Energy Distribution (TED)'))
+        print('////////////////////////////////////////////')
+        self.TED.run(self.L,self.Freq,rectPrint=False)
