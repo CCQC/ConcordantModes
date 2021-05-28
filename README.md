@@ -11,13 +11,13 @@ User must have:
 Python version 3.5.4
 Numpy version 1.13.1
 
-Any other versions will not be guaranteed to work.
+No other versions will be guaranteed to work.
 
 // Quickstart Guide //
 
 An example is provided in the "Example" directory.
 
-4 files are necessary: "zmat", "template.dat", "MH_Main.py", "fc.dat"
+4 files are necessary: "zmat", "template.dat", "main.py", "fc.dat"
 
 zmat:
 This file contains geometric information about the system of interest. There is a "ZMAT" block and a "cart" block.
@@ -30,9 +30,9 @@ The "cart" block contains the cartesian structures for the system. If two struct
 template.dat:
 This is the template input file for an interfacing quantum chemistry code. The displaced geometries are inserted to this file and single point energies for each displaced geometry are computed. The energies are then reaped and a second order numerical derivative is performed to calculate force constants from these energies.
 
-MH_Main.py:
+main.py:
 This is the main file that imports the MixedHessian options and program, and then runs it. Future work wil provide documentation for each "options" keyword.
-To run the program, simply enter "python MH_Main.py" or "nohup python MH_Main.py &" if you would like to retain the output.
+To run the program, simply enter "python main.py" or "nohup python main.py &" if you would like to retain the output.
 
 fc.dat:
 This file contains the cartesian force constants of the first structure (or the only structure). These force constants must be in units of mdyn/angstrom.
