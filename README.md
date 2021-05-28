@@ -31,7 +31,7 @@ template.dat:
 This is the template input file for an interfacing quantum chemistry code. The displaced geometries are inserted to this file and single point energies for each displaced geometry are computed. The energies are then reaped and a second order numerical derivative is performed to calculate force constants from these energies.
 
 main.py:
-This is the main file that imports the MixedHessian options and program, and then runs it. Future work wil provide documentation for each "options" keyword.
+This is the main file that imports the Concordant Mode options and program, and then runs it. Future work wil provide documentation for each "options" keyword.
 To run the program, simply enter "python main.py" or "nohup python main.py &" if you would like to retain the output.
 
 fc.dat:
