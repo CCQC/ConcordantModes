@@ -29,7 +29,7 @@ class vulcan_template(object):
         if self.progname == 'cfour':
             self.vulcan_template = """#!/bin/sh
 #$ -q {q}
-#$ -N MixedHess
+#$ -N Concordant
 #$ -S /bin/sh
 #$ -cwd
 #$ -t {jarray}
@@ -49,7 +49,7 @@ echo "    ID:                "$JOB_ID
 echo "    Hostname:          "$HOSTNAME
 echo "    Working directory: "$SGE_O_WORKDIR
 echo ""
-echo "    Submitted using:   MixedHessian "
+echo "    Submitted using:   Concordant Modes Approach "
 echo "***********************************************************************"
 
 # cd into individual task directory
@@ -98,7 +98,7 @@ echo " Job complete on `hostname`." """
         else:
             self.vulcan_template = """#!/bin/sh
 #$ -q {q}
-#$ -N MixedHess
+#$ -N Concordant
 #$ -S /bin/sh
 #$ -cwd
 #$ -t {jarray}
@@ -118,7 +118,7 @@ echo "    ID:                "$JOB_ID
 echo "    Hostname:          "$HOSTNAME
 echo "    Working directory: "$SGE_O_WORKDIR
 echo ""
-echo "    Submitted using:   MixedHessian "
+echo "    Submitted using:   Concordant Modes Approach "
 echo "***********************************************************************"
 
 # cd into individual task directory

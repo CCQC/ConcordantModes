@@ -11,6 +11,6 @@ options_kwargs = {
 options_obj = Options(**options_kwargs)
 
 # 3. call Mixed Hessian Program
-from MixedHessian.MH import MixedHessian
-MH_obj = MixedHessian(options_obj)
-MH_obj.run()
+from MixedHessian.CMA import ConcordantModes
+CMA_obj = MixedHessian(options_obj)
+CMA_obj.run()

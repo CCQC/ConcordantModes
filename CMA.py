@@ -22,7 +22,7 @@ from MixedHessian.vulcan_template    import vulcan_template
 from MixedHessian.ZMAT               import ZMAT
 from MixedHessian.int2cart           import int2cart
 
-class MixedHessian(object):
+class ConcordantModes(object):
     def __init__(self, options):
         self.options = options
         """ 

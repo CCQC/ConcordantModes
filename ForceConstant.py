@@ -3,7 +3,7 @@ from numpy.linalg import inv
 from numpy import linalg as LA
 
 """
-    This script will calculate the force constants of the Mixed Hessian normal
+    This script will calculate the force constants of the CMA normal
     modes using numerical differentiation.
 
     [f(x+h) - 2f(x) + f(x-h)] / h^2 = 
