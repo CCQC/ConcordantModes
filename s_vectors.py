@@ -31,7 +31,9 @@ class s_vectors(object):
             Bonds,
             Angles,
             Torsions,
-            then out-of-plane motions (Eventually)
+            out-of-plane motions (Eventually),
+            LinX Bends (Eventually),
+            LinY Bends (Eventually)
         """
         # Toggle this to convert from bohr to angstrom
         # self.carts = 0.5291772085936*self.carts
