@@ -1,4 +1,4 @@
-from MixedHessian.options import Options
+from ConcordantModes.options import Options
 options_kwargs = {
   'queue'             : "gen3.q,gen4.q,gen6.q,debug.q",
   'program'           : "psi4@master",
@@ -11,6 +11,6 @@ options_kwargs = {
 options_obj = Options(**options_kwargs)
 
 # 3. call Mixed Hessian Program
-from MixedHessian.CMA import ConcordantModes
-CMA_obj = MixedHessian(options_obj)
+from ConcordantModes.CMA import ConcordantModes
+CMA_obj = ConcordantModes(options_obj)
 CMA_obj.run()

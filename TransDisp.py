@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 from numpy import linalg as LA
-from MixedHessian.s_vectors          import s_vectors
+from ConcordantModes.s_vectors          import s_vectors
 
 
 """

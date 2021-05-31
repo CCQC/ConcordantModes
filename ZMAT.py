@@ -3,8 +3,8 @@ import os
 import shutil
 import re
 from . import masses
-from MixedHessian.int2cart import int2cart
-from MixedHessian.TransDisp import TransDisp
+from ConcordantModes.int2cart import int2cart
+from ConcordantModes.TransDisp import TransDisp
 
 class ZMAT(object):
     def __init__(self,options):
