@@ -8,19 +8,19 @@ import numpy as np
 from numpy import linalg as LA
 from numpy.linalg import inv
 from scipy.linalg import fractional_matrix_power
-from MixedHessian.DirectoryTree      import DirectoryTree
-from MixedHessian.F_Convert          import F_conv
-from MixedHessian.F_Read             import F_Read
-from MixedHessian.ForceConstant      import ForceConstant
-from MixedHessian.G_Matrix           import G_Matrix
-from MixedHessian.GF_Method          import GF_Method
-from MixedHessian.Reap               import Reap
-from MixedHessian.s_vectors          import s_vectors
-from MixedHessian.TED                import TED
-from MixedHessian.TransDisp          import TransDisp
-from MixedHessian.vulcan_template    import vulcan_template
-from MixedHessian.ZMAT               import ZMAT
-from MixedHessian.int2cart           import int2cart
+from ConcordantModes.DirectoryTree      import DirectoryTree
+from ConcordantModes.F_Convert          import F_conv
+from ConcordantModes.F_Read             import F_Read
+from ConcordantModes.ForceConstant      import ForceConstant
+from ConcordantModes.G_Matrix           import G_Matrix
+from ConcordantModes.GF_Method          import GF_Method
+from ConcordantModes.Reap               import Reap
+from ConcordantModes.s_vectors          import s_vectors
+from ConcordantModes.TED                import TED
+from ConcordantModes.TransDisp          import TransDisp
+from ConcordantModes.vulcan_template    import vulcan_template
+from ConcordantModes.ZMAT               import ZMAT
+from ConcordantModes.int2cart           import int2cart
 
 class ConcordantModes(object):
     def __init__(self, options):
