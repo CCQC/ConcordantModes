@@ -5,6 +5,7 @@ options_kwargs = {
   'energyRegex'       : r"Giraffe The Energy is\s+(\-\d+\.\d+)",
   'cartInsert'        : 7,
   'coords'            : "Redundant",
+  # 'reducedDisp'       : True,
   # 'calc'              : False,
   'successRegex'      : r"beer"
 }

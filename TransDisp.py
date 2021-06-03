@@ -25,7 +25,10 @@ from ConcordantModes.s_vectors          import s_vectors
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options):
+    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options,GF=None):
+        """
+            As is generally the case for Programmers, GF = None by default.
+        """
         self.dispTol         = dispTol
         self.Conv            = Conv
         self.s_vectors       = s_vectors
@@ -39,6 +42,8 @@ class TransDisp(object):
         self.options         = options
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
+        if GF:
+            self.GF = GF
 
     def run(self):
         self.B = self.s_vectors.B.copy() # (redundant internals (s) x cartesians (3N))
@@ -72,11 +77,28 @@ class TransDisp(object):
         
         L = inv(self.eig_inv)
 
+        """
+            This code will be useful for submitting the computation with reduced displacements
+        """
+        Disp = self.disp
+        self.disp = []
+        for i in range(len(self.n_coord)):
+            self.disp.append(Disp)
+        if self.options.reducedDisp:
+            self.Freq = inv(np.diag(self.GF.Freq.copy()))
+            redDisp = np.dot(self.disp,self.Freq)
+            redDisp = redDisp / min(redDisp)
+            redDisp = redDisp*self.disp
+            self.disp = redDisp
+
+        # raise RuntimeError
+
         """ Now we actually generate the displacements """
         for i in range(len(self.eigs.T)):
             disp = np.zeros(len(self.eigs.T))
-            disp[i] = self.disp
-            # print("Disp #" + str(i+1))
+            disp[i] = self.disp[i]
+            print("Disp #" + str(i+1))
+            print(disp)
             # print("Plus Disp:")
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-11,self.A.copy())
             # print("Normal Coordinate Value: ")
@@ -95,6 +117,7 @@ class TransDisp(object):
                 # self.dispSym[i] = 1
         
         # self.dispSym = self.dispSym.astype(int)
+        # raise RuntimeError
 
     def INTC(self,carts,eig_inv,Proj):
         tol = 1.0e-3

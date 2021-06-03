@@ -13,9 +13,9 @@ from numpy import linalg as LA
 
 class s_vectors(object):
     def __init__(self,zmat,options):
-        self.s_STRE_dict    = {}
-        self.s_BEND_dict    = {}
-        self.s_TORS_dict    = {}
+        self.s_2center_dict    = {}
+        self.s_3center_dict    = {}
+        self.s_4center_dict    = {}
         self.bondIndices    = np.array(zmat.bondIndices).astype(np.int) 
         self.angleIndices   = np.array(zmat.angleIndices).astype(np.int) 
         self.torsionIndices = np.array(zmat.torsionIndices).astype(np.int) 
@@ -42,35 +42,35 @@ class s_vectors(object):
         """
         if len(self.bondIndices) > 0:
             for i in range(len(self.bondIndices)):
-                self.s_STRE_dict["B" + str(i+1)] = self.carts.copy()
-                self.s_STRE_dict["B" + str(i+1)] = 0*self.s_STRE_dict["B" + str(i+1)]
+                self.s_2center_dict["B" + str(i+1)] = self.carts.copy()
+                self.s_2center_dict["B" + str(i+1)] = 0*self.s_STRE_dict["B" + str(i+1)]
                 r = self.compute_r(self.carts,self.bondIndices[i][0]-1,self.bondIndices[i][1]-1)
-                self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][0]-1] = self.compute_e(self.carts,self.bondIndices[i][0]-1,self.bondIndices[i][1]-1,r)
-                self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][1]-1] = -self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][0]-1]
+                self.s_2center_dict["B" + str(i+1)][self.bondIndices[i][0]-1] = self.compute_e(self.carts,self.bondIndices[i][0]-1,self.bondIndices[i][1]-1,r)
+                self.s_2center_dict["B" + str(i+1)][self.bondIndices[i][1]-1] = -self.s_STRE_dict["B" + str(i+1)][self.bondIndices[i][0]-1]
 
         """
             Next, angles.
         """
         if len(self.angleIndices) > 0:
             for i in range(len(self.angleIndices)):
-                self.s_BEND_dict["A" + str(i+1)] = self.carts.copy()
-                self.s_BEND_dict["A" + str(i+1)] = 0*self.s_BEND_dict["A" + str(i+1)]
+                self.s_3center_dict["A" + str(i+1)] = self.carts.copy()
+                self.s_3center_dict["A" + str(i+1)] = 0*self.s_3center_dict["A" + str(i+1)]
                 r_1 = self.compute_r(self.carts,self.angleIndices[i][0]-1,self.angleIndices[i][1]-1)
                 r_2 = self.compute_r(self.carts,self.angleIndices[i][1]-1,self.angleIndices[i][2]-1)
                 e_1 = self.compute_e(self.carts,self.angleIndices[i][0]-1,self.angleIndices[i][1]-1,r_1)
                 e_2 = self.compute_e(self.carts,self.angleIndices[i][2]-1,self.angleIndices[i][1]-1,r_2)
                 phi = self.compute_phi(e_1,e_2)
-                self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][0]-1] = self.compute_BEND(e_1,e_2,phi,r_1)
-                self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][2]-1] = self.compute_BEND(e_2,e_1,phi,r_2)
-                self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][1]-1] = -self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][0]-1] - self.s_BEND_dict["A" + str(i+1)][self.angleIndices[i][2]-1]
+                self.s_3center_dict["A" + str(i+1)][self.angleIndices[i][0]-1] = self.compute_BEND(e_1,e_2,phi,r_1)
+                self.s_3center_dict["A" + str(i+1)][self.angleIndices[i][2]-1] = self.compute_BEND(e_2,e_1,phi,r_2)
+                self.s_3center_dict["A" + str(i+1)][self.angleIndices[i][1]-1] = -self.s_3center_dict["A" + str(i+1)][self.angleIndices[i][0]-1] - self.s_3center_dict["A" + str(i+1)][self.angleIndices[i][2]-1]
         
         """
             Finally, for now, torsions.
         """
         if len(self.torsionIndices) > 0:
             for i in range(len(self.torsionIndices)):
-                self.s_TORS_dict["D" + str(i+1)] = self.carts.copy()
-                self.s_TORS_dict["D" + str(i+1)] = 0*self.s_TORS_dict["D" + str(i+1)]
+                self.s_4center_dict["D" + str(i+1)] = self.carts.copy()
+                self.s_4center_dict["D" + str(i+1)] = 0*self.s_4center_dict["D" + str(i+1)]
                 r_1   = self.compute_r(self.carts,self.torsionIndices[i][0]-1,self.torsionIndices[i][1]-1)
                 r_2   = self.compute_r(self.carts,self.torsionIndices[i][1]-1,self.torsionIndices[i][2]-1)
                 r_3   = self.compute_r(self.carts,self.torsionIndices[i][2]-1,self.torsionIndices[i][3]-1)
@@ -79,32 +79,33 @@ class s_vectors(object):
                 e_3   = self.compute_e(self.carts,self.torsionIndices[i][2]-1,self.torsionIndices[i][3]-1,r_3)
                 phi_1 = self.compute_phi(e_1,-e_2)
                 phi_2 = self.compute_phi(e_2,-e_3)
-                self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][0]-1] = self.compute_TORS1(e_1,-e_2,phi_1,r_1)
-                self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][3]-1] = self.compute_TORS1(-e_3,e_2,phi_2,r_3)
-                self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][1]-1] = self.compute_TORS2(e_1,-e_2,-e_3,phi_1,phi_2,r_1,r_2)
-                self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][2]-1] = -self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][0]-1] \
-                                                                                          -self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][1]-1] \
-                                                                                          -self.s_TORS_dict["D" + str(i+1)][self.torsionIndices[i][3]-1] 
+                self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][0]-1] = self.compute_TORS1(e_1,-e_2,phi_1,r_1)
+                self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][3]-1] = self.compute_TORS1(-e_3,e_2,phi_2,r_3)
+                self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][1]-1] = self.compute_TORS2(e_1,-e_2,-e_3,phi_1,phi_2,r_1,r_2)
+                self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][2]-1] = -self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][0]-1] \
+                                                                                          -self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][1]-1] \
+                                                                                          -self.s_4center_dict["D" + str(i+1)][self.torsionIndices[i][3]-1] 
 
         """
             The last step will be to concatenate all of the s-vectors into a singular B-tensor, in order of stretches, then bends, then torsions.
+            Note: I am going to modify this to hold all 2-center, 3-center, and 4-center internal coordinates.
         """
-        self.B = np.array([self.s_STRE_dict['B1'].flatten()])
+        self.B = np.array([self.s_2center_dict['B1'].flatten()])
         """
             Append stretches
         """
-        for i in range(len(self.s_STRE_dict)-1):
-            self.B = np.append(self.B,np.array([self.s_STRE_dict['B'+str(i+2)].flatten()]),axis=0)
+        for i in range(len(self.s_2center_dict)-1):
+            self.B = np.append(self.B,np.array([self.s_2center_dict['B'+str(i+2)].flatten()]),axis=0)
         """
             Append bends
         """
-        for i in range(len(self.s_BEND_dict)):
-            self.B = np.append(self.B,np.array([self.s_BEND_dict['A'+str(i+1)].flatten()]),axis=0)
+        for i in range(len(self.s_3center_dict)):
+            self.B = np.append(self.B,np.array([self.s_3center_dict['A'+str(i+1)].flatten()]),axis=0)
         """
             Append torsions
         """
-        for i in range(len(self.s_TORS_dict)):
-            self.B = np.append(self.B,np.array([self.s_TORS_dict['D'+str(i+1)].flatten()]),axis=0)
+        for i in range(len(self.s_4center_dict)):
+            self.B = np.append(self.B,np.array([self.s_4center_dict['D'+str(i+1)].flatten()]),axis=0)
 
 
         tol = 1e-10

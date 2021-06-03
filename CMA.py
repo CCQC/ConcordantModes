@@ -114,7 +114,7 @@ class ConcordantModes(object):
         """
         s_vec = s_vectors(self.zmat,self.options)
         s_vec.run(self.zmat.CartesiansFinal,False)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,GF=TED_GF)
         transdisp.run()
         
         
