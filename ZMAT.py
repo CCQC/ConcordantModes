@@ -26,7 +26,8 @@ class ZMAT(object):
         """ Custom int coord regexes """
         bondRegex    = re.compile("^\s*(\d+)\s+(\d+)\s*\n")
         angleRegex   = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
-        torsionRegex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        torsionRegex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
+        oopRegex     = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
         
         """ Cartesian regexes"""
         cartBeginRegex     = re.compile(r"cart begin")
@@ -117,6 +118,8 @@ class ZMAT(object):
         self.angleVariables          = []
         self.torsionIndices          = []
         self.torsionVariables        = []
+        self.oopIndices              = []
+        self.oopVariables            = []
         self.variableDictionaryInit  = {}
         self.variableDictionaryFinal = {}
 
@@ -191,34 +194,49 @@ class ZMAT(object):
         elif self.options.coords.upper() == "CUSTOM":
             """ 
                 This option will allow the user to specify a custom array of internal coordinates. 
-                Thus far they will still be limited to torsions for 4 index coordinates.
             """
+            Sum = 0
+            blank = 0
             for i in range(len(zmatOutput)):
                 if re.search(bondRegex,zmatOutput[i]):
                     List = re.findall(bondRegex,zmatOutput[i])[0]
                     self.bondIndices.append(List)
-                    self.bondVariables.append("R"+str(i-len(self.angleVariables)-len(self.torsionVariables)))
+                    self.bondVariables.append("R"+str(i+1-Sum+len(self.bondVariables)))
                 elif re.search(angleRegex,zmatOutput[i]):
                     List = re.findall(angleRegex,zmatOutput[i])[0]
                     self.angleIndices.append(List)
-                    self.angleVariables.append("A"+str(i-len(self.bondVariables)-len(self.torsionVariables)))
+                    self.angleVariables.append("A"+str(i+1-Sum+len(self.angleVariables)))
                 elif re.search(torsionRegex,zmatOutput[i]):
                     List = re.findall(torsionRegex,zmatOutput[i])[0]
                     self.torsionIndices.append(List)
-                    self.torsionVariables.append("D"+str(i-len(self.bondVariables)-len(self.angleVariables)))
+                    self.torsionVariables.append("D"+str(i+1-Sum+len(self.torsionVariables)))
+                elif re.search(oopRegex,zmatOutput[i]):
+                    List = re.findall(oopRegex,zmatOutput[i])[0]
+                    self.oopIndices.append(List)
+                    self.oopVariables.append("O"+str(i+1-Sum+len(self.oopVariables)))
+                else:
+                    blank += 1
+                Sum = len(self.bondVariables)+len(self.angleVariables)+len(self.torsionVariables)+len(self.oopVariables)+blank
         
         """
             This code utilizes the INTC function from the TransDisp module to calculate the initial variable values from the cartesian coordinates.
         """
         transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options)
-        I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices))
+        I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices))
         variables1 = transdisp.INTC(self.CartesiansInit,I,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I,I)
-        for i in range(len(self.angleIndices)+len(self.torsionIndices)):
+        for i in range(len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices)):
             variables1[len(self.bondIndices)+i] *= 180./np.pi
             variables2[len(self.bondIndices)+i] *= 180./np.pi
-        Variables = np.append(self.bondVariables,np.append(self.angleVariables,self.torsionVariables))    
-        
+        Variables = np.append(self.bondVariables,np.append(self.angleVariables,self.torsionVariables))
+        if len(self.oopVariables):
+            Variables = np.append(Variables,self.oopVariables)
+
+        """
+            I believe this code is only here to check the Redundant
+            coordinate generation process, however I don't want to check
+            that right now. This is left as an exercise to the reader ;)
+        """
         if self.options.coords.upper() == "REDUNDANT":
             indices = []
             for i in range(len(self.bondIndices)):
@@ -242,7 +260,9 @@ class ZMAT(object):
             force them to lie between -90 deg and +270 deg.
             *** 
                 This is a tad outdated. I'll leave it in for now, but I really should just change
-                how I deal with edge variable cases in my INTC code. 
+                how I deal with edge variable cases in my INTC code.
+                
+                I believe I have that implemented now. So I can check this, but I don't really want to right now...
             ***
         """
         """ Handle Variable lists separately. First the INIT: """

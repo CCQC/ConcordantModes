@@ -25,7 +25,10 @@ from ConcordantModes.s_vectors          import s_vectors
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options):
+    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options,GF=None):
+        """
+            As is generally the case for Programmers, GF = None by default.
+        """
         self.dispTol         = dispTol
         self.Conv            = Conv
         self.s_vectors       = s_vectors
@@ -39,6 +42,8 @@ class TransDisp(object):
         self.options         = options
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
+        if GF:
+            self.GF = GF
 
     def run(self):
         self.B = self.s_vectors.B.copy() # (redundant internals (s) x cartesians (3N))
@@ -72,11 +77,28 @@ class TransDisp(object):
         
         L = inv(self.eig_inv)
 
+        """
+            This code will be useful for submitting the computation with reduced displacements
+        """
+        Disp = self.disp
+        self.disp = []
+        for i in range(len(self.n_coord)):
+            self.disp.append(Disp)
+        if self.options.reducedDisp:
+            self.Freq = inv(np.diag(self.GF.Freq.copy()))
+            redDisp = np.dot(self.disp,self.Freq)
+            redDisp = redDisp / min(redDisp)
+            redDisp = redDisp*self.disp
+            self.disp = redDisp
+
+        # raise RuntimeError
+
         """ Now we actually generate the displacements """
         for i in range(len(self.eigs.T)):
             disp = np.zeros(len(self.eigs.T))
-            disp[i] = self.disp
-            # print("Disp #" + str(i+1))
+            disp[i] = self.disp[i]
+            print("Disp #" + str(i+1))
+            print(disp)
             # print("Plus Disp:")
             self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-11,self.A.copy())
             # print("Normal Coordinate Value: ")
@@ -95,8 +117,16 @@ class TransDisp(object):
                 # self.dispSym[i] = 1
         
         # self.dispSym = self.dispSym.astype(int)
+        # raise RuntimeError
 
     def INTC(self,carts,eig_inv,Proj):
+        """
+            This is a function that computes all currently implemented and specified
+            internal coordinates from the desired cartesian coordinates. The internal
+            coordinate values will be appended together in the order of the for-loops below.
+            All other methods in this package which use the INTC generated variables MUST
+            abide by this ordering.
+        """
         tol = 1.0e-3
         intCoord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
@@ -128,6 +158,20 @@ class TransDisp(object):
                 if Condition2:
                     t -= 2*np.pi
             intCoord = np.append(intCoord,t)
+        for i in range(len(self.zmat.oopIndices)):
+            x1 = np.array(carts[int(self.zmat.oopIndices[i][0])-1]).astype(float)
+            x2 = np.array(carts[int(self.zmat.oopIndices[i][1])-1]).astype(float)
+            x3 = np.array(carts[int(self.zmat.oopIndices[i][2])-1]).astype(float)
+            x4 = np.array(carts[int(self.zmat.oopIndices[i][3])-1]).astype(float)
+            o = self.calcOOP(x1,x2,x3,x4)
+            if self.Conv:
+                Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.oopVariables[i]]) > 180.
+                Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.oopVariables[i]]) < -180.
+                if Condition1:
+                    o = o - 2*np.pi
+                if Condition2:
+                    o = o + 2*np.pi
+            intCoord = np.append(intCoord,o)
         intCoord = np.dot(Proj.T,intCoord)
         # intCoord[np.abs(intCoord) < tol*np.max(np.abs(intCoord))] = 0
         intCoord = np.dot(eig_inv,intCoord)
@@ -151,10 +195,10 @@ class TransDisp(object):
         t = np.arctan2(s,c)
         return t
 
-    def calcOutOfPlane(self,x1,x2,x3,x4):
+    def calcOOP(self,x1,x2,x3,x4):
         """ 
             This function will compute an out of plane angle between one bond and a plane
-            formed by 3 other atoms. See page 58 of Molecular vibrations by Wilson, Cecius, and Cross
+            formed by 3 other atoms. See page 58 of Molecular vibrations by Wilson, Decius, and Cross
             for more info.
         """
         e1 = (x1-x2)/self.calcBond(x1,x2)
