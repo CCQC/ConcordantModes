@@ -120,6 +120,13 @@ class TransDisp(object):
         # raise RuntimeError
 
     def INTC(self,carts,eig_inv,Proj):
+        """
+            This is a function that computes all currently implemented and specified
+            internal coordinates from the desired cartesian coordinates. The internal
+            coordinate values will be appended together in the order of the for-loops below.
+            All other methods in this package which use the INTC generated variables MUST
+            abide by this ordering.
+        """
         tol = 1.0e-3
         intCoord = np.array([])
         for i in range(len(self.zmat.bondIndices)):
@@ -151,6 +158,20 @@ class TransDisp(object):
                 if Condition2:
                     t -= 2*np.pi
             intCoord = np.append(intCoord,t)
+        for i in range(len(self.zmat.oopIndices)):
+            x1 = np.array(carts[int(self.zmat.oopIndices[i][0])-1]).astype(float)
+            x2 = np.array(carts[int(self.zmat.oopIndices[i][1])-1]).astype(float)
+            x3 = np.array(carts[int(self.zmat.oopIndices[i][2])-1]).astype(float)
+            x4 = np.array(carts[int(self.zmat.oopIndices[i][3])-1]).astype(float)
+            o = self.calcOOP(x1,x2,x3,x4)
+            if self.Conv:
+                Condition1 = float(self.zmat.variableDictionaryFinal[self.zmat.oopVariables[i]]) > 180.
+                Condition2 = float(self.zmat.variableDictionaryFinal[self.zmat.oopVariables[i]]) < -180.
+                if Condition1:
+                    o = o - 2*np.pi
+                if Condition2:
+                    o = o + 2*np.pi
+            intCoord = np.append(intCoord,o)
         intCoord = np.dot(Proj.T,intCoord)
         # intCoord[np.abs(intCoord) < tol*np.max(np.abs(intCoord))] = 0
         intCoord = np.dot(eig_inv,intCoord)
@@ -174,10 +195,10 @@ class TransDisp(object):
         t = np.arctan2(s,c)
         return t
 
-    def calcOutOfPlane(self,x1,x2,x3,x4):
+    def calcOOP(self,x1,x2,x3,x4):
         """ 
             This function will compute an out of plane angle between one bond and a plane
-            formed by 3 other atoms. See page 58 of Molecular vibrations by Wilson, Cecius, and Cross
+            formed by 3 other atoms. See page 58 of Molecular vibrations by Wilson, Decius, and Cross
             for more info.
         """
         e1 = (x1-x2)/self.calcBond(x1,x2)
