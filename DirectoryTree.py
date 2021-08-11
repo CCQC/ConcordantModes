@@ -5,12 +5,9 @@ import shutil
 import numpy as np
 
 
-# Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
     def __init__(self,progname,zmat,disps,insertionIndex):
-    # def __init__(self,progname,zmat,disps,insertionIndex,dispSym):
-        # self.dispSym = dispSym
         self.progname = progname
         self.zmat = zmat
         self.insertionIndex = insertionIndex
@@ -21,11 +18,15 @@ class DirectoryTree(object):
         if self.progname == 'cfour':
             space = ''
         if index == -1:
-            print('The user needs to specify a different value for the cartInsert keyword.')
+            print('The user needs to specify a different value for the \
+                   cartInsert keyword.')
             raise RuntimeError
         else:
             for i in range(int(n_at)):
-                data.insert(index+i, space + at[i] + "{:16.10f}".format(dispp[i][0]) + "{:16.10f}".format(dispp[i][1]) + "{:16.10f}".format(dispp[i][2]) + '\n')
+                data.insert(index+i, space + at[i] 
+                            + "{:16.10f}".format(dispp[i][0]) 
+                            + "{:16.10f}".format(dispp[i][1]) 
+                            + "{:16.10f}".format(dispp[i][2]) + '\n')
         
         return data
 
@@ -62,7 +63,8 @@ class DirectoryTree(object):
         os.chdir('./Disps')
         os.mkdir("1")
         os.chdir("./1")
-        data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        data = self.Make_Input(data,self.disps.DispCart['ref'],str(n_atoms),
+                               self.zmat.atomList,self.insertionIndex)
         inp = ''
         if self.progname == 'cfour':
             inp = 'ZMAT'
@@ -78,7 +80,10 @@ class DirectoryTree(object):
             shutil.copy('../../GENBAS','.')
         os.chdir('..')
 
-        """ I need to restructure this so that it iterates over only running jobs, not the duplicates by symmetry. """
+        """ 
+            I need to restructure this so that it iterates over only running 
+            jobs, not the duplicates by symmetry. 
+        """
         Sum = 0
         # self.dispSym = self.dispSym.astype(int)
         # for i in range(len(self.disps.DispCart)-np.sum(self.dispSym)-1):
@@ -88,16 +93,30 @@ class DirectoryTree(object):
             os.mkdir(str(i+2))
             os.chdir("./" + str(i+2))
             if j == 0:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                data = self.Make_Input(data,
+                                       self.disps.DispCart[str(k+1)+'_plus'],
+                                       str(n_atoms),self.zmat.atomList,
+                                       self.insertionIndex)
             elif j == 1:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                data = self.Make_Input(data,
+                                       self.disps.DispCart[str(k+1)+'_minus'],
+                                       str(n_atoms),self.zmat.atomList,
+                                       self.insertionIndex)
             # if self.dispSym[k] == 0:
                 # if j == 0:
-                    # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                    # data = self.Make_Input(data,
+                                             # self.disps.DispCart[str(k+1)+'_plus'],
+                                             # str(n_atoms),self.zmat.atomList,
+                                             # self.insertionIndex)
                 # if j == 1:
-                    # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                    # data = self.Make_Input(data,
+                                             # self.disps.DispCart[str(k+1)+'_minus'],
+                                             # str(n_atoms),self.zmat.atomList,
+                                             # self.insertionIndex)
             # elif self.dispSym[k] == 1:
-                # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+                # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],
+                                         # str(n_atoms),self.zmat.atomList,
+                                         # self.insertionIndex)
             # Sum += self.dispSym[k]
             Sum += 1
             with open(inp,'w') as file:

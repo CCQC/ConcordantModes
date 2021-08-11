@@ -56,7 +56,8 @@ class ConcordantModes(object):
         """
             Compute the initial s-vectors
         """
-        s_vec = s_vectors(self.zmat,self.options,self.zmat.variableDictionaryInit)
+        s_vec = s_vectors(self.zmat,self.options,
+                          self.zmat.variableDictionaryInit)
         s_vec.run(self.zmat.CartesiansInit,True)
 
         self.TED = TED(s_vec.Proj,self.zmat)
@@ -80,7 +81,8 @@ class ConcordantModes(object):
             print("Need to specify the force constants!")
             raise RuntimeError
         f_read.run()
-        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False, self.TED)
+        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False, 
+                        self.TED, self.options.units)
         f_conv.run()
         if self.options.coords != "ZMAT":
             f_conv.F = np.dot(self.TED.Proj.T,np.dot(f_conv.F,self.TED.Proj))
@@ -91,7 +93,8 @@ class ConcordantModes(object):
             Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         """
         print("Initial Frequencies:")
-        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol,self.options.projTol,self.zmat,self.TED)
+        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol,
+                            self.options.projTol,self.zmat,self.TED)
         init_GF.run()
 
         """
@@ -103,18 +106,22 @@ class ConcordantModes(object):
         self.F[np.abs(self.F) < self.options.tol] = 0
         
         print("TED Frequencies:")
-        TED_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat,self.TED)
+        TED_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,
+                           self.zmat,self.TED)
         TED_GF.run()
 
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')
         
         """
-            Recompute the B-Tensors to match the final geometry, then generate the displacements.
+            Recompute the B-Tensors to match the final geometry, 
+            then generate the displacements.
         """
         s_vec = s_vectors(self.zmat,self.options,self.zmat.variableDictionaryFinal)
         s_vec.run(self.zmat.CartesiansFinal,False)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,GF=TED_GF)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,
+                              self.options.dispTol,self.TED,self.options,
+                              GF=TED_GF)
         transdisp.run()
         
         
@@ -129,8 +136,8 @@ class ConcordantModes(object):
         progname = prog.split('@')[0]
         
         if self.options.calc:
-            # Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert, transdisp.dispSym)
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, 
+                                    self.options.cartInsert)
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
@@ -138,7 +145,9 @@ class ConcordantModes(object):
                 dispList.append(i)
             
             """
-                This code generates the submit script for the displacements, submits an array, then checks if all jobs have finished every 10 seconds. :D
+                This code generates the submit script for the displacements, 
+                submits an array, then checks if all jobs have finished every 
+                10 seconds. :D
             """
 
             v_template = vulcan_template(self.options,len(dispList),progname,prog)
@@ -148,12 +157,16 @@ class ConcordantModes(object):
             
             pipe = subprocess.PIPE
             
-            process = subprocess.run('qsub displacements.sh', stdout=pipe, stderr=pipe, shell=True)
+            process = subprocess.run('qsub displacements.sh', stdout=pipe, 
+                                     stderr=pipe, shell=True)
             self.outRegex = re.compile(r'Your\s*job\-array\s*(\d*)')
-            self.job_id = int(re.search(self.outRegex,str(process.stdout)).group(1))
+            self.job_id = \
+                int(re.search(self.outRegex,str(process.stdout)).group(1))
+            
             self.jobFinRegex = re.compile(r'taskid')
             while(True):
-                qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], stdout=pipe, stderr=pipe)
+                qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], 
+                                            stdout=pipe, stderr=pipe)
                 qacct_string = str(qacct_proc.stdout)
                 job_match = re.findall(self.jobFinRegex,qacct_string)
                 if len(job_match) == len(dispList):
@@ -165,17 +178,20 @@ class ConcordantModes(object):
         
 
         """
-            After this point, all of the jobs will have finished, and its time to reap the energies
-            as well as checking for sucesses on all of the jobs
+            After this point, all of the jobs will have finished, and its time 
+            to reap the energies as well as checking for sucesses on all of 
+            the jobs
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,
+                        transdisp.n_coord)
         Reap_obj.run()
         os.chdir('..')
 
         """
-            Compute the force constants here, currently can only do diagonal force constants
+            Compute the force constants here, currently can only do diagonal 
+            force constants
         """
         fc = ForceConstant(transdisp, Reap_obj.energiesDict)
         fc.run()
@@ -183,14 +199,16 @@ class ConcordantModes(object):
         print(fc.FC)
 
         """
-            I will need to make a method just for reading in force constants, for now the diagonals will do.
+            I will need to make a method just for reading in force constants, 
+            for now the diagonals will do.
         """
         self.F = np.diag(fc.FC)
 
         """
-            Recompute the G-matrix with the new geometry, and then transform the G-matrix using the 
-            lower level of theory eigenvalue matrix. This will not fully diagonalize the G-matrix
-            if a different geometry is used between the two.
+            Recompute the G-matrix with the new geometry, and then transform 
+            the G-matrix using the lower level of theory eigenvalue matrix. 
+            This will not fully diagonalize the G-matrix if a different 
+            geometry is used between the two.
         """
         g_mat = G_Matrix(self.zmat, s_vec, self.options)
         g_mat.run()
@@ -203,13 +221,14 @@ class ConcordantModes(object):
             Final GF Matrix run
         """
         print("Final Frequencies:")
-        Final_GF = GF_Method(self.G,self.F,self.options.tol,self.options.projTol,self.zmat,self.TED)
+        Final_GF = GF_Method(self.G,self.F,self.options.tol,
+                             self.options.projTol,self.zmat,self.TED)
         Final_GF.run()
         
         """
-            This code below is a rudimentary table of the TED for the final frequencies.
-            Actually right now it uses the initial L-matrix, which may need to be modified
-            by the final L-matrix.
+            This code below is a rudimentary table of the TED for the final 
+            frequencies. Actually right now it uses the initial L-matrix, 
+            which may need to be modified by the final L-matrix.
         """
         print('////////////////////////////////////////////')
         print("//{:^40s}//".format(' Final TED'))
@@ -217,16 +236,23 @@ class ConcordantModes(object):
         self.TED.run(np.dot(init_GF.L,Final_GF.L),Final_GF.Freq)
 
         """
-            This code prints out the frequencies in order of energy as well as the ZPVE in several different units.
+            This code prints out the frequencies in order of energy as well 
+            as the ZPVE in several different units.
         """
-        print("Final ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) + " (cm^-1) " + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) + " (kcal mol^-1) " \
-                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) + " (hartrees) ")
+        print("Final ZPVE in: " + "{:6.2f}".format(np.sum(Final_GF.Freq)/2) 
+                + " (cm^-1) " 
+                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/349.7550881133) 
+                + " (kcal mol^-1) "
+                + "{:6.2f}".format(0.5*np.sum(Final_GF.Freq)/219474.6313708) 
+                + " (hartrees) ")
         
         """
-            This code converts the force constants back into cartesian coordinates and writes out
-            an "output.default.hess" file, which is of the same format as FCMFINAL of CFOUR.
+            This code converts the force constants back into cartesian 
+            coordinates and writes out an "output.default.hess" file, which 
+            is of the same format as FCMFINAL of CFOUR.
 
-            One further note. I will likely have to convert my force constants within the F_Conv back to internal coordinates first.
+            One further note. I will likely have to convert my force constants 
+            within the F_Conv back to internal coordinates first.
         """
         # cart_conv = F_conv(self.F, s_vec, self.zmat, "cartesian", True)
         # cart_conv.run()
