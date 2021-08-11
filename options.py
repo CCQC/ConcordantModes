@@ -18,7 +18,9 @@ class Options(object):
         self.reducedDisp = kwargs.pop('reducedDisp',False)
         self.spin = kwargs.pop('spin', 1)
         self.successRegex = kwargs.pop('successRegex','')
+        self.tightDisp = kwargs.pop('tightDisp',False)
         self.tol = kwargs.pop('tol',1.0e-14)
+        self.units = kwargs.pop('units','HartreeBohr')
         
         ## These options may be helpful in the future for porting over to Sapelo
         # self.cluster = kwargs.pop("cluster", "").upper()

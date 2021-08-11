@@ -22,19 +22,23 @@ class ZMAT(object):
         firstAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s*\n")
         secondAtomRegex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s*\n")
         thirdAtomRegex  = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s*\n")
-        fullAtomRegex   = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        fullAtomRegex   = re.compile(
+                "^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
         """ Custom int coord regexes """
         bondRegex    = re.compile("^\s*(\d+)\s+(\d+)\s*\n")
         angleRegex   = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
         torsionRegex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
         oopRegex     = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
+        linRegex     = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*L\s*\n")
         
         """ Cartesian regexes"""
         cartBeginRegex     = re.compile(r"cart begin")
         cartBeginRegex     = re.compile(r"cart begin")
         cartEndRegex       = re.compile(r"cart end")
-        cartesianRegex     = re.compile("[A-Z][A-Za-z]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n")
-        cartesianAtomRegex = re.compile("([A-Z][A-Za-z]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n")
+        s = "[A-Z][A-Za-z]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n"
+        cartesianRegex     = re.compile(s)
+        s = "([A-Z][A-Za-z]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
+        cartesianAtomRegex = re.compile(s)
         dividerRegex       = re.compile("^\s*\-\-\-\s*\n")
         
         """ Read in the ZMAT file """
@@ -120,6 +124,8 @@ class ZMAT(object):
         self.torsionVariables        = []
         self.oopIndices              = []
         self.oopVariables            = []
+        self.linIndices              = []
+        self.linVariables            = []
         self.variableDictionaryInit  = {}
         self.variableDictionaryFinal = {}
 
@@ -141,16 +147,22 @@ class ZMAT(object):
                     List = re.findall(thirdAtomRegex,zmatOutput[i])[0]
                     self.bondIndices.append([str(i-firstIndex+1),List[1]])
                     self.bondVariables.append("R"+str(i-firstIndex))
-                    self.angleIndices.append([str(i-firstIndex+1),List[1],List[2]])
+                    self.angleIndices.append(
+                            [str(i-firstIndex+1),List[1],List[2]])
                     self.angleVariables.append("A"+str(i-firstIndex))
-                """ All remaining ZMAT atoms, will have bond, angle, and torsion term """
+                """ 
+                    All remaining ZMAT atoms, will have bond, angle, and torsion 
+                    term 
+                """
                 if re.search(fullAtomRegex,zmatOutput[i]):
                     List = re.findall(fullAtomRegex,zmatOutput[i])[0]
                     self.bondIndices.append([str(i-firstIndex+1),List[1]])
                     self.bondVariables.append("R"+str(i-firstIndex))
-                    self.angleIndices.append([str(i-firstIndex+1),List[1],List[2]])
+                    self.angleIndices.append(
+                            [str(i-firstIndex+1),List[1],List[2]])
                     self.angleVariables.append("A"+str(i-firstIndex))
-                    self.torsionIndices.append([str(i-firstIndex+1),List[1],List[2],List[3]])
+                    self.torsionIndices.append(
+                            [str(i-firstIndex+1),List[1],List[2],List[3]])
                     self.torsionVariables.append("D"+str(i-firstIndex))
         elif self.options.coords.upper() == "REDUNDANT":
             count = 0
@@ -166,9 +178,12 @@ class ZMAT(object):
             count = 0
             for i in range(len(self.bondIndices)):
                 for j in range(len(self.bondIndices)-i-1):
-                    a = np.setdiff1d(self.bondIndices[i],self.bondIndices[i+j+1])
-                    b = np.intersect1d(self.bondIndices[i],self.bondIndices[i+j+1])
-                    c = np.setdiff1d(self.bondIndices[i+j+1],self.bondIndices[i])
+                    a = np.setdiff1d(
+                            self.bondIndices[i],self.bondIndices[i+j+1])
+                    b = np.intersect1d(
+                            self.bondIndices[i],self.bondIndices[i+j+1])
+                    c = np.setdiff1d(
+                            self.bondIndices[i+j+1],self.bondIndices[i])
                     if len(a) and len(b) and len(c):
                         d = np.array([a[0],b[0],c[0]])
                         self.angleIndices = np.append(self.angleIndices,d)
@@ -181,9 +196,12 @@ class ZMAT(object):
             count = 0
             for i in range(len(self.angleIndices)):
                 for j in range(len(self.angleIndices)-i-1):
-                    a = np.setdiff1d(self.angleIndices[i],self.angleIndices[i+j+1])
-                    b = np.intersect1d(self.angleIndices[i],self.angleIndices[i+j+1])
-                    c = np.setdiff1d(self.angleIndices[i+j+1],self.angleIndices[i])
+                    a = np.setdiff1d(
+                            self.angleIndices[i],self.angleIndices[i+j+1])
+                    b = np.intersect1d(
+                            self.angleIndices[i],self.angleIndices[i+j+1])
+                    c = np.setdiff1d(
+                            self.angleIndices[i+j+1],self.angleIndices[i])
                     if len(a) and len(b)==2 and len(c):
                         d = np.array([a[0],b[0],b[1],c[0]])
                         self.torsionIndices = np.append(self.torsionIndices,d)
@@ -193,7 +211,8 @@ class ZMAT(object):
 
         elif self.options.coords.upper() == "CUSTOM":
             """ 
-                This option will allow the user to specify a custom array of internal coordinates. 
+                This option will allow the user to specify a custom array of 
+                internal coordinates. 
             """
             Sum = 0
             blank = 0
@@ -201,41 +220,63 @@ class ZMAT(object):
                 if re.search(bondRegex,zmatOutput[i]):
                     List = re.findall(bondRegex,zmatOutput[i])[0]
                     self.bondIndices.append(List)
-                    self.bondVariables.append("R"+str(i+1-Sum+len(self.bondVariables)))
+                    self.bondVariables.append(
+                            "R"+str(i+1-Sum+len(self.bondVariables)))
                 elif re.search(angleRegex,zmatOutput[i]):
                     List = re.findall(angleRegex,zmatOutput[i])[0]
                     self.angleIndices.append(List)
-                    self.angleVariables.append("A"+str(i+1-Sum+len(self.angleVariables)))
+                    self.angleVariables.append(
+                            "A"+str(i+1-Sum+len(self.angleVariables)))
                 elif re.search(torsionRegex,zmatOutput[i]):
                     List = re.findall(torsionRegex,zmatOutput[i])[0]
                     self.torsionIndices.append(List)
-                    self.torsionVariables.append("D"+str(i+1-Sum+len(self.torsionVariables)))
+                    self.torsionVariables.append(
+                            "D"+str(i+1-Sum+len(self.torsionVariables)))
                 elif re.search(oopRegex,zmatOutput[i]):
                     List = re.findall(oopRegex,zmatOutput[i])[0]
                     self.oopIndices.append(List)
-                    self.oopVariables.append("O"+str(i+1-Sum+len(self.oopVariables)))
+                    self.oopVariables.append(
+                            "O"+str(i+1-Sum+len(self.oopVariables)))
+                elif re.search(linRegex,zmatOutput[i]):
+                    List = re.findall(linRegex,zmatOutput[i])[0]
+                    self.linIndices.append(List)
+                    self.linVariables.append(
+                            "L"+str(i+1-Sum+len(self.linVariables)))
                 else:
                     blank += 1
-                Sum = len(self.bondVariables)+len(self.angleVariables)+len(self.torsionVariables)+len(self.oopVariables)+blank
+                Sum = len(self.bondVariables) + len(self.angleVariables) \
+                    + len(self.torsionVariables) + len(self.oopVariables) \
+                    + len(self.linVariables) + blank
         
         """
-            This code utilizes the INTC function from the TransDisp module to calculate the initial variable values from the cartesian coordinates.
+            This code utilizes the INTC function from the TransDisp module to 
+            calculate the initial variable values from the cartesian 
+            coordinates.
         """
-        transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options)
-        I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices))
+        transdisp = TransDisp(
+                1,self,1,1,False,self.dispTol,np.array([]),self.options)
+        I = np.eye(
+                len(self.bondIndices) + len(self.angleIndices) \
+                + len(self.torsionIndices) + len(self.oopIndices) \
+                + len(self.linIndices))
         variables1 = transdisp.INTC(self.CartesiansInit,I,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I,I)
-        for i in range(len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices)):
+        for i in range(
+                len(self.angleIndices) + len(self.torsionIndices) \
+                + len(self.oopIndices) + len(self.linIndices)):
             variables1[len(self.bondIndices)+i] *= 180./np.pi
             variables2[len(self.bondIndices)+i] *= 180./np.pi
-        Variables = np.append(self.bondVariables,np.append(self.angleVariables,self.torsionVariables))
+        Variables = np.append(
+                self.bondVariables,np.append(self.angleVariables,
+                    self.torsionVariables))
         if len(self.oopVariables):
             Variables = np.append(Variables,self.oopVariables)
+        if len(self.linVariables):
+            Variables = np.append(Variables,self.linVariables)
 
         """
-            I believe this code is only here to check the Redundant
-            coordinate generation process, however I don't want to check
-            that right now. This is left as an exercise to the reader ;)
+            This code is useful for checking the Redundant coordinate 
+            generation process.
         """
         if self.options.coords.upper() == "REDUNDANT":
             indices = []
@@ -256,23 +297,27 @@ class ZMAT(object):
         else:
             self.variableDictionaryFinal = self.variableDictionaryInit.copy()
         """ 
-            And now we must temper the torsion angles! For consistency's sake we will
-            force them to lie between -90 deg and +270 deg.
-            *** 
-                This is a tad outdated. I'll leave it in for now, but I really should just change
-                how I deal with edge variable cases in my INTC code.
-                
-                I believe I have that implemented now. So I can check this, but I don't really want to right now...
-            ***
+            And now we must temper the torsion angles! For consistency's sake 
+            we will force them to lie between -90 deg and +270 deg.
+
+            *** Out of plane and linear bends will have to be added
         """
+        
         """ Handle Variable lists separately. First the INIT: """
         for i in range(len(self.torsionVariables)):
-            Condition1 = float(self.variableDictionaryInit[self.torsionVariables[i]]) <= -90.
-            Condition2 = float(self.variableDictionaryInit[self.torsionVariables[i]]) >= 270.
-            buff = np.floor(abs(float(self.variableDictionaryInit[self.torsionVariables[i]]))/360)
+            Condition1 = float(
+                    self.variableDictionaryInit[
+                        self.torsionVariables[i]]) <= -90.
+            Condition2 = float(
+                    self.variableDictionaryInit[
+                        self.torsionVariables[i]]) >= 270.
+            buff = np.floor(abs(float(self.variableDictionaryInit[
+                self.torsionVariables[i]]))/360)
             if Condition1:
-                self.variableDictionaryInit[self.torsionVariables[i]] = float(self.variableDictionaryInit[self.torsionVariables[i]])
-                self.variableDictionaryInit[self.torsionVariables[i]] += 360.*buff
+                self.variableDictionaryInit[self.torsionVariables[i]] = \
+                    float(self.variableDictionaryInit[self.torsionVariables[i]])
+                self.variableDictionaryInit[self.torsionVariables[i]] += \
+                    360.*buff
                 if float(self.variableDictionaryInit[self.torsionVariables[i]]) <= -90.:
                     self.variableDictionaryInit[self.torsionVariables[i]] += 360.
             if Condition2:

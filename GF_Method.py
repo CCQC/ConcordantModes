@@ -25,7 +25,6 @@ class GF_Method(object):
         self.F_O = np.dot(np.dot(self.G_O,self.F),self.G_O)
         self.eig_v,self.L_p = LA.eigh(self.F_O)
         print(self.eig_v)
-        """ You might need to transform L_p to L before flipping it. Think through this. """
         self.L_p[np.abs(self.L_p) < self.tol] = 0
         self.L = np.dot(self.G_O,self.L_p)
         self.L[np.abs(self.L) < self.tol] = 0
@@ -42,7 +41,8 @@ class GF_Method(object):
         """ Convert from Hartrees to wavenumbers. """
         self.Freq *= self.Hartree_wavenum
         for i in range(len(self.Freq)):
-            print("Frequency #" + "{:3d}".format(i+1) + ": " + "{:10.2f}".format(self.Freq[i]))
+            print("Frequency #" + "{:3d}".format(i+1) + ": " 
+                  + "{:10.2f}".format(self.Freq[i]))
         """ Compute and then print the TED. """
         # np.set_printoptions(suppress=True)
         print('////////////////////////////////////////////')
