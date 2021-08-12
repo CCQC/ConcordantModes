@@ -19,6 +19,7 @@ class Options(object):
         self.spin = kwargs.pop('spin', 1)
         self.successRegex = kwargs.pop('successRegex','')
         self.tol = kwargs.pop('tol',1.0e-14)
+        self.off_diag = kwargs.pop('off_diag', 1)
         
         ## These options may be helpful in the future for porting over to Sapelo
         # self.cluster = kwargs.pop("cluster", "").upper()

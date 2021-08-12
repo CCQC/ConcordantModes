@@ -116,6 +116,10 @@ class ConcordantModes(object):
         s_vec.run(self.zmat.CartesiansFinal,False)
         transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,GF=TED_GF)
         transdisp.run()
+        #nate
+        eigs = transdisp.eigs 
+        p_disp = transdisp.p_disp 
+        m_disp = transdisp.m_disp 
         
         
         if self.options.dispCheck:
@@ -130,12 +134,14 @@ class ConcordantModes(object):
         
         if self.options.calc:
             # Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert, transdisp.dispSym)
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert,eigs,p_disp,m_disp,self.options)
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
             for i in os.listdir(rootdir + '/Disps'):
                 dispList.append(i)
+            print('printing disp list')
+            print(dispList) 
             
             """
                 This code generates the submit script for the displacements, submits an array, then checks if all jobs have finished every 10 seconds. :D
@@ -170,14 +176,22 @@ class ConcordantModes(object):
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord,eigs)
         Reap_obj.run()
         os.chdir('..')
+        
+        #nate
+        p_en_array = Reap_obj.p_en_array 
+        m_en_array = Reap_obj.m_en_array 
+        ref_en =     Reap_obj.ref_en
 
         """
             Compute the force constants here, currently can only do diagonal force constants
         """
-        fc = ForceConstant(transdisp, Reap_obj.energiesDict)
+        #fc = ForceConstant(transdisp, Reap_obj.energiesDict)
+        
+        #nate
+        fc = ForceConstant(transdisp,p_en_array,m_en_array,ref_en,self.options)
         fc.run()
         print('Computed Force Constants:')
         print(fc.FC)
@@ -185,8 +199,10 @@ class ConcordantModes(object):
         """
             I will need to make a method just for reading in force constants, for now the diagonals will do.
         """
-        self.F = np.diag(fc.FC)
-
+        #self.F = np.diag(fc.FC)
+        #nate
+        self.F = fc.FC
+        print(self.F)
         """
             Recompute the G-matrix with the new geometry, and then transform the G-matrix using the 
             lower level of theory eigenvalue matrix. This will not fully diagonalize the G-matrix

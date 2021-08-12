@@ -8,13 +8,18 @@ import numpy as np
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,zmat,disps,insertionIndex):
+    def __init__(self,progname,zmat,disps,insertionIndex,eigs,p_disp,m_disp,options):
     # def __init__(self,progname,zmat,disps,insertionIndex,dispSym):
         # self.dispSym = dispSym
         self.progname = progname
         self.zmat = zmat
         self.insertionIndex = insertionIndex
         self.disps = disps # This should be the 'TransDisp' object
+        #nate
+        self.eigs = eigs
+        self.p_disp = p_disp
+        self.m_disp = m_disp
+        self.options = options
 
     def Make_Input(self,data,dispp,n_at,at,index):	 
         space = ' '
@@ -78,33 +83,102 @@ class DirectoryTree(object):
             shutil.copy('../../GENBAS','.')
         os.chdir('..')
 
-        """ I need to restructure this so that it iterates over only running jobs, not the duplicates by symmetry. """
-        Sum = 0
-        # self.dispSym = self.dispSym.astype(int)
-        # for i in range(len(self.disps.DispCart)-np.sum(self.dispSym)-1):
-        for i in range(len(self.disps.DispCart)-1):
-            j = Sum % 2
-            k = Sum // 2
-            os.mkdir(str(i+2))
-            os.chdir("./" + str(i+2))
-            if j == 0:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-            elif j == 1:
-                data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-            # if self.dispSym[k] == 0:
-                # if j == 0:
-                    # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-                # if j == 1:
-                    # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-            # elif self.dispSym[k] == 1:
-                # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
-            # Sum += self.dispSym[k]
-            Sum += 1
-            with open(inp,'w') as file:
-                file.writelines(data)
-            data = data_buff.copy()
-            if init:
-                shutil.copy('../../initden.dat','.')
-            if genbas:
-                shutil.copy('../../GENBAS','.')
-            os.chdir('..')
+        """
+            Not including the reference input, this code loops through and generates the directories for the displacement
+            jobs and copies in the input file data. Following this, these jobs are ready to be submitted to the queue.  
+        """ 
+        off_diag = self.options.off_diag 
+        
+        p_disp = self.p_disp
+        m_disp = self.m_disp
+        a = p_disp.shape
+        Sum = 2
+        for i in range(a[0]):
+            for j in range(i,i+off_diag):
+                if j > a[0] -1:
+                    break
+                else: 
+                    #fc[i,j] = 1
+                    if i == j:
+                        p_data = self.Make_Input(data,p_disp[i,i],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
+                        os.mkdir(str(Sum))
+                        os.chdir("./" + str(Sum))          
+                        with open(inp,'w') as file:
+                            file.writelines(p_data)
+                        data = data_buff.copy()
+                        if init:
+                            shutil.copy('../../initden.dat','.')
+                        if genbas:
+                            shutil.copy('../../GENBAS','.')
+                        os.chdir('..')
+                        m_data = self.Make_Input(data,m_disp[i,i],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
+                        os.mkdir(str(Sum+1))
+                        os.chdir("./" + str(Sum+1))          
+                        with open(inp,'w') as file:
+                            file.writelines(m_data)
+                        data = data_buff.copy()
+                        if init:
+                            shutil.copy('../../initden.dat','.')
+                        if genbas:
+                            shutil.copy('../../GENBAS','.')
+                        os.chdir('..')
+                    
+                    elif i != j:
+                        p_data = self.Make_Input(data,p_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
+                        os.mkdir(str(Sum))
+                        os.chdir("./" + str(Sum))          
+                        with open(inp,'w') as file:
+                            file.writelines(p_data)
+                        data = data_buff.copy()
+                        if init:
+                            shutil.copy('../../initden.dat','.')
+                        if genbas:
+                            shutil.copy('../../GENBAS','.')
+                        os.chdir('..')
+                        m_data = self.Make_Input(data,m_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
+                        os.mkdir(str(Sum+1))
+                        os.chdir("./" + str(Sum+1))          
+                        with open(inp,'w') as file:
+                            file.writelines(m_data)
+                        data = data_buff.copy()
+                        if init:
+                            shutil.copy('../../initden.dat','.')
+                        if genbas:
+                            shutil.copy('../../GENBAS','.')
+                        os.chdir('..')
+                    Sum +=2
+        
+
+      
+        #old diagonal-only code
+        
+        #""" I need to restructure this so that it iterates over only running jobs, not the duplicates by symmetry. """
+        #Sum = 0
+        ## self.dispSym = self.dispSym.astype(int)
+        ## for i in range(len(self.disps.DispCart)-np.sum(self.dispSym)-1):
+        #for i in range(len(self.disps.DispCart)-1):
+        #    j = Sum % 2
+        #    k = Sum // 2
+        #    os.mkdir(str(i+2))
+        #    os.chdir("./" + str(i+2))
+        #    if j == 0:
+        #        data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        #    elif j == 1:
+        #        data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        #    # if self.dispSym[k] == 0:
+        #        # if j == 0:
+        #            # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        #        # if j == 1:
+        #            # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_minus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        #    # elif self.dispSym[k] == 1:
+        #        # data = self.Make_Input(data,self.disps.DispCart[str(k+1)+'_plus'],str(n_atoms),self.zmat.atomList,self.insertionIndex)
+        #    # Sum += self.dispSym[k]
+        #    Sum += 1
+        #    with open(inp,'w') as file:
+        #        file.writelines(data)
+        #    data = data_buff.copy()
+        #    if init:
+        #        shutil.copy('../../initden.dat','.')
+        #    if genbas:
+        #        shutil.copy('../../GENBAS','.')
+        #    os.chdir('..')
