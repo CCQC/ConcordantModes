@@ -8,7 +8,7 @@ import numpy as np
 # Alright, it's time to generalize this for multiple program inputs
     
 class DirectoryTree(object):
-    def __init__(self,progname,zmat,disps,insertionIndex,eigs,p_disp,m_disp,options):
+    def __init__(self,progname,zmat,disps,insertionIndex,p_disp,m_disp,options,indices):
     # def __init__(self,progname,zmat,disps,insertionIndex,dispSym):
         # self.dispSym = dispSym
         self.progname = progname
@@ -16,11 +16,10 @@ class DirectoryTree(object):
         self.insertionIndex = insertionIndex
         self.disps = disps # This should be the 'TransDisp' object
         #nate
-        self.eigs = eigs
         self.p_disp = p_disp
         self.m_disp = m_disp
         self.options = options
-
+        self.indices = indices 
     def Make_Input(self,data,dispp,n_at,at,index):	 
         space = ' '
         if self.progname == 'cfour':
@@ -84,72 +83,76 @@ class DirectoryTree(object):
         os.chdir('..')
 
         """
-            Not including the reference input, this code loops through and generates the directories for the displacement
+            Not including the reference input, this function generates the directories for the displacement
             jobs and copies in the input file data. Following this, these jobs are ready to be submitted to the queue.  
         """ 
-        off_diag = self.options.off_diag 
         
+        #def create_directory(direc,data):
+        #    os.mkdir(str(direc))
+        #    os.chdir("./" + str(direc))          
+        #    print(data)
+        #    file = open(inp,'w')
+        #    file.writelines(data)
+        #    if init:
+        #        shutil.copy('../../initden.dat','.')
+        #    if genbas:
+        #        shutil.copy('../../GENBAS','.')
+        #    os.chdir('..')
+        #    file.close()
         p_disp = self.p_disp
         m_disp = self.m_disp
-        a = p_disp.shape
-        Sum = 2
-        for i in range(a[0]):
-            for j in range(i,i+off_diag):
-                if j > a[0] -1:
-                    break
-                else: 
-                    #fc[i,j] = 1
-                    if i == j:
-                        p_data = self.Make_Input(data,p_disp[i,i],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
-                        os.mkdir(str(Sum))
-                        os.chdir("./" + str(Sum))          
-                        with open(inp,'w') as file:
-                            file.writelines(p_data)
-                        data = data_buff.copy()
-                        if init:
-                            shutil.copy('../../initden.dat','.')
-                        if genbas:
-                            shutil.copy('../../GENBAS','.')
-                        os.chdir('..')
-                        m_data = self.Make_Input(data,m_disp[i,i],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
-                        os.mkdir(str(Sum+1))
-                        os.chdir("./" + str(Sum+1))          
-                        with open(inp,'w') as file:
-                            file.writelines(m_data)
-                        data = data_buff.copy()
-                        if init:
-                            shutil.copy('../../initden.dat','.')
-                        if genbas:
-                            shutil.copy('../../GENBAS','.')
-                        os.chdir('..')
-                    
-                    elif i != j:
-                        p_data = self.Make_Input(data,p_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
-                        os.mkdir(str(Sum))
-                        os.chdir("./" + str(Sum))          
-                        with open(inp,'w') as file:
-                            file.writelines(p_data)
-                        data = data_buff.copy()
-                        if init:
-                            shutil.copy('../../initden.dat','.')
-                        if genbas:
-                            shutil.copy('../../GENBAS','.')
-                        os.chdir('..')
-                        m_data = self.Make_Input(data,m_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
-                        os.mkdir(str(Sum+1))
-                        os.chdir("./" + str(Sum+1))          
-                        with open(inp,'w') as file:
-                            file.writelines(m_data)
-                        data = data_buff.copy()
-                        if init:
-                            shutil.copy('../../initden.dat','.')
-                        if genbas:
-                            shutil.copy('../../GENBAS','.')
-                        os.chdir('..')
-                    Sum +=2
-        
+        a = p_disp.shape[0]
+        indices = self.indices 
+        direc = 2 
+       
+        """
+            This loop makes calls to the Make_Input function for storing the cartesian displacements as a variable,
+            upon which it is written to a standard input file after the create_directory function creates a directory
+            within the Disps directory.
+        """
+         
+        #for index in indices: 
+        #    i,j = index[0], index[1] 
+        #    p_data = self.Make_Input(data,p_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex)  
 
-      
+        #    create_directory(direc,p_data)
+        #    m_data = self.Make_Input(data,m_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
+
+        #    create_directory(direc+1,m_data)
+        #    direc += 2              
+        
+        for index in indices: 
+            i,j = index[0], index[1] 
+            p_data = self.Make_Input(data,p_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex)  
+
+            #create_directory(direc,p_data)
+            os.mkdir(str(direc))
+            os.chdir("./" + str(direc))          
+            with open(inp,'w') as file:
+                file.writelines(p_data)
+            data = data_buff.copy()
+            if init:
+                shutil.copy('../../initden.dat','.')
+            if genbas:
+                shutil.copy('../../GENBAS','.')
+            os.chdir('..')
+
+            m_data = self.Make_Input(data,m_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
+            os.mkdir(str(direc+1))
+            os.chdir("./" + str(direc+1))          
+            with open(inp,'w') as file:
+                file.writelines(m_data)
+            data = data_buff.copy()
+            if init:
+                shutil.copy('../../initden.dat','.')
+            if genbas:
+                shutil.copy('../../GENBAS','.')
+            os.chdir('..')
+
+            #create_directory(direc+1,m_data)
+            #data = data_buff.copy()
+            direc += 2              
+
         #old diagonal-only code
         
         #""" I need to restructure this so that it iterates over only running jobs, not the duplicates by symmetry. """

@@ -21,6 +21,7 @@ from ConcordantModes.TransDisp          import TransDisp
 from ConcordantModes.vulcan_template    import vulcan_template
 from ConcordantModes.ZMAT               import ZMAT
 from ConcordantModes.int2cart           import int2cart
+from ConcordantModes.Algorithm          import Algorithm
 
 class ConcordantModes(object):
     def __init__(self, options):
@@ -44,6 +45,7 @@ class ConcordantModes(object):
         t1 = time.time()
         
         rootdir = os.getcwd()
+        
         
         """
             Parse the output to get all pertinent ZMAT info
@@ -108,13 +110,28 @@ class ConcordantModes(object):
 
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')
+        S = TED_GF.S
+        initial_fc = TED_GF.eig_v 
+        eigs = len(S) 
+
+        """ Coming soon, machinery that computes a diagnostic to aid in off-diagonal force constant
+        computation priority!! """
         
+        algo = Algorithm(eigs,S,initial_fc,self.options)
+        algo.run()
+        print(algo.indices)  
+
+
         """
             Recompute the B-Tensors to match the final geometry, then generate the displacements.
         """
+        
+
+
         s_vec = s_vectors(self.zmat,self.options,self.zmat.variableDictionaryFinal)
         s_vec.run(self.zmat.CartesiansFinal,False)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,GF=TED_GF)
+        #transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,GF=TED_GF)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,algo.indices,GF=TED_GF)
         transdisp.run()
         #nate
         eigs = transdisp.eigs 
@@ -134,7 +151,7 @@ class ConcordantModes(object):
         
         if self.options.calc:
             # Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert, transdisp.dispSym)
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert,eigs,p_disp,m_disp,self.options)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert,p_disp,m_disp,self.options,algo.indices)
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
@@ -176,7 +193,7 @@ class ConcordantModes(object):
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord,eigs)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord,eigs,algo.indices)
         Reap_obj.run()
         os.chdir('..')
         
@@ -191,18 +208,17 @@ class ConcordantModes(object):
         #fc = ForceConstant(transdisp, Reap_obj.energiesDict)
         
         #nate
-        fc = ForceConstant(transdisp,p_en_array,m_en_array,ref_en,self.options)
+        fc = ForceConstant(transdisp,p_en_array,m_en_array,ref_en,self.options,algo.indices)
         fc.run()
         print('Computed Force Constants:')
         print(fc.FC)
-
+       
         """
             I will need to make a method just for reading in force constants, for now the diagonals will do.
         """
         #self.F = np.diag(fc.FC)
         #nate
         self.F = fc.FC
-        print(self.F)
         """
             Recompute the G-matrix with the new geometry, and then transform the G-matrix using the 
             lower level of theory eigenvalue matrix. This will not fully diagonalize the G-matrix

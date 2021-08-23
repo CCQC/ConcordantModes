@@ -25,7 +25,7 @@ from ConcordantModes.s_vectors          import s_vectors
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options,GF=None):
+    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options,indices,GF=None):
         """
             As is generally the case for Programmers, GF = None by default.
         """
@@ -42,10 +42,12 @@ class TransDisp(object):
         self.options         = options
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
+        self.indices         = indices
         if GF:
             self.GF = GF
 
     def run(self):
+        
         self.B = self.s_vectors.B.copy() # (redundant internals (s) x cartesians (3N))
         """ Invert the L-matrix and then normalize the rows. """
         projTol = 1.0e-3
@@ -96,35 +98,29 @@ class TransDisp(object):
         #""" Now we actually generate the displacements """
         ## raise RuntimeError
         """
-            This code loops through and generates the displacements for the diagonal and (if specified)
-            the off-diagonals. Where the displacement matrix D[i,j] = D[j,i].
+            This code loops through a list of indices that the force constants will be computed at and
+            generates the displacements for the diagonal and (if specified) the off-diagonals. Where 
+            the displacement matrix D[i,j] = D[j,i].
         """
-        off_diag = self.options.off_diag 
-        
         p_disp = np.zeros((len(self.eigs),len(self.eigs)),dtype=object)
         m_disp = np.zeros((len(self.eigs),len(self.eigs)),dtype=object)
-        a = p_disp.shape
-        disp = np.zeros(len(self.eigs.T))
-        Sum = 2
-        for i in range(a[0]):
-            for j in range(i,i+off_diag):
-                #resets disp vector to 0
-                disp = np.zeros(len(self.eigs.T))
-                if j > a[0] -1:
-                    break
-                else:
-                    disp[i] = self.disp[i]
-                    disp[j] = self.disp[j]
-                    if i == j:
-                        p_disp[i,i] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-                        m_disp[i,i] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-                    elif i != j:
-                        disp[j] = self.disp[j]
-                        p_disp[i,j] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-                        m_disp[i,j] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-                    Sum +=2
-        self.p_disp = p_disp
-        self.m_disp = m_disp
+        a = p_disp.shape[0]
+        
+        def p_displacements(disp):
+            return self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+        def m_displacements(disp):
+            return self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+
+        for index in self.indices:
+            i, j = index[0], index[1]
+            disp = np.zeros(len(self.eigs.T))    
+            disp[i] = self.disp[i]
+            disp[j] = self.disp[j]
+            p_disp[i,j] = p_displacements(disp) 
+            m_disp[i,j] = m_displacements(disp) 
+        self.p_disp = p_disp 
+        self.m_disp = m_disp 
+
     def INTC(self,carts,eig_inv,Proj):
         """
             This is a function that computes all currently implemented and specified
@@ -215,18 +211,12 @@ class TransDisp(object):
         return theta
 
     def CoordConvert(self,n_disp,n_coord,refCarts,max_iter,tolerance,A):
-        #nate
-        print('printing n_disp and n_coord')
-        print(n_disp)
-        print(n_coord)
         tol = 1.0e-3
         # ensureConverge = False
         # ensureConverge = True
         convIter = 10
         # s_vec = s_vectors(self.zmat,self.options)
         newN = n_coord + n_disp
-        print('printing newN')
-        print(newN)
         # oldNorm = LA.norm(n_disp)
         newCarts = np.array(refCarts).astype(float)
         # refCarts = newCarts.copy()

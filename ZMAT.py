@@ -221,7 +221,8 @@ class ZMAT(object):
         """
             This code utilizes the INTC function from the TransDisp module to calculate the initial variable values from the cartesian coordinates.
         """
-        transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options)
+        indices = []
+        transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options,indices)
         I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices))
         variables1 = transdisp.INTC(self.CartesiansInit,I,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I,I)

@@ -19,8 +19,11 @@ class Options(object):
         self.spin = kwargs.pop('spin', 1)
         self.successRegex = kwargs.pop('successRegex','')
         self.tol = kwargs.pop('tol',1.0e-14)
-        self.off_diag = kwargs.pop('off_diag', 1)
-        
+        self.off_diag = kwargs.pop('off_diag', False)
+        self.off_diag_bands = kwargs.pop('off_diag_bands', 1)
+        self.off_diag_limit = kwargs.pop('off_diag_limit', False) 
+        self.mode_coupling_check = kwargs.pop('mode_coupling_check', False)
+        self.printout_rel_e = kwargs.pop('printout_rel_e', True)
         ## These options may be helpful in the future for porting over to Sapelo
         # self.cluster = kwargs.pop("cluster", "").upper()
         # self.wait_time = kwargs.pop("wait_time", None)
