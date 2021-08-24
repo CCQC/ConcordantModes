@@ -87,18 +87,6 @@ class DirectoryTree(object):
             jobs and copies in the input file data. Following this, these jobs are ready to be submitted to the queue.  
         """ 
         
-    #def create_directory(self,direc,data):
-    #    os.mkdir(str(direc))
-    #    os.chdir("./" + str(direc))          
-    #    print(data)
-    #    file = open(inp,'w')
-    #    file.writelines(data)
-    #    if init:
-    #        shutil.copy('../../initden.dat','.')
-    #    if genbas:
-    #        shutil.copy('../../GENBAS','.')
-    #    os.chdir('..')
-    #    file.close()
         p_disp = self.p_disp
         m_disp = self.m_disp
         a = p_disp.shape[0]
@@ -152,6 +140,19 @@ class DirectoryTree(object):
             #create_directory(direc+1,m_data)
             #data = data_buff.copy()
             direc += 2              
+    
+    #def create_directory(self,direc,data):
+    #    os.mkdir(str(direc))
+    #    os.chdir("./" + str(direc))          
+    #    print(data)
+    #    file = open(inp,'w')
+    #    file.writelines(data)
+    #    if init:
+    #        shutil.copy('../../initden.dat','.')
+    #    if genbas:
+    #        shutil.copy('../../GENBAS','.')
+    #    os.chdir('..')
+    #    file.close()
 
         #old diagonal-only code
         
