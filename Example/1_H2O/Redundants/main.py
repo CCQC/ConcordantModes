@@ -11,7 +11,7 @@ options_kwargs = {
   'off_diag'          : False,
   'off_diag_bands'    : 3,
   'off_diag_limit'    : False,
-  'printout_rel_e'    : True,
+  'printout_rel_e'    : False,
   'mode_coupling_check' : False 
 }
 options_obj = Options(**options_kwargs)

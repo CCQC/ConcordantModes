@@ -87,18 +87,18 @@ class DirectoryTree(object):
             jobs and copies in the input file data. Following this, these jobs are ready to be submitted to the queue.  
         """ 
         
-        #def create_directory(direc,data):
-        #    os.mkdir(str(direc))
-        #    os.chdir("./" + str(direc))          
-        #    print(data)
-        #    file = open(inp,'w')
-        #    file.writelines(data)
-        #    if init:
-        #        shutil.copy('../../initden.dat','.')
-        #    if genbas:
-        #        shutil.copy('../../GENBAS','.')
-        #    os.chdir('..')
-        #    file.close()
+    #def create_directory(self,direc,data):
+    #    os.mkdir(str(direc))
+    #    os.chdir("./" + str(direc))          
+    #    print(data)
+    #    file = open(inp,'w')
+    #    file.writelines(data)
+    #    if init:
+    #        shutil.copy('../../initden.dat','.')
+    #    if genbas:
+    #        shutil.copy('../../GENBAS','.')
+    #    os.chdir('..')
+    #    file.close()
         p_disp = self.p_disp
         m_disp = self.m_disp
         a = p_disp.shape[0]
@@ -115,10 +115,10 @@ class DirectoryTree(object):
         #    i,j = index[0], index[1] 
         #    p_data = self.Make_Input(data,p_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex)  
 
-        #    create_directory(direc,p_data)
+        #    self.create_directory(direc,p_data)
         #    m_data = self.Make_Input(data,m_disp[i,j],str(n_atoms),self.zmat.atomList,self.insertionIndex) 
 
-        #    create_directory(direc+1,m_data)
+        #    self.create_directory(direc+1,m_data)
         #    direc += 2              
         
         for index in indices: 

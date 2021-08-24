@@ -23,14 +23,6 @@ class ForceConstant(object):
         self.indices = indices
     def run(self):
     
-        """Functions for computing the diagonal and off-diagonal force constants """
-        def diag_fc(e_p, e_m, e_r, disp):
-            fc = (e_p - 2*e_r + e_m)/(disp**2) 
-            return fc
-
-        def off_diag_fc(e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp):
-            fc =  ((e_pp - e_pi - e_pj + 2*e_r - e_mi - e_mj + e_mm)/(2*(disp**2)))
-            return fc
 
         indices = self.indices  
         p_en_array = self.p_en_array 
@@ -45,13 +37,21 @@ class ForceConstant(object):
             e_mi, e_mj = m_en_array[i,i], m_en_array[j,j] 
             e_pp, e_mm = p_en_array[i,j], m_en_array[i,j]  
             if i == j:
-                self.FC[i,i] = diag_fc(e_pi, e_mi, e_r, disp.disp[i]) 
+                self.FC[i,i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i]) 
             elif i !=j:
-                self.FC[i,j] = off_diag_fc(e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp.disp[i])
+                self.FC[i,j] = self.off_diag_fc(e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp.disp[i])
         #Take advantage of FC[i,j] = FC[j,i]
         cf = np.triu_indices(a,1)
         il = (cf[1],cf[0])
         self.FC[il] = self.FC[cf]
+    """Functions for computing the diagonal and off-diagonal force constants """
+    def diag_fc(self,e_p, e_m, e_r, disp):
+        fc = (e_p - 2*e_r + e_m)/(disp**2) 
+        return fc
+
+    def off_diag_fc(self,e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp):
+        fc =  ((e_pp - e_pi - e_pj + 2*e_r - e_mi - e_mj + e_mm)/(2*(disp**2)))
+        return fc
      
  
 #old diagonal only force constant code

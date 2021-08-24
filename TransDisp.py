@@ -106,20 +106,21 @@ class TransDisp(object):
         m_disp = np.zeros((len(self.eigs),len(self.eigs)),dtype=object)
         a = p_disp.shape[0]
         
-        def p_displacements(disp):
-            return self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-        def m_displacements(disp):
-            return self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
-
         for index in self.indices:
             i, j = index[0], index[1]
             disp = np.zeros(len(self.eigs.T))    
             disp[i] = self.disp[i]
             disp[j] = self.disp[j]
-            p_disp[i,j] = p_displacements(disp) 
-            m_disp[i,j] = m_displacements(disp) 
+            p_disp[i,j] = self.p_displacements(disp) 
+            m_disp[i,j] = self.m_displacements(disp) 
         self.p_disp = p_disp 
         self.m_disp = m_disp 
+    
+    def p_displacements(self,disp):
+        return self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+    def m_displacements(self,disp):
+        return self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+    
 
     def INTC(self,carts,eig_inv,Proj):
         """
