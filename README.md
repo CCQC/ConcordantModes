@@ -43,4 +43,4 @@ This is the main file that imports the Concordant Mode options and program, and 
 To run the program, simply enter "python main.py" or "nohup python main.py &" if you would like to retain the output.
 
 fc.dat:
-This file contains the cartesian force constants of the first structure (or the only structure). These force constants must be in units of mdyn/angstrom.
+This file contains the cartesian force constants of the first structure (or the only structure).

@@ -253,12 +253,9 @@ class ZMAT(object):
             calculate the initial variable values from the cartesian 
             coordinates.
         """
-        transdisp = TransDisp(
-                1,self,1,1,False,self.dispTol,np.array([]),self.options)
-        I = np.eye(
-                len(self.bondIndices) + len(self.angleIndices) \
-                + len(self.torsionIndices) + len(self.oopIndices) \
-                + len(self.linIndices))
+        indices = []
+        transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options,indices)
+        I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices))
         variables1 = transdisp.INTC(self.CartesiansInit,I,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I,I)
         for i in range(

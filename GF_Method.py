@@ -24,11 +24,17 @@ class GF_Method(object):
         """ Symmetrize F, diagonalize, then backtransform the eigenvectors. """
         self.F_O = np.dot(np.dot(self.G_O,self.F),self.G_O)
         self.eig_v,self.L_p = LA.eigh(self.F_O)
-        print(self.eig_v)
         self.L_p[np.abs(self.L_p) < self.tol] = 0
         self.L = np.dot(self.G_O,self.L_p)
+        
+        """ Construct the normal mode overlap matrix """
+        L = np.absolute(np.real(self.L))
+        L_inv = LA.inv(L) 
+        L_t = L.T
+        S = np.dot(L_t,L)
+        self.S = S
+       
         self.L[np.abs(self.L) < self.tol] = 0
-        self.L = np.real(self.L)
         """ Compute the frequencies by the square root of the eigenvalues. """
         self.Freq = np.sqrt(self.eig_v, dtype=np.complex)
         """ Filter for imaginary modes. """

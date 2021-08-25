@@ -25,8 +25,7 @@ from ConcordantModes.s_vectors import s_vectors
 """
 
 class TransDisp(object):
-    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options,
-            GF=None):
+    def __init__(self,s_vectors,zmat,disp,eigs,Conv,dispTol,TED,options,indices,GF=None):
         """
             As is generally the case for Programmers, GF = None by default.
         """
@@ -43,10 +42,12 @@ class TransDisp(object):
         self.options         = options
         self.DispCart        = {}
         self.DispCart["ref"] = self.refCarts.copy()
+        self.indices         = indices
         if GF:
             self.GF = GF
 
     def run(self):
+        
         self.B = self.s_vectors.B.copy() # (redundant internals (s) x cartesians (3N))
         """ Invert the L-matrix and then normalize the rows. """
         projTol = 1.0e-3
@@ -96,23 +97,29 @@ class TransDisp(object):
 
         # raise RuntimeError
 
-        """ Now we actually generate the displacements """
-        for i in range(len(self.eigs.T)):
-            disp = np.zeros(len(self.eigs.T))
-            disp[i] = self.disp[i]
-            print("Disp #" + str(i+1))
-            print(disp)
-            self.DispCart[str(i+1)+'_plus'] = \
-                self.CoordConvert(disp,self.n_coord.copy(),
-                                  self.refCarts.copy(),50,1.0e-11,
-                                  self.A.copy(),self.options.tightDisp,
-                                  self.zmat,self.options)
-            self.DispCart[str(i+1)+'_minus'] = \
-                self.CoordConvert(-disp,self.n_coord.copy(),
-                                  self.refCarts.copy(),50,1.0e-11,
-                                  self.A.copy(),self.options.tightDisp,
-                                  self.zmat,self.options)
+        """
+            This code loops through a list of indices that the force constants will be computed at and
+            generates the displacements for the diagonal and (if specified) the off-diagonals. Where 
+            the displacement matrix D[i,j] = D[j,i].
+        """
+        p_disp = np.zeros((len(self.eigs),len(self.eigs)),dtype=object)
+        m_disp = np.zeros((len(self.eigs),len(self.eigs)),dtype=object)
+        a = p_disp.shape[0]
         
+        for index in self.indices:
+            i, j = index[0], index[1]
+            disp = np.zeros(len(self.eigs.T))    
+            disp[i] = self.disp[i]
+            disp[j] = self.disp[j]
+            p_disp[i,j] = self.p_displacements(disp) 
+            m_disp[i,j] = self.m_displacements(disp) 
+        self.p_disp = p_disp 
+        self.m_disp = m_disp 
+    
+    def p_displacements(self,disp):
+        return self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+    def m_displacements(self,disp):
+        return self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
 
     def INTC(self,carts,eig_inv,Proj):
         """
@@ -310,3 +317,29 @@ class TransDisp(object):
         A = np.dot(L.T,A) # (Q x 3N)
 
         return A
+        
+        #Diagonal-only code 
+ 
+        #for i in range(len(self.eigs.T)):
+        #    disp = np.zeros(len(self.eigs.T))
+        #    disp[i] = self.disp[i]
+        #    print("Disp #" + str(i+1))
+        #    print(disp)
+        #    # print("Plus Disp:")
+        #    self.DispCart[str(i+1)+'_plus'] = self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-11,self.A.copy())
+        #    # print("Normal Coordinate Value: ")
+        #    # print(i+1)
+        #    # print(self.n_coord[i])
+        #    # print("Minus Disp:")
+        #    self.DispCart[str(i+1)+'_minus'] = self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-11,self.A.copy())
+        #    # print("Normal Coordinate Value: ")
+        #    # print(i+1)
+        #    # print(self.n_coord[i])
+        #    """ This code is probably worthless """
+        #    # norm1 = LA.norm(self.DispCart[str(i+1)+'_plus'] - self.DispCart["ref"])
+        #    # norm2 = LA.norm(self.DispCart[str(i+1)+'_minus'] - self.DispCart["ref"])
+        #    # normDiff = np.abs(norm1-norm2)
+        #    # if self.dispTol > normDiff:
+        #        # self.dispSym[i] = 1
+        #
+        ## self.dispSym = self.dispSym.astype(int)
