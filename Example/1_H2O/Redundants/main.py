@@ -6,8 +6,13 @@ options_kwargs = {
   'cartInsert'        : 7,
   'coords'            : "Redundant",
   # 'reducedDisp'       : True,
-  # 'calc'              : False,
-  'successRegex'      : r"beer"
+  #'calc'              : False,
+  'successRegex'      : r"beer",
+  'off_diag'          : False,
+  'off_diag_bands'    : 3,
+  'off_diag_limit'    : False,
+  'printout_rel_e'    : False,
+  'mode_coupling_check' : False 
 }
 options_obj = Options(**options_kwargs)
 
