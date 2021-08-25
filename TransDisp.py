@@ -60,7 +60,7 @@ class TransDisp(object):
             Compute the A-matrix to convert from normal coordinates to cartesians
         """
         self.A = self.ComputeA(self.s_vectors.B.copy(),self.TED.Proj,
-                               self.eig_inv)
+                               self.eig_inv,self.zmat.massWeight)
 
         """ Generate the normal coordinate values for the reference structure """
         self.n_coord = self.INTC(self.refCarts,self.eig_inv,self.TED.Proj)
@@ -272,7 +272,7 @@ class TransDisp(object):
             if tightDisp:
                 sVec = s_vectors(zmat,options,zmat.variableDictionaryFinal)
                 sVec.run(newCarts,False)
-                A = self.ComputeA(sVec.B,self.TED.Proj,self.eig_inv)
+                A = self.ComputeA(sVec.B,self.TED.Proj,self.eig_inv,self.zmat.massWeight)
             if LA.norm(n_disp) < tolerance:
                 break
         if LA.norm(n_disp) > tolerance:
@@ -283,7 +283,7 @@ class TransDisp(object):
             print(tolerance)
         return newCarts
 
-    def ComputeA(self,B,Proj,eig_inv):
+    def ComputeA(self,B,Proj,eig_inv,u):
         """
             Construct 'A', the commented lines may be useful for getting 
             intensities later. The BB^T product must be linearly independent 
@@ -295,15 +295,17 @@ class TransDisp(object):
         # A = LA.pinv(A) # (s x s)
         # A = BT.dot(A) # (3N x s)
         # A = np.dot(A,Proj).T # (S x 3N)
-        A = LA.pinv(B)
+        
         L = inv(eig_inv)
+        A = LA.pinv(B)
         A = np.dot(A,Proj) # (3N x S)
         A = A.T # (S x 3N)
+       
         """ 
             Similar to the first two commented lines, this will be necessary 
             for intensities. 
         """
-        # self.A = (self.u).dot(self.A)
+        # A = A.dot(np.sqrt(inv(u)))
         """ This step modifies A to convert from normal coords to carts. """
         A = np.dot(L.T,A) # (Q x 3N)
 

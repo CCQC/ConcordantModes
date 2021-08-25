@@ -348,6 +348,8 @@ class ZMAT(object):
         for i in range(len(self.masses)):
             self.masses[i] = self.masses[i]/self.amu_elMass
        
+        self.massWeight = np.diag(np.array(self.masses).repeat(3))
+        
         """
             Print off the internal coordinate and its value in Bohr/Degree
         """
