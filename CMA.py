@@ -21,6 +21,7 @@ from ConcordantModes.TransDisp          import TransDisp
 from ConcordantModes.vulcan_template    import vulcan_template
 from ConcordantModes.ZMAT               import ZMAT
 from ConcordantModes.int2cart           import int2cart
+from ConcordantModes.Algorithm          import Algorithm
 
 class ConcordantModes(object):
     def __init__(self, options):
@@ -44,6 +45,7 @@ class ConcordantModes(object):
         t1 = time.time()
         
         rootdir = os.getcwd()
+        
         
         """
             Parse the output to get all pertinent ZMAT info
@@ -112,17 +114,33 @@ class ConcordantModes(object):
 
         if os.path.exists(rootdir + '/Intder'):
             shutil.rmtree(rootdir + '/Intder')
+        S = TED_GF.S
+        initial_fc = TED_GF.eig_v 
+        eigs = len(S) 
+
+        """ Coming soon, machinery that computes a diagnostic to aid in off-diagonal force constant
+        computation priority!! """
         
+        algo = Algorithm(eigs,S,initial_fc,self.options)
+        algo.run()
+        print(algo.indices)  
+
+
         """
             Recompute the B-Tensors to match the final geometry, 
             then generate the displacements.
         """
+        
+
+
         s_vec = s_vectors(self.zmat,self.options,self.zmat.variableDictionaryFinal)
         s_vec.run(self.zmat.CartesiansFinal,False)
-        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,
-                              self.options.dispTol,self.TED,self.options,
-                              GF=TED_GF)
+        transdisp = TransDisp(s_vec,self.zmat,self.options.disp,init_GF.L,True,self.options.dispTol,self.TED,self.options,algo.indices,GF=TED_GF)
         transdisp.run()
+        #nate
+        eigs = transdisp.eigs 
+        p_disp = transdisp.p_disp 
+        m_disp = transdisp.m_disp 
         
         
         if self.options.dispCheck:
@@ -136,13 +154,14 @@ class ConcordantModes(object):
         progname = prog.split('@')[0]
         
         if self.options.calc:
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, 
-                                    self.options.cartInsert)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert,p_disp,m_disp,self.options,algo.indices)
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
             for i in os.listdir(rootdir + '/Disps'):
                 dispList.append(i)
+            print('printing disp list')
+            print(dispList) 
             
             """
                 This code generates the submit script for the displacements, 
@@ -184,26 +203,34 @@ class ConcordantModes(object):
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,
-                        transdisp.n_coord)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord,eigs,algo.indices)
         Reap_obj.run()
         os.chdir('..')
+        
+        #nate
+        p_en_array = Reap_obj.p_en_array 
+        m_en_array = Reap_obj.m_en_array 
+        ref_en =     Reap_obj.ref_en
 
         """
             Compute the force constants here, currently can only do diagonal 
             force constants
         """
-        fc = ForceConstant(transdisp, Reap_obj.energiesDict)
+        #fc = ForceConstant(transdisp, Reap_obj.energiesDict)
+        
+        #nate
+        fc = ForceConstant(transdisp,p_en_array,m_en_array,ref_en,self.options,algo.indices)
         fc.run()
         print('Computed Force Constants:')
         print(fc.FC)
-
+       
         """
             I will need to make a method just for reading in force constants, 
             for now the diagonals will do.
         """
-        self.F = np.diag(fc.FC)
-
+        #self.F = np.diag(fc.FC)
+        #nate
+        self.F = fc.FC
         """
             Recompute the G-matrix with the new geometry, and then transform 
             the G-matrix using the lower level of theory eigenvalue matrix. 
