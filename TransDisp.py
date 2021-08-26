@@ -117,9 +117,9 @@ class TransDisp(object):
         self.m_disp = m_disp 
     
     def p_displacements(self,disp):
-        return self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+        return self.CoordConvert(disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy(),False,self.zmat,self.options)
     def m_displacements(self,disp):
-        return self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy())
+        return self.CoordConvert(-disp,self.n_coord.copy(),self.refCarts.copy(),50,1.0e-9,self.A.copy(),False,self.zmat,self.options)
 
     def INTC(self,carts,eig_inv,Proj):
         """
