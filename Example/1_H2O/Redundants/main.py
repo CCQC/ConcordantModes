@@ -6,7 +6,7 @@ options_kwargs = {
   'cartInsert'        : 7,
   'coords'            : "Redundant",
   # 'reducedDisp'       : True,
-  #'calc'              : False,
+  'calc'              : False,
   'successRegex'      : r"beer",
   'off_diag'          : False,
   'off_diag_bands'    : 3,
