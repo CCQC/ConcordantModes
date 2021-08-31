@@ -5,13 +5,10 @@ memory 14 gb
 molecule {
   0 1
   units bohr
- H   -0.0000000000   -1.4194589775    0.9984134852
- O    0.0000000000   -0.0000000000   -0.1304833504
- H    0.0000000000    1.4194589775    0.9984134852
 }
 
 set {
-  basis cc-pvtz
+  basis cc-pvdz
   reference rhf
   e_convergence 10 
   d_convergence 10

@@ -30,10 +30,8 @@ class ConcordantModes(object):
             This constant is from:
             https://physics.nist.gov/cgi-bin/cuu/Value?hr 
             If this link dies, find the new link on NIST
-            for the Hartree to Joule conversion and pop
-            it in there.
-            There is a standard uncertainty of 0.0000000000085
-            to this value.
+            for the Hartree to Joule conversion and pop it in there.
+            There is a standard uncertainty of 0.0000000000085 to this value.
         """
         self.mdyne_Hart = 4.3597447222071
         """
@@ -74,20 +72,90 @@ class ConcordantModes(object):
 
         """
             Read in FC matrix in cartesians, then convert to internals.
+        
+            I am adding a process to compute an initial hessian in internal coordinates.
         """
+        initBool = False
         if os.path.exists(rootdir + '/fc.dat'):
             f_read = F_Read("fc.dat")
         elif os.path.exists(rootdir + '/FCMFINAL'):
             f_read = F_Read("FCMFINAL")
         else:
-            print("Need to specify the force constants!")
-            raise RuntimeError
-        f_read.run()
-        f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False, 
-                        self.TED, self.options.units)
-        f_conv.run()
-        if self.options.coords != "ZMAT":
-            f_conv.F = np.dot(self.TED.Proj.T,np.dot(f_conv.F,self.TED.Proj))
+            initBool = True
+            
+            # First generate displacements in internal coordinates
+            indices = np.triu_indices(len(s_vec.Proj.T))
+            indices = np.array(indices).T
+            eigsInit = np.eye(len(s_vec.Proj.T))
+
+            initDisp = TransDisp(s_vec,self.zmat,self.options.disp,eigsInit,True,self.options.dispTol,self.TED,self.options,indices)
+            initDisp.run()
+            progInit = self.options.programInit
+            prognameInit = progInit.split('@')[0]
+            
+            DirObjInit = DirectoryTree(prognameInit, self.zmat, initDisp, self.options.cartInsertInit,initDisp.p_disp,initDisp.m_disp,self.options,indices,"templateInit.dat")
+            DirObjInit.run()
+            os.chdir(rootdir + '/Disps')
+            dispList = []
+            for i in os.listdir(rootdir + '/Disps'):
+                dispList.append(i)
+            
+            v_template = vulcan_template(self.options,len(dispList),prognameInit,progInit)
+            out = v_template.run()
+            with open('displacements.sh','w') as file:
+                file.write(out)
+            
+            pipe = subprocess.PIPE
+            
+            process = subprocess.run('qsub displacements.sh', stdout=pipe, 
+                                     stderr=pipe, shell=True)
+            self.outRegex = re.compile(r'Your\s*job\-array\s*(\d*)')
+            self.job_id = \
+                int(re.search(self.outRegex,str(process.stdout)).group(1))
+            
+            self.jobFinRegex = re.compile(r'taskid')
+            while(True):
+                qacct_proc = subprocess.run(['qacct','-j',str(self.job_id)], 
+                                            stdout=pipe, stderr=pipe)
+                qacct_string = str(qacct_proc.stdout)
+                job_match = re.findall(self.jobFinRegex,qacct_string)
+                if len(job_match) == len(dispList):
+                    break
+                time.sleep(10)
+
+            output = str(process.stdout)
+            error = str(process.stderr)  
+            
+            ReapObjInit = Reap(prognameInit,self.zmat,initDisp.DispCart,self.options,initDisp.n_coord,eigsInit,indices)
+            ReapObjInit.run()
+            # os.chdir('..')
+            print('GiraffeDirectory:')
+            print(os.getcwd())
+            # raise RuntimeError
+            
+            #nate
+            p_en_arrayInit = ReapObjInit.p_en_array 
+            m_en_arrayInit = ReapObjInit.m_en_array 
+            ref_enInit =     ReapObjInit.ref_en
+
+            fcInit = ForceConstant(initDisp,p_en_arrayInit,m_en_arrayInit,ref_enInit,self.options,indices)
+            fcInit.run()
+            print('Computed Force Constants:')
+            print(fcInit.FC)
+
+            # raise RuntimeError
+
+        if os.path.exists(rootdir + '/fc.dat') or os.path.exists(rootdir + '/FCMFINAL'):
+            f_read.run()
+            f_conv = F_conv(f_read.FC_mat, s_vec, self.zmat, "internal", False, 
+                            self.TED, self.options.units)
+            f_conv.run()
+            F = f_conv.F
+        else:
+            F = fcInit.FC
+        
+        if self.options.coords != "ZMAT" and not initBool:
+            F = np.dot(self.TED.Proj.T,np.dot(F,self.TED.Proj))
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED.Proj.T,np.dot(g_mat.G,self.TED.Proj))
         
@@ -95,7 +163,7 @@ class ConcordantModes(object):
             Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         """
         print("Initial Frequencies:")
-        init_GF = GF_Method(g_mat.G.copy(),f_conv.F.copy(),self.options.tol,
+        init_GF = GF_Method(g_mat.G.copy(),F.copy(),self.options.tol,
                             self.options.projTol,self.zmat,self.TED)
         init_GF.run()
 
@@ -104,7 +172,7 @@ class ConcordantModes(object):
         """
         self.G = np.dot(np.dot(LA.inv(init_GF.L),g_mat.G),LA.inv(init_GF.L).T)
         self.G[np.abs(self.G) < self.options.tol] = 0
-        self.F = np.dot(np.dot(init_GF.L.T,f_conv.F),init_GF.L)
+        self.F = np.dot(np.dot(init_GF.L.T,F),init_GF.L)
         self.F[np.abs(self.F) < self.options.tol] = 0
         
         print("TED Frequencies:")
@@ -112,8 +180,8 @@ class ConcordantModes(object):
                            self.zmat,self.TED)
         TED_GF.run()
 
-        if os.path.exists(rootdir + '/Intder'):
-            shutil.rmtree(rootdir + '/Intder')
+        # if os.path.exists(rootdir + '/Intder'):
+            # shutil.rmtree(rootdir + '/Intder')
         S = TED_GF.S
         initial_fc = TED_GF.eig_v 
         eigs = len(S) 
@@ -154,7 +222,7 @@ class ConcordantModes(object):
         progname = prog.split('@')[0]
         
         if self.options.calc:
-            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert,p_disp,m_disp,self.options,algo.indices)
+            Dir_obj = DirectoryTree(progname, self.zmat, transdisp, self.options.cartInsert,p_disp,m_disp,self.options,algo.indices,"template.dat")
             Dir_obj.run()
             os.chdir(rootdir + '/Disps')
             dispList = []
@@ -285,6 +353,6 @@ class ConcordantModes(object):
         # cart_conv.run()
 
         t2 = time.time()
-        
+       
         # print(Final_GF.Freq - init_GF.Freq)
         print('This program took ' + str(t2-t1) + ' seconds to run.')

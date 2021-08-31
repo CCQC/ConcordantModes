@@ -78,12 +78,12 @@ class Reap(object):
         print(rel_en_m)
         os.chdir('..')
         if self.options.printout_rel_e: 
-            auxillary = ''
+            auxiliary = ''
             header = 'Index, relative energy, directory \n'
-            with open("auxillary", 'a') as file:
+            with open("auxiliary", 'a') as file:
                 file.writelines(header)
             for energy in relative_energies:
-                with open("auxillary", 'a') as file:
+                with open("auxiliary", 'a') as file:
                     file.writelines(str(energy) + '\n')
     
     def reap_energies(self,direc,successRegex,energyRegex):

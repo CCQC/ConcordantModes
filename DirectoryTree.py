@@ -7,7 +7,7 @@ import numpy as np
 
     
 class DirectoryTree(object):
-    def __init__(self,progname,zmat,disps,insertionIndex,p_disp,m_disp,options,indices):
+    def __init__(self,progname,zmat,disps,insertionIndex,p_disp,m_disp,options,indices,template):
         # self.dispSym = dispSym
         self.progname = progname
         self.zmat = zmat
@@ -17,6 +17,7 @@ class DirectoryTree(object):
         self.p_disp = p_disp
         self.m_disp = m_disp
         self.options = options
+        self.template = template
         self.indices = indices 
     def Make_Input(self,data,dispp,n_at,at,index):	 
         space = ' '
@@ -49,7 +50,7 @@ class DirectoryTree(object):
         n_atoms = len(self.zmat.atomList)
         
         if progname == 'molpro' or progname == 'psi4' or progname =='cfour':
-            with open('template.dat','r') as file:
+            with open(self.template,'r') as file:
                 data = file.readlines()
         else:
             print('Specified program not supported: ' + progname)
@@ -62,8 +63,11 @@ class DirectoryTree(object):
         if os.path.exists(root+'/GENBAS'):
             genbas = True
         data_buff = data.copy()
+        print(os.getcwd())
+        if os.path.exists(os.getcwd() + '/oldDisps'):
+            shutil.rmtree('oldDisps',ignore_errors=True)
         if os.path.exists(os.getcwd() + '/Disps'):
-            shutil.rmtree('Disps',ignore_errors=True)
+            shutil.move('Disps','oldDisps')
         os.mkdir('Disps')
         os.chdir('./Disps')
         os.mkdir("1")
