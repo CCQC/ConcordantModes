@@ -255,7 +255,7 @@ class ZMAT(object):
         """
         indices = []
         transdisp = TransDisp(1,self,1,1,False,self.dispTol,np.array([]),self.options,indices)
-        I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices))
+        I = np.eye(len(self.bondIndices)+len(self.angleIndices)+len(self.torsionIndices)+len(self.oopIndices)+len(self.linIndices))
         variables1 = transdisp.INTC(self.CartesiansInit,I,I)
         variables2 = transdisp.INTC(self.CartesiansFinal,I,I)
         for i in range(

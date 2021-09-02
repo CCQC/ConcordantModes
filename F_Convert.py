@@ -62,10 +62,6 @@ class F_conv(object):
                 self.Print_const()
         elif self.coord.lower() == "cartesian":
             self.F = np.einsum('ai,bj,ab->ij',self.s_vec.B,self.s_vec.B,self.F)
-            """ 
-                These force constants are converted from Hartree/bohr^2 to 
-                mdyne/Ang 
-            """
             if self.Print:
                 self.N = len(self.zmat.atomList)*3
                 self.Print_const()
@@ -86,7 +82,7 @@ class F_conv(object):
                     '{:20.10f}'.format(self.F_print[3*(len(self.F_print)//3) 
                                        + i])
             FC_output += '\n'
-        with open('output.default.hess','w') as file:
+        with open('fcFinal.dat','w') as file:
             file.write(FC_output)
                 
 

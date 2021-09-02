@@ -22,8 +22,13 @@ class G_Matrix(object):
         """
         tol = 1e-12
         u = np.array(self.zmat.masses)
+        for i in range(len(u)):
+            if self.zmat.atomList[i] == "X":
+                u[i] = 0
+            else:
+                u[i] = 1./u[i]
         u = np.repeat(u,3)
         u = np.diag(u)
-        u = inv(u)
+        # u = inv(u)
         self.G = B.dot(u.dot(B.T))
         self.G[np.abs(self.G) < tol] = 0

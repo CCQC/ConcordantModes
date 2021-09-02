@@ -4,7 +4,7 @@ import shutil
 import re
 
 class Reap(object):
-    def __init__(self, progname, zmat, dispcart, options, n_coord,eigs,indices):
+    def __init__(self, progname, zmat, dispcart, options, n_coord,eigs,indices,energyRegex,successRegex):
         self.progname = progname
         self.zmat = zmat
         self.dispcart = dispcart
@@ -13,13 +13,15 @@ class Reap(object):
         self.dispSym = [0]
         #nate
         self.eigs = eigs
+        self.energyRegex = energyRegex
+        self.successRegex = successRegex
         self.indices = indices
     def run(self):
         """
             Define energy search regex
         """
-        energyRegex = re.compile(self.options.energyRegex)
-        successRegex = re.compile(self.options.successRegex)
+        energyRegex = re.compile(self.energyRegex)
+        successRegex = re.compile(self.successRegex)
 
         rootdir = os.getcwd()
         n_atoms = len(self.zmat.atomList)

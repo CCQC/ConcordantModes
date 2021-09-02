@@ -126,7 +126,7 @@ class ConcordantModes(object):
             output = str(process.stdout)
             error = str(process.stderr)  
             
-            ReapObjInit = Reap(prognameInit,self.zmat,initDisp.DispCart,self.options,initDisp.n_coord,eigsInit,indices)
+            ReapObjInit = Reap(prognameInit,self.zmat,initDisp.DispCart,self.options,initDisp.n_coord,eigsInit,indices,self.options.energyRegexInit,self.options.successRegexInit)
             ReapObjInit.run()
             # os.chdir('..')
             print('GiraffeDirectory:')
@@ -271,7 +271,7 @@ class ConcordantModes(object):
         """
         if not self.options.calc:
             os.chdir("Disps")
-        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord,eigs,algo.indices)
+        Reap_obj = Reap(progname,self.zmat,transdisp.DispCart,self.options,transdisp.n_coord,eigs,algo.indices,self.options.energyRegex,self.options.successRegex)
         Reap_obj.run()
         os.chdir('..')
         
@@ -349,8 +349,11 @@ class ConcordantModes(object):
             One further note. I will likely have to convert my force constants 
             within the F_Conv back to internal coordinates first.
         """
-        # cart_conv = F_conv(self.F, s_vec, self.zmat, "cartesian", True)
-        # cart_conv.run()
+        self.F = np.dot(np.dot(transdisp.eig_inv.T,self.F),transdisp.eig_inv)
+        if self.options.coords != "ZMAT":
+            self.F = np.dot(self.TED.Proj,np.dot(self.F,self.TED.Proj.T))
+        cart_conv = F_conv(self.F, s_vec, self.zmat, "cartesian", True, self.TED,self.options.units)
+        cart_conv.run()
 
         t2 = time.time()
        
