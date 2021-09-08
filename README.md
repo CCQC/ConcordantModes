@@ -7,15 +7,13 @@ As of right now, the user must be on the Vulcan cluster.
 
 // Dependencies //
 
-User must have:
+User must have at least:
 Python version 3.5.4
 Numpy version 1.13.1
 
-No other versions will be guaranteed to work.
-
 A simple way to ensure this program may be run is by creating a conda environment with the following command:
 
-conda create --name TEST python=3.9 sympy
+conda create --name CMA python=3.9 sympy numpy scipy
 
 If you need to install anaconda, consult this website:
 https://www.anaconda.com/products/individual
@@ -31,16 +29,16 @@ This file contains geometric information about the system of interest. There is 
 
 The "ZMAT" block contains connectivity information for specifying the internal coordinates of the molecule by which the normal modes will be described.
 There are several possible coordinate specification systems that may be utilized and these are outlined in the description of the "coords" keyword from the options.py file.
-Furtheremore, the user may consult the "Example" directory contained herein for more guidance on how to construct the different connectivities.
+Furthermore, the user may consult the "Example" directory contained herein for more guidance on how to construct the different connectivities.
 
-The "cart" block contains the cartesian structures for the system. If two structures are entered (separated by a --- on a new line), the first structure will be used to construct the starting normal modes from the provided force constants. These normal modes are then placed atop the second structure and the requisite displacements are generated to compute force constants for these modes and the subsequent frequencies. If only one structure is entered, the same process will take place but all atop a single structure. Currently the geometric units must be Bohr.
+The "cart" block contains the cartesian structures for the system. If two structures are entered (separated by a --- on a new line), the first structure will be used to construct the starting normal modes from the provided force constants. These normal modes are then placed atop the second structure and the requisite displacements are generated to compute force constants for these modes and the subsequent frequencies. If only one structure is entered, the same process will take place but all atop a single structure. The default units are bohr.
 
 template.dat:
 This is the template input file for an interfacing quantum chemistry code. The displaced geometries are inserted to this file and single point energies for each displaced geometry are computed. The energies are then reaped and a second order numerical derivative is performed to calculate force constants from these energies.
 
 main.py:
 This is the main file that imports the Concordant Mode options and program, and then runs it. Future work wil provide documentation for each "options" keyword.
-To run the program, simply enter "python main.py" or "nohup python main.py &" if you would like to retain the output.
+To run the program, simply enter "python main.py" or "nohup python -u main.py &" if you would like to retain the output.
 
 fc.dat:
 This file contains the cartesian force constants of the first structure (or the only structure).
