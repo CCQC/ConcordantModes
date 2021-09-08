@@ -3,107 +3,129 @@ import os
 import shutil
 import re
 
+
 class Reap(object):
-    def __init__(self, progname, zmat, dispcart, options, n_coord,eigs,indices,energyRegex,successRegex):
+    def __init__(
+        self,
+        progname,
+        zmat,
+        dispcart,
+        options,
+        n_coord,
+        eigs,
+        indices,
+        energyRegex,
+        successRegex,
+    ):
         self.progname = progname
         self.zmat = zmat
         self.dispcart = dispcart
         self.options = options
         self.n_coord = n_coord
         self.dispSym = [0]
-        #nate
+        # nate
         self.eigs = eigs
         self.energyRegex = energyRegex
         self.successRegex = successRegex
         self.indices = indices
+
     def run(self):
         """
-            Define energy search regex
+        Define energy search regex
         """
         energyRegex = re.compile(self.energyRegex)
         successRegex = re.compile(self.successRegex)
 
         rootdir = os.getcwd()
         n_atoms = len(self.zmat.atomList)
-        
+
         n_disp = len(self.dispcart)
         self.Energies = np.array([])
-        
+
         progname = self.progname
-        print("If something looks wrong with the final frequencies, check \
-                these energies!")
+        print(
+            "If something looks wrong with the final frequencies, check \
+                these energies!"
+        )
         print("(Job number 1 == Reference energy) :D")
 
-        os.chdir("./"+str(1))
-        with open("output.dat",'r') as file:
+        os.chdir("./" + str(1))
+        with open("output.dat", "r") as file:
             data = file.read()
-        if not re.search(successRegex,data):
-            print('Energy failed at ' + str('ref'))
+        if not re.search(successRegex, data):
+            print("Energy failed at " + str("ref"))
             raise RuntimeError
-        os.chdir('..')
-        ref_en = float(re.findall(energyRegex,data)[0]) 
+        os.chdir("..")
+        ref_en = float(re.findall(energyRegex, data)[0])
         print("Reference energy: " + str(ref_en))
-        
-    
+
         indices = self.indices
-        eigs = self.eigs 
-        p_en_array = np.zeros((len(eigs),len(eigs)))
-        m_en_array = np.zeros((len(eigs),len(eigs)))
-        rel_en_p = np.zeros((len(eigs),len(eigs)))
-        rel_en_m = np.zeros((len(eigs),len(eigs)))
+        eigs = self.eigs
+        p_en_array = np.zeros((len(eigs), len(eigs)))
+        m_en_array = np.zeros((len(eigs), len(eigs)))
+        rel_en_p = np.zeros((len(eigs), len(eigs)))
+        rel_en_m = np.zeros((len(eigs), len(eigs)))
         relative_energies = []
-       
-        
-        direc = 2            
+
+        direc = 2
         for index in indices:
-            i,j = index[0], index[1] 
-            p_en_array[i,j] = energy = self.reap_energies(direc,successRegex,energyRegex)
+            i, j = index[0], index[1]
+            p_en_array[i, j] = energy = self.reap_energies(
+                direc, successRegex, energyRegex
+            )
             print(energy)
             rel = ref_en - energy
-            rel_en_p[i,j] = rel 
-            relative_energies.append([(i,j), rel, direc]) 
-            m_en_array[i,j] = energy = self.reap_energies(direc+1,successRegex,energyRegex)
+            rel_en_p[i, j] = rel
+            relative_energies.append([(i, j), rel, direc])
+            m_en_array[i, j] = energy = self.reap_energies(
+                direc + 1, successRegex, energyRegex
+            )
             print(energy)
             rel = ref_en - energy
-            rel_en_m[i,j] = rel 
-            relative_energies.append([(i,j), rel, direc]) 
-            direc += 2 
-        
-                    
-        self.p_en_array = p_en_array 
-        self.m_en_array = m_en_array 
+            rel_en_m[i, j] = rel
+            relative_energies.append([(i, j), rel, direc])
+            direc += 2
+
+        self.p_en_array = p_en_array
+        self.m_en_array = m_en_array
         self.ref_en = ref_en
-        np.set_printoptions(precision=2, linewidth = 120)
-        print("Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements")
+        np.set_printoptions(precision=2, linewidth=120)
+        print(
+            "Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements"
+        )
         print(rel_en_p)
-        print("Relative energies minus-displacements on the diagonal and minus/minus-displacements on the off-diagonal elements")
+        print(
+            "Relative energies minus-displacements on the diagonal and minus/minus-displacements on the off-diagonal elements"
+        )
         print(rel_en_m)
-        os.chdir('..')
-        if self.options.printout_rel_e: 
-            auxiliary = ''
-            header = 'Index, relative energy, directory \n'
-            with open("auxiliary", 'a') as file:
+        os.chdir("..")
+        if self.options.printout_rel_e:
+            auxiliary = ""
+            header = "Index, relative energy, directory \n"
+            with open("auxiliary", "a") as file:
                 file.writelines(header)
             for energy in relative_energies:
-                with open("auxiliary", 'a') as file:
-                    file.writelines(str(energy) + '\n')
-    
-    def reap_energies(self,direc,successRegex,energyRegex):
-        os.chdir("./"+str(direc))
-        with open("output.dat",'r') as file:
+                with open("auxiliary", "a") as file:
+                    file.writelines(str(energy) + "\n")
+
+    def reap_energies(self, direc, successRegex, energyRegex):
+        os.chdir("./" + str(direc))
+        with open("output.dat", "r") as file:
             data = file.read()
-        if not re.search(successRegex,data):
-            print('Energy failed at ' + os.getcwd())
+        if not re.search(successRegex, data):
+            print("Energy failed at " + os.getcwd())
             raise RuntimeError
-        energy = float(re.findall(energyRegex,data)[0])
-         
-        os.chdir('..')
+        energy = float(re.findall(energyRegex, data)[0])
+
+        os.chdir("..")
         return energy
-        #with open("auxillary.dat", 'w') as file:
+        # with open("auxillary.dat", 'w') as file:
         #    for energy in relative_energies:
-        #        file.writelines(energy)  
-        #print(relative_energies)
-        #np.set_printoptions(precision=8)
+        #        file.writelines(energy)
+        # print(relative_energies)
+        # np.set_printoptions(precision=8)
+
+
 #        self.energiesDict['ref'] = float(self.Energies[0])
 #        Sum = 0
 #        for i in range(n_disp - np.sum(self.dispSym) - 1):
@@ -124,7 +146,7 @@ class Reap(object):
 ##            Sum += 1
 #            # Sum += self.dispSym[k]
 
-   #old diagonal-only code
+# old diagonal-only code
 
 #        for i in range(n_disp - np.sum(self.dispSym)):
 #            os.chdir("./"+str(i+1))

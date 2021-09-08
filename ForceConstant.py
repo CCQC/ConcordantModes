@@ -13,49 +13,54 @@ from numpy import linalg as LA
     [E_(ij_plus) - E_(i_plus,j) - E_(i,j_plus) + E_(ref) - E_(i_minus,j) - E_(i,j_minus) + E_(i_minus,j_minus) / 2*disp_size^2
 """
 
+
 class ForceConstant(object):
-    def __init__(self,disp,p_en_array,m_en_array,ref_en,options,indices):
+    def __init__(self, disp, p_en_array, m_en_array, ref_en, options, indices):
         self.options = options
         self.disp = disp
         self.p_en_array = p_en_array
         self.m_en_array = m_en_array
         self.ref_en = ref_en
         self.indices = indices
+
     def run(self):
-        indices = self.indices  
-        p_en_array = self.p_en_array 
-        m_en_array = self.m_en_array  
+        indices = self.indices
+        p_en_array = self.p_en_array
+        m_en_array = self.m_en_array
         disp = self.disp
         e_r = self.ref_en
         a = self.p_en_array.shape[0]
-        self.FC = np.zeros((a,a))
+        self.FC = np.zeros((a, a))
         for index in indices:
-            i,j = index[0], index[1] 
-            e_pi, e_pj = p_en_array[i,i], p_en_array[j,j] 
-            e_mi, e_mj = m_en_array[i,i], m_en_array[j,j] 
-            e_pp, e_mm = p_en_array[i,j], m_en_array[i,j]  
+            i, j = index[0], index[1]
+            e_pi, e_pj = p_en_array[i, i], p_en_array[j, j]
+            e_mi, e_mj = m_en_array[i, i], m_en_array[j, j]
+            e_pp, e_mm = p_en_array[i, j], m_en_array[i, j]
             if i == j:
-                self.FC[i,i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i]) 
-            elif i !=j:
-                self.FC[i,j] = self.off_diag_fc(e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp.disp[i])
-        #Take advantage of FC[i,j] = FC[j,i]
-        cf = np.triu_indices(a,1)
-        il = (cf[1],cf[0])
+                self.FC[i, i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i])
+            elif i != j:
+                self.FC[i, j] = self.off_diag_fc(
+                    e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp.disp[i]
+                )
+        # Take advantage of FC[i,j] = FC[j,i]
+        cf = np.triu_indices(a, 1)
+        il = (cf[1], cf[0])
         self.FC[il] = self.FC[cf]
 
     """Functions for computing the diagonal and off-diagonal force constants """
-    def diag_fc(self,e_p, e_m, e_r, disp):
-        fc = (e_p - 2*e_r + e_m)/(disp**2) 
+
+    def diag_fc(self, e_p, e_m, e_r, disp):
+        fc = (e_p - 2 * e_r + e_m) / (disp ** 2)
         return fc
 
-    def off_diag_fc(self,e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp):
-        fc =  ((e_pp - e_pi - e_pj + 2*e_r - e_mi - e_mj + e_mm)/(2*(disp**2)))
+    def off_diag_fc(self, e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp):
+        fc = (e_pp - e_pi - e_pj + 2 * e_r - e_mi - e_mj + e_mm) / (2 * (disp ** 2))
         return fc
-     
- 
-#old diagonal only force constant code
 
-#class ForceConstant(object):
+
+# old diagonal only force constant code
+
+# class ForceConstant(object):
 #    def __init__(self,disp,energiesDict):
 #        self.disp = disp
 #        self.energiesDict = energiesDict

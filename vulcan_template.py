@@ -7,27 +7,28 @@ from numpy import linalg as LA
     This file just stores the vulcan qsub script
 """
 
+
 class vulcan_template(object):
-    def __init__(self,options,job_num,progname,prog):
+    def __init__(self, options, job_num, progname, prog):
         self.progname = progname
         self.progdict = {
             "molpro": "molpro -n $NSLOTS --nouse-logfile --no-xml-output -o \
                 output.dat input.dat",
             "psi4": "psi4 -n $NSLOTS",
-            "cfour": prog + '+vectorization'
+            "cfour": prog + "+vectorization",
         }
-        self.odict = {                               
-            'q':        options.queue,                      
-            'nslots':   options.nslots,    
-            'jarray':   '1-{}'.format(job_num), 
-            'progname': progname,               
-            'prog':     prog,                   
-            'tc':       str(job_num),           
-            'cline':    self.progdict[progname]      
+        self.odict = {
+            "q": options.queue,
+            "nslots": options.nslots,
+            "jarray": "1-{}".format(job_num),
+            "progname": progname,
+            "prog": prog,
+            "tc": str(job_num),
+            "cline": self.progdict[progname],
         }
-# This can be inserted back in if the sync keyword is sorted
-#$ -sync y
-        if self.progname == 'cfour':
+        # This can be inserted back in if the sync keyword is sorted
+        # $ -sync y
+        if self.progname == "cfour":
             self.vulcan_template = """#!/bin/sh
 #$ -q {q}
 #$ -N Concordant

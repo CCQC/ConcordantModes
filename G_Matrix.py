@@ -8,15 +8,16 @@ from numpy import linalg as LA
     the L-matrix.
 """
 
+
 class G_Matrix(object):
     def __init__(self, zmat, s_vectors, options):
-        self.zmat      = zmat
+        self.zmat = zmat
         self.s_vectors = s_vectors
-        self.options   = options
+        self.options = options
 
     def run(self):
         B = self.s_vectors.B
-        
+
         """
             Compute and temper G
         """
@@ -26,8 +27,8 @@ class G_Matrix(object):
             if self.zmat.atomList[i] == "X":
                 u[i] = 0
             else:
-                u[i] = 1./u[i]
-        u = np.repeat(u,3)
+                u[i] = 1.0 / u[i]
+        u = np.repeat(u, 3)
         u = np.diag(u)
         # u = inv(u)
         self.G = B.dot(u.dot(B.T))
