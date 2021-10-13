@@ -3,14 +3,13 @@ from numpy.linalg import inv
 from numpy import linalg as LA
 
 
-"""
+class VulcanTemplate(object):
+    """
     This file just stores the vulcan qsub script
-"""
+    """
 
-
-class vulcan_template(object):
-    def __init__(self, options, job_num, progname, prog):
-        self.progname = progname
+    def __init__(self, options, job_num, prog_name, prog):
+        self.prog_name = prog_name
         self.progdict = {
             "molpro": "molpro -n $NSLOTS --nouse-logfile --no-xml-output -o \
                 output.dat input.dat",
@@ -21,14 +20,14 @@ class vulcan_template(object):
             "q": options.queue,
             "nslots": options.nslots,
             "jarray": "1-{}".format(job_num),
-            "progname": progname,
+            "prog_name": prog_name,
             "prog": prog,
             "tc": str(job_num),
-            "cline": self.progdict[progname],
+            "cline": self.progdict[prog_name],
         }
         # This can be inserted back in if the sync keyword is sorted
         # $ -sync y
-        if self.progname == "cfour":
+        if self.prog_name == "cfour":
             self.vulcan_template = """#!/bin/sh
 #$ -q {q}
 #$ -N Concordant
