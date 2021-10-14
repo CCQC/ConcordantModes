@@ -165,13 +165,35 @@ class Zmat(object):
                     self.torsion_variables.append("D" + str(i - first_index))
         elif self.options.coords.upper() == "REDUNDANT":
             count = 0
-            for i in range(len(zmat_output)):
-                if re.search(bond_regex, zmat_output[i]):
-                    count += 1
-                    List = re.findall(bond_regex, zmat_output[i])[0]
-                    self.bond_indices.append(List)
-                    self.bond_variables.append("R" + str(count))
-            self.bond_indices = np.array(self.bond_indices)
+            if self.options.interatomic_distance:
+                self.bond_indices = np.array([])
+                indices = []
+                transdisp_inter = TransDisp(
+                    1, self, 1, 1, False, self.disp_tol, np.array([]), self.options, indices
+                )
+                inter_atomic_len = np.zeros((len(self.cartesians_init),len(self.cartesians_init)))
+                for i in range(len(self.cartesians_init)):
+                    for j in range(i):
+                       inter_atomic_len[j,i] = transdisp_inter.calc_bond(self.cartesians_init[i],self.cartesians_init[j])
+                       if inter_atomic_len[j,i] < self.options.bond_tol:
+                           count += 1
+                           self.bond_indices = np.append(self.bond_indices,np.array([str(j+1),str(i+1)]))
+                           self.bond_variables.append("R" + str(count))
+                    self.bond_indices = np.reshape(self.bond_indices,(-1,2))
+                print("Interatomic Distance Matrix:")
+                print(inter_atomic_len)
+                print("Bond tolerance:")
+                print(self.options.bond_tol)
+                print("Resulting bond indices:")
+                print(self.bond_indices)
+            else:
+                for i in range(len(zmat_output)):
+                    if re.search(bond_regex, zmat_output[i]):
+                        count += 1
+                        List = re.findall(bond_regex, zmat_output[i])[0]
+                        self.bond_indices.append(List)
+                        self.bond_variables.append("R" + str(count))
+                self.bond_indices = np.array(self.bond_indices)
             # Form all possible angles from bonds
             self.angle_indices = np.array([])
             count = 0

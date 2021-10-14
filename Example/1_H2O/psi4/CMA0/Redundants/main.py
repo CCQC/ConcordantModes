@@ -15,7 +15,7 @@ options_kwargs = {
 }
 options_obj = Options(**options_kwargs)
 
-# 3. call Mixed Hessian Program
+# 3. call Concordant Modes Program
 from concordantmodes.cma import ConcordantModes
 
 CMA_obj = ConcordantModes(options_obj)
