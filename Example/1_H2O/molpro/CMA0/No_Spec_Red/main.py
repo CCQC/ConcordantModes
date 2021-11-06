@@ -6,8 +6,8 @@ options_kwargs = {
     "energy_regex": r"\(T\) total energy\s+(\-\d+\.\d+)",
     "cart_insert": 9,
     "coords": "Redundant",
-    "interatomic_distance" : True,
-    "inter_tol" : 2.0,
+    "interatomic_distance": True,
+    "inter_tol": 2.0,
     "success_regex": r"Variable memory released",
 }
 options_obj = Options(**options_kwargs)

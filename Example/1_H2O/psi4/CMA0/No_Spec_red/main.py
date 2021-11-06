@@ -7,8 +7,8 @@ options_kwargs = {
     "cart_insert": 7,
     "coords": "Redundant",
     "success_regex": r"beer",
-    "interatomic_distance" : True,
-    "inter_tol" : 2.0
+    "interatomic_distance": True,
+    "inter_tol": 2.0,
 }
 options_obj = Options(**options_kwargs)
 

@@ -169,17 +169,31 @@ class Zmat(object):
                 self.bond_indices = np.array([])
                 indices = []
                 transdisp_inter = TransDisp(
-                    1, self, 1, 1, False, self.disp_tol, np.array([]), self.options, indices
+                    1,
+                    self,
+                    1,
+                    1,
+                    False,
+                    self.disp_tol,
+                    np.array([]),
+                    self.options,
+                    indices,
                 )
-                inter_atomic_len = np.zeros((len(self.cartesians_init),len(self.cartesians_init)))
+                inter_atomic_len = np.zeros(
+                    (len(self.cartesians_init), len(self.cartesians_init))
+                )
                 for i in range(len(self.cartesians_init)):
                     for j in range(i):
-                       inter_atomic_len[j,i] = transdisp_inter.calc_bond(self.cartesians_init[i],self.cartesians_init[j])
-                       if inter_atomic_len[j,i] < self.options.bond_tol:
-                           count += 1
-                           self.bond_indices = np.append(self.bond_indices,np.array([str(j+1),str(i+1)]))
-                           self.bond_variables.append("R" + str(count))
-                    self.bond_indices = np.reshape(self.bond_indices,(-1,2))
+                        inter_atomic_len[j, i] = transdisp_inter.calc_bond(
+                            self.cartesians_init[i], self.cartesians_init[j]
+                        )
+                        if inter_atomic_len[j, i] < self.options.bond_tol:
+                            count += 1
+                            self.bond_indices = np.append(
+                                self.bond_indices, np.array([str(j + 1), str(i + 1)])
+                            )
+                            self.bond_variables.append("R" + str(count))
+                    self.bond_indices = np.reshape(self.bond_indices, (-1, 2))
                 print("Interatomic Distance Matrix:")
                 print(inter_atomic_len)
                 print("Bond tolerance:")

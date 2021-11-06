@@ -95,34 +95,36 @@ class ConcordantModes(object):
             prog_init = self.options.program_init
             prog_name_init = prog_init.split("@")[0]
 
-            dir_obj_init = DirectoryTree(
-                prog_name_init,
-                self.zmat_obj,
-                init_disp,
-                self.options.cart_insert_init,
-                init_disp.p_disp,
-                init_disp.m_disp,
-                self.options,
-                indices,
-                "templateInit.dat",
-                "DispsInit",
-            )
-            dir_obj_init.run()
-            os.chdir(rootdir + "/DispsInit")
-            disp_list = []
-            for i in os.listdir(rootdir + "/DispsInit"):
-                disp_list.append(i)
+            if self.options.init_calc:
+                dir_obj_init = DirectoryTree(
+                    prog_name_init,
+                    self.zmat_obj,
+                    init_disp,
+                    self.options.cart_insert_init,
+                    init_disp.p_disp,
+                    init_disp.m_disp,
+                    self.options,
+                    indices,
+                    "templateInit.dat",
+                    "DispsInit",
+                )
+                dir_obj_init.run()
+                os.chdir(rootdir + "/DispsInit")
+                disp_list = []
+                for i in os.listdir(rootdir + "/DispsInit"):
+                    disp_list.append(i)
 
-            v_template = VulcanTemplate(
-                self.options, len(disp_list), prog_name_init, prog_init
-            )
-            out = v_template.run()
-            with open("displacements.sh", "w") as file:
-                file.write(out)
+                v_template = VulcanTemplate(
+                    self.options, len(disp_list), prog_name_init, prog_init
+                )
+                out = v_template.run()
+                with open("displacements.sh", "w") as file:
+                    file.write(out)
 
-            sub = Submit(disp_list)
-            sub.run()
-
+                sub = Submit(disp_list)
+                sub.run()
+            else:
+                os.chdir(rootdir + "/DispsInit")
             reap_obj_init = Reap(
                 prog_name_init,
                 self.zmat_obj,
