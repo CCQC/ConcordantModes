@@ -22,6 +22,7 @@ from concordantmodes.submit import Submit
 from concordantmodes.ted import TED
 from concordantmodes.trans_disp import TransDisp
 from concordantmodes.vulcan_template import VulcanTemplate
+from concordantmodes.sapelo_template import SapeloTemplate
 from concordantmodes.zmat import Zmat
 
 
@@ -114,17 +115,33 @@ class ConcordantModes(object):
                 for i in os.listdir(rootdir + "/DispsInit"):
                     disp_list.append(i)
 
-                v_template = VulcanTemplate(
-                    self.options, len(disp_list), prog_name_init, prog_init
-                )
-                out = v_template.run()
-                with open("displacements.sh", "w") as file:
-                    file.write(out)
+                if self.options.cluster != "sapelo":
+                    v_template = VulcanTemplate(self.options, len(disp_list), progname, prog)
+                    out = v_template.run()
+                    with open("displacements.sh", "w") as file:
+                        file.write(out)
 
-                sub = Submit(disp_list)
-                sub.run()
-            else:
-                os.chdir(rootdir + "/DispsInit")
+                    # Submits an array, then checks if all jobs have finished every
+                    # 10 seconds.
+                    sub = Submit(disp_list)
+                    sub.run()
+                else:
+                    print('Here I am', os.getcwd())
+                    s_template = SapeloTemplate(self.options, len(disp_list), prog_name_init, prog_init)
+                    out = s_template.run()
+                    with open("optstep.sh", "w") as file:
+                        file.write(out)
+                    print('where the eff am I', os.getcwd())
+                    for z in range(0,len(disp_list)):
+                        source = os.getcwd() + "/optstep.sh"
+                        os.chdir('./' + str(z + 1))
+                        destination = os.getcwd()
+                        shutil.copy2(source, destination)
+                        os.chdir('../')
+                    sub = Submit(disp_list,self.options)
+                    sub.run()
+
+
             reap_obj_init = Reap(
                 prog_name_init,
                 self.zmat_obj,
@@ -275,16 +292,31 @@ class ConcordantModes(object):
             print(disp_list)
 
             # Generates the submit script for the displacements.
+            if self.options.cluster != "sapelo":
+                v_template = VulcanTemplate(self.options, len(disp_list), progname, prog)
+                out = v_template.run()
+                with open("displacements.sh", "w") as file:
+                    file.write(out)
 
-            v_template = VulcanTemplate(self.options, len(disp_list), progname, prog)
-            out = v_template.run()
-            with open("displacements.sh", "w") as file:
-                file.write(out)
-
-            # Submits an array, then checks if all jobs have finished every
-            # 10 seconds.
-            sub = Submit(disp_list)
-            sub.run()
+                # Submits an array, then checks if all jobs have finished every
+                # 10 seconds.
+                sub = Submit(disp_list)
+                sub.run()
+            else:
+                print('Here I am', os.getcwd())
+                s_template = SapeloTemplate(self.options, len(disp_list), progname, prog)
+                out = s_template.run()
+                with open("optstep.sh", "w") as file:
+                    file.write(out)
+                print('where the eff am I', os.getcwd())
+                for z in range(0,len(disp_list)):
+                    source = os.getcwd() + "/optstep.sh"
+                    os.chdir('./' + str(z + 1))
+                    destination = os.getcwd()
+                    shutil.copy2(source, destination)
+                    os.chdir('../')
+                sub = Submit(disp_list,self.options)
+                sub.run()
 
         # After this point, all of the jobs will have finished, and its time
         # to reap the energies as well as checking for sucesses on all of
