@@ -303,12 +303,10 @@ class ConcordantModes(object):
                 sub = Submit(disp_list)
                 sub.run()
             else:
-                print('Here I am', os.getcwd())
                 s_template = SapeloTemplate(self.options, len(disp_list), progname, prog)
                 out = s_template.run()
                 with open("optstep.sh", "w") as file:
                     file.write(out)
-                print('where the eff am I', os.getcwd())
                 for z in range(0,len(disp_list)):
                     source = os.getcwd() + "/optstep.sh"
                     os.chdir('./' + str(z + 1))
