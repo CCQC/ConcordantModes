@@ -1,8 +1,8 @@
 
- Primary working directories    : /tmp/601751.4.gen4.q
- Secondary working directories  : /tmp/601751.4.gen4.q
+ Primary working directories    : /tmp/601755.4.gen4.q
+ Secondary working directories  : /tmp/601755.4.gen4.q
  Wavefunction directory         : /home/vulcan/nlk36701/wfu/
- Main file repository           : /tmp/601751.4.gen4.q/
+ Main file repository           : /tmp/601755.4.gen4.q/
 
  ARCHNAME  : Linux/x86_64
  FC        : /opt/intel/compilers_and_libraries_2016.1.150/linux/bin/intel64/ifort
@@ -11,7 +11,7 @@
  id        : ccgc
 
  Nodes     nprocs
- n062         1
+ n035         1
  ga_uses_ma=false, calling ma_init with nominal heap.
  GA-space will be limited to   8.0 MW (determined by -G option)
 
@@ -36,9 +36,9 @@
  {rhf;maxit,200}
  {ccsd(t);maxit,200}
 
- Variables initialized (661), CPU time= 0.01 sec
- Commands  initialized (458), CPU time= 0.00 sec, 486 directives.
- Default parameters read. Elapsed time= 0.04 sec
+ Variables initialized (661), CPU time= 0.00 sec
+ Commands  initialized (458), CPU time= 0.01 sec, 486 directives.
+ Default parameters read. Elapsed time= 0.06 sec
 
  Checking input...
  Passed
@@ -53,7 +53,7 @@
 
  **********************************************************************************************************************************
  LABEL *   Optimization of min3                                                          
- Linux-4.4.3/n062(x86_64) 64 bit mpp version                                             DATE: 09-Nov-21          TIME: 10:50:16  
+ Linux-4.4.3/n035(x86_64) 64 bit mpp version                                             DATE: 09-Nov-21          TIME: 12:17:31  
  **********************************************************************************************************************************
 
  SHA1:             9e8077add272b0f3cad6f7df79ec5211205f459d
@@ -152,8 +152,8 @@
 
  Memory used in sort:       0.95 MW
 
- SORT1 READ      546378. AND WROTE      367096. INTEGRALS IN      2 RECORDS. CPU TIME:     0.01 SEC, REAL TIME:     0.01 SEC
- SORT2 READ      367096. AND WROTE      396151. INTEGRALS IN     17 RECORDS. CPU TIME:     0.01 SEC, REAL TIME:     0.02 SEC
+ SORT1 READ      546378. AND WROTE      367100. INTEGRALS IN      2 RECORDS. CPU TIME:     0.01 SEC, REAL TIME:     0.01 SEC
+ SORT2 READ      367100. AND WROTE      396151. INTEGRALS IN     17 RECORDS. CPU TIME:     0.02 SEC, REAL TIME:     0.02 SEC
 
  FILE SIZES:   FILE 1:     5.6 MBYTE,  FILE 4:     8.4 MBYTE,   TOTAL:     14.1 MBYTE
 
@@ -168,8 +168,8 @@
                                            T        V       H0       H01     AOSYM     SMH    MOLCAS    ERIS     OPER   
 
  PROGRAMS   *        TOTAL       INT
- CPU TIMES  *         0.19      0.14
- REAL TIME  *         0.38 SEC
+ CPU TIMES  *         0.32      0.26
+ REAL TIME  *         0.49 SEC
  DISK USED  *        19.05 MB      
  GA USED    *         0.00 MB       (max)       0.00 MB       (current)
  **********************************************************************************************************************************
@@ -210,8 +210,7 @@
    13      0.667D-08      0.565D-09       -76.05719552     75.755244    0.00000    0.00000    0.80204    6
    14      0.165D-08      0.158D-09       -76.05719552     75.755244    0.00000    0.00000    0.80204    6
    15      0.443D-09      0.378D-10       -76.05719552     75.755244    0.00000    0.00000    0.80204    6
-   16      0.891D-10      0.937D-11       -76.05719552     75.755244    0.00000    0.00000    0.80204    6
-   17      0.232D-10      0.359D-11       -76.05719552     75.755244    0.00000    0.00000    0.80204    0
+   16      0.891D-10      0.115D-10       -76.05719552     75.755244    0.00000    0.00000    0.80204    0
 
  Final occupancy:   3   1   1   0
 
@@ -249,8 +248,8 @@
                                          GEOM     BASIS     RHF  
 
  PROGRAMS   *        TOTAL       RHF       INT
- CPU TIMES  *         0.22      0.03      0.14
- REAL TIME  *         0.43 SEC
+ CPU TIMES  *         0.35      0.03      0.26
+ REAL TIME  *         0.55 SEC
  DISK USED  *        19.05 MB      
  GA USED    *         0.00 MB       (max)       0.00 MB       (current)
  **********************************************************************************************************************************
@@ -282,7 +281,7 @@
 
  Memory could be reduced to 0.56 Mwords without degradation in triples
 
- Integral transformation finished. Total CPU:   0.01 sec, npass=  1  Memory used:   0.12 MW
+ Integral transformation finished. Total CPU:   0.00 sec, npass=  1  Memory used:   0.12 MW
 
  Reference energy:                    -76.05719552
 
@@ -295,30 +294,30 @@
  SCS-MP2 total energy:                -76.31588550
 
  ITER.      SQ.NORM     CORR.ENERGY   TOTAL ENERGY   ENERGY CHANGE        DEN1      VAR(S)    VAR(P)  DIIS     TIME
-   1      1.06040754    -0.26687088   -76.32406641    -0.00543089    -0.00047542  0.44D-03  0.81D-03  1  1     0.01
+   1      1.06040754    -0.26687088   -76.32406641    -0.00543089    -0.00047542  0.44D-03  0.81D-03  1  1     0.02
    2      1.06351765    -0.26728571   -76.32448124    -0.00041483    -0.00445518  0.75D-05  0.85D-04  2  2     0.02
    3      1.06452972    -0.26734620   -76.32454172    -0.00006049    -0.00080408  0.15D-05  0.39D-05  3  3     0.03
-   4      1.06479299    -0.26735606   -76.32455159    -0.00000987    -0.00015899  0.97D-07  0.19D-06  4  4     0.03
+   4      1.06479299    -0.26735606   -76.32455159    -0.00000987    -0.00015899  0.97D-07  0.19D-06  4  4     0.04
    5      1.06482802    -0.26735348   -76.32454900     0.00000259    -0.00001816  0.33D-07  0.11D-07  5  5     0.04
    6      1.06483376    -0.26735333   -76.32454886     0.00000014    -0.00000166  0.51D-08  0.11D-08  6  6     0.05
-   7      1.06483531    -0.26735345   -76.32454898    -0.00000012    -0.00000030  0.79D-09  0.16D-09  6  1     0.05
-   8      1.06483588    -0.26735347   -76.32454899    -0.00000001     0.00000041  0.28D-10  0.12D-10  6  2     0.06
+   7      1.06483531    -0.26735345   -76.32454898    -0.00000012    -0.00000030  0.79D-09  0.16D-09  6  1     0.06
+   8      1.06483588    -0.26735347   -76.32454899    -0.00000001     0.00000041  0.28D-10  0.12D-10  6  2     0.07
    9      1.06483608    -0.26735345   -76.32454898     0.00000002    -0.00000007  0.12D-11  0.10D-11  6  3     0.07
-  10      1.06483611    -0.26735345   -76.32454897     0.00000000     0.00000002  0.39D-13  0.53D-13  6  4     0.07
-  11      1.06483612    -0.26735345   -76.32454897     0.00000000    -0.00000001  0.18D-14  0.38D-14  6  5     0.08
-  12      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.16D-15  0.27D-15  6  6     0.09
-  13      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.26D-16  0.21D-16  6  1     0.09
-  14      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.42D-17  0.20D-17  6  2     0.10
-  15      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.11D-17  0.18D-18  6  3     0.11
-  16      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.10D-18  0.17D-19  6  4     0.11
-  17      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.84D-20  0.21D-20  6  5     0.12
-  18      1.06483612    -0.26735345   -76.32454897    -0.00000000    -0.00000000  0.38D-21  0.17D-21  6  6     0.13
+  10      1.06483611    -0.26735345   -76.32454897     0.00000000     0.00000002  0.39D-13  0.53D-13  6  4     0.08
+  11      1.06483612    -0.26735345   -76.32454897     0.00000000    -0.00000001  0.18D-14  0.38D-14  6  5     0.09
+  12      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.16D-15  0.27D-15  6  6     0.10
+  13      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.26D-16  0.21D-16  6  1     0.10
+  14      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.42D-17  0.20D-17  6  2     0.11
+  15      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.11D-17  0.18D-18  6  3     0.12
+  16      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.10D-18  0.17D-19  6  4     0.12
+  17      1.06483612    -0.26735345   -76.32454897    -0.00000000     0.00000000  0.84D-20  0.21D-20  6  5     0.13
+  18      1.06483612    -0.26735345   -76.32454897    -0.00000000    -0.00000000  0.38D-21  0.17D-21  6  6     0.14
 
- Norm of t1 vector:      0.02604775      S-energy:     0.00000000      T1 diagnostic:  0.00651194
+ Norm of t1 vector:      0.02604775      S-energy:    -0.00000000      T1 diagnostic:  0.00651194
                                                                        D1 diagnostic:  0.01074366
 
 
- Total CPU time for triples:      0.01 sec
+ Total CPU time for triples:      0.02 sec
 
 
  RESULTS
@@ -333,16 +332,15 @@
   Total correlation energy             -0.274993646100
 
   CCSD total energy                   -76.324548970752
-  CCSD[T] energy                      -76.332380980710
+  CCSD[T] energy                      -76.332380980711
   CCSD-T energy                       -76.332053368305
  !CCSD(T) total energy                -76.332189170363
 
  Timing summary (sec):
 
  STEP                 CPU(USER)    SYS     CPU(TOT)    WALL
- Transformation          0.01      0.00      0.01      0.00
- CCSD iterations         0.12      0.01      0.13      0.16
- Triples                 0.01      0.01      0.02      0.02
+ CCSD iterations         0.14      0.02      0.16      0.17
+ Triples                 0.02      0.00      0.02      0.03
 
  Program statistics:
 
@@ -364,8 +362,8 @@
                                          GEOM     BASIS     RHF  
 
  PROGRAMS   *        TOTAL   CCSD(T)       RHF       INT
- CPU TIMES  *         0.37      0.15      0.03      0.14
- REAL TIME  *         0.63 SEC
+ CPU TIMES  *         0.52      0.17      0.03      0.26
+ REAL TIME  *         0.79 SEC
  DISK USED  *        19.05 MB      
  GA USED    *         0.00 MB       (max)       0.00 MB       (current)
  **********************************************************************************************************************************

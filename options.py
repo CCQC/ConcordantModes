@@ -31,3 +31,5 @@ class Options(object):
         self.tight_disp = kwargs.pop("tight_disp", False)
         self.tol = kwargs.pop("tol", 1.0e-14)
         self.units = kwargs.pop("units", "HartreeBohr")
+        self.cluster = kwargs.pop("cluster", "sapelo")
+
