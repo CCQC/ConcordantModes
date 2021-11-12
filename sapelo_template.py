@@ -24,7 +24,7 @@ class SapeloTemplate(object):
             "prog": prog,
             "tc": str(job_num),
             "cline": self.progdict[prog_name],
-            "job_name": options.job_name
+            "job_name": options.job_name,
         }
         # This can be inserted back in if the sync keyword is sorted
         # $ -sync y
@@ -61,6 +61,6 @@ rm $scratch_dir
 
 #ignored line -- do not remove
 """
+
     def run(self):
         return self.sapelo_template.format(**self.odict)
-
