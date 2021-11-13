@@ -2,7 +2,6 @@ import numpy as np
 from numpy.linalg import inv
 from numpy import linalg as LA
 
-
 class SapeloTemplate(object):
     """
     This file just stores the sapelo optstep script
@@ -24,14 +23,14 @@ class SapeloTemplate(object):
             "prog": prog,
             "tc": str(job_num),
             "cline": self.progdict[prog_name],
-            "job_name": options.job_name,
+           # "job_name": options.job_name,
         }
         # This can be inserted back in if the sync keyword is sorted
         # $ -sync y
         if self.prog_name != "cfour":
             self.sapelo_template = """#!/bin/sh
 #!/bin/bash
-#SBATCH --job-name={job_name}             # Job name
+#SBATCH --job-name=Concordant             # Job name
 #SBATCH --partition=batch               # Partition (queue) name
 #SBATCH --constraint=Intel
 #SBATCH --nodes=1                     # Number of nodes
@@ -64,3 +63,4 @@ rm $scratch_dir
 
     def run(self):
         return self.sapelo_template.format(**self.odict)
+
