@@ -3,10 +3,12 @@ import subprocess
 import time
 import os
 
+
 class Submit(object):
     def __init__(self, disp_list, options):
         self.disp_list = disp_list
         self.options = options
+
     def run(self):
         if self.options.cluster != "sapelo":
             pipe = subprocess.PIPE
@@ -31,31 +33,42 @@ class Submit(object):
             output = str(process.stdout)
             error = str(process.stderr)
             pass
-        
+
         else:
             from subprocess import Popen
+
             processes = []
             print(os.getcwd())
             for z in range(len(self.disp_list)):
-                #path = 'Disps' + '/' +  str(z + 1) + '/'
-                path = str(z + 1) + '/'
+                # path = 'Disps' + '/' +  str(z + 1) + '/'
+                path = str(z + 1) + "/"
                 pipe = subprocess.PIPE
-                #process = Popen(['sh',  './sub.sh'], cwd = path, stdout=pipe, stderr=pipe, shell = True)
-                job = subprocess.run(['sbatch', './optstep.sh'],cwd = path, stdout=pipe, stderr=pipe)
+                # process = Popen(['sh',  './sub.sh'], cwd = path, stdout=pipe, stderr=pipe, shell = True)
+                job = subprocess.run(
+                    ["sbatch", "./optstep.sh"], cwd=path, stdout=pipe, stderr=pipe
+                )
                 processes.append(job)
                 time.sleep(2)
-                  
-            for q in range(len(processes)):
-                while(True):
-                    job = processes[q] 
-                    outRegex =  r'Submitted\s*batch\s*job(?:-array)?\s*(\d*)'
-                    job_id = int(re.search(outRegex, job.stdout.decode('UTF-8')).group(1))
-                    jobFinRegex = re.compile(r'taskid')
-                    finish = subprocess.run(['sacct', '-j', str(job_id)], stdout=pipe, stderr=pipe)
-                    output = str(finish.stdout.decode('UTF-8'))    
-                    if not ("PENDING" in output or "RUNNING" in output):
-                        print('job id ' +  str(job_id) + ' must be complete or failed ' + str(q))
-                        break 
-            print('sleeping')
-            time.sleep(10)
 
+            for q in range(len(processes)):
+                while True:
+                    job = processes[q]
+                    outRegex = r"Submitted\s*batch\s*job(?:-array)?\s*(\d*)"
+                    job_id = int(
+                        re.search(outRegex, job.stdout.decode("UTF-8")).group(1)
+                    )
+                    jobFinRegex = re.compile(r"taskid")
+                    finish = subprocess.run(
+                        ["sacct", "-j", str(job_id)], stdout=pipe, stderr=pipe
+                    )
+                    output = str(finish.stdout.decode("UTF-8"))
+                    if not ("PENDING" in output or "RUNNING" in output):
+                        print(
+                            "job id "
+                            + str(job_id)
+                            + " must be complete or failed "
+                            + str(q)
+                        )
+                        break
+            print("sleeping")
+            time.sleep(10)
