@@ -9,21 +9,20 @@ class Algorithm(object):
     mode.
     """
 
-    def __init__(self, eigs, S, initial_fc, options):
+    def __init__(self, eigs, initial_fc, options):
 
         self.eigs = eigs
         self.options = options
-        self.S = S
         self.initial_fc = initial_fc
 
     def run(self):
-        S = self.S
         initial_fc = self.initial_fc
 
         tolerance = 5e-32
+        print(self.eigs)
         a = self.eigs
         if self.options.mode_coupling_check:
-            self.indices = self.coupling_diagnostic(a, S, initial_fc, tolerance)
+            self.indices = self.coupling_diagnostic(a, initial_fc, tolerance)
         else:
             if self.options.off_diag:
                 off_diag = self.options.off_diag_bands + 1
@@ -34,10 +33,11 @@ class Algorithm(object):
             else:
                 lim = a + 1
                 off_diag = 1
-            self.indices = self.loop(a, S, off_diag, lim)
+            self.indices = self.loop(a, off_diag, lim)
 
-    def loop(self, a, S, off_diag, lim):
+    def loop(self, a, off_diag, lim):
 
+        a = self.eigs
         indices = []
         Sum = 2
         for i in range(a):
@@ -55,11 +55,13 @@ class Algorithm(object):
                     Sum += 2
         return indices
 
-    def coupling_diagnostic(self, a, S, initial_fc, tolerance):
+    def coupling_diagnostic(self, a, initial_fc, tolerance):
         indices = []
         diag = np.zeros((a, a))
-        print("overlap")
-        print(S)
+        with open('S_p.npy', 'rb') as x:
+            S = np.load(x)
+         
+
         for x in range(a):
             for y in range(a):
                 if x == y:
@@ -70,13 +72,26 @@ class Algorithm(object):
         diag = np.absolute(diag)
         print("Diagnostic Matrix")
         print(diag)
-        for x in range(a):
-            for y in range(a):
-                if x == y:
-                    indices.append([x, y])
-                if x != y:
-                    if diag[x, y] > tolerance:
-                        indices.append([x, y])
-                    else:
-                        break
+        with open('D.npy', 'wb') as q:
+            np.save(q, diag)
+        diag[np.abs(diag) < 1e-31] = 1e-30
+        data = np.abs(diag)
+        stdev = np.std(data)
+        for index, i in np.ndenumerate(data):
+            if abs(data[index] - np.mean(data)) > 2  * np.std(data):
+                indices.append(list(index)) 
+        indices_new = []
+        for index in indices:
+            if index[1] > index[0]:
+                indices_new.append(index)
+        indices = indices_new 
+        #for x in range(a):
+        #    for y in range(a):
+        #        if x == y:
+        #            indices.append([x, y])
+        #        if x != y:
+        #            if diag[x, y] > tolerance:
+        #                indices.append([x, y])
+        #            else:
+        #                break
         return indices
