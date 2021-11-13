@@ -21,6 +21,7 @@ class GFMethod(object):
         self.HARTREE_WAVENUM = 219474.6313708
         self.ted = ted
         self.cma = cma
+
     def run(self):
         # Construct the orthogonalizer
         self.G_O = fractional_matrix_power(self.G, 0.5)
@@ -33,17 +34,17 @@ class GFMethod(object):
         L = np.absolute(np.real(self.L))
         L_p = np.real(self.L_p)
         S_p = np.dot(np.absolute(LA.inv(L_p)), np.absolute(L_p))
-       
-        #make sure the correct "primed" or unprimed version is being saved in each instance
+
+        # make sure the correct "primed" or unprimed version is being saved in each instance
         if self.cma:
-            with open('L_full.npy', 'wb') as z:
-                np.save(z, L) 
+            with open("L_full.npy", "wb") as z:
+                np.save(z, L)
         if self.cma is None:
-            with open('L_0.npy', 'wb') as z:
-                np.save(z, L) 
+            with open("L_0.npy", "wb") as z:
+                np.save(z, L)
         if self.cma == "init":
-            with open('S_p.npy', 'wb') as z:
-                np.save(z, S_p) 
+            with open("S_p.npy", "wb") as z:
+                np.save(z, S_p)
         # Construct the normal mode overlap matrix. Will be useful for off-diagonal diagnostics.
         L = np.absolute(np.real(self.L))
         L_inv = LA.inv(L)

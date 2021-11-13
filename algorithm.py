@@ -58,9 +58,8 @@ class Algorithm(object):
     def coupling_diagnostic(self, a, initial_fc, tolerance):
         indices = []
         diag = np.zeros((a, a))
-        with open('S_p.npy', 'rb') as x:
+        with open("S_p.npy", "rb") as x:
             S = np.load(x)
-         
 
         for x in range(a):
             for y in range(a):
@@ -72,20 +71,20 @@ class Algorithm(object):
         diag = np.absolute(diag)
         print("Diagnostic Matrix")
         print(diag)
-        with open('D.npy', 'wb') as q:
+        with open("D.npy", "wb") as q:
             np.save(q, diag)
         diag[np.abs(diag) < 1e-31] = 1e-30
         data = np.abs(diag)
         stdev = np.std(data)
         for index, i in np.ndenumerate(data):
-            if abs(data[index] - np.mean(data)) > 2  * np.std(data):
-                indices.append(list(index)) 
+            if abs(data[index] - np.mean(data)) > 2 * np.std(data):
+                indices.append(list(index))
         indices_new = []
         for index in indices:
             if index[1] > index[0]:
                 indices_new.append(index)
-        indices = indices_new 
-        #for x in range(a):
+        indices = indices_new
+        # for x in range(a):
         #    for y in range(a):
         #        if x == y:
         #            indices.append([x, y])

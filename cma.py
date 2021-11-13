@@ -154,7 +154,7 @@ class ConcordantModes(object):
                 self.options.energy_regex_init,
                 self.options.success_regex_init,
             )
-            print('not recalculating', os.getcwd())
+            print("not recalculating", os.getcwd())
             os.chdir(rootdir + "/DispsInit")
             reap_obj_init.run()
 
@@ -197,7 +197,7 @@ class ConcordantModes(object):
             F = np.dot(self.TED_obj.proj.T, np.dot(F, self.TED_obj.proj))
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
-        
+
         # Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         print("Initial Frequencies:")
         init_GF = GFMethod(
@@ -231,7 +231,7 @@ class ConcordantModes(object):
 
         # if os.path.exists(rootdir + '/Intder'):
         # shutil.rmtree(rootdir + '/Intder')
-        #S = TED_GF.S
+        # S = TED_GF.S
         initial_fc = TED_GF.eig_v
         eigs = len(TED_GF.S)
 
@@ -260,7 +260,7 @@ class ConcordantModes(object):
         )
         transdisp.run()
         # nate
-        #eigs = transdisp.eigs
+        # eigs = transdisp.eigs
         p_disp = transdisp.p_disp
         m_disp = transdisp.m_disp
         if self.options.disp_check:
@@ -356,9 +356,9 @@ class ConcordantModes(object):
         # nate
         self.F = fc.FC
         if self.options.benchmark_full:
-            with open('Full_fc_levelB.npy', 'wb') as z:
-                np.save(z, fc.FC) 
-         
+            with open("Full_fc_levelB.npy", "wb") as z:
+                np.save(z, fc.FC)
+
         # Recompute the G-matrix with the new geometry, and then transform
         # the G-matrix using the lower level of theory eigenvalue matrix.
         # This will not fully diagonalize the G-matrix if a different
@@ -382,7 +382,6 @@ class ConcordantModes(object):
             self.zmat_obj,
             self.TED_obj,
             cma,
-            
         )
         final_GF.run()
 
@@ -409,13 +408,13 @@ class ConcordantModes(object):
         # This code converts the force constants back into cartesian
         # coordinates and writes out an "output.default.hess" file, which
         # is of the same format as FCMFINAL of CFOUR.
-        #print(self.F.shape) 
-        #self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
-        #print(self.F.shape) 
-        #if self.options.coords != "ZMAT":
+        # print(self.F.shape)
+        # self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+        # print(self.F.shape)
+        # if self.options.coords != "ZMAT":
         #    self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
         #    print('what the hell', self.F.shape)
-        #cart_conv = FcConv(
+        # cart_conv = FcConv(
         #    self.F,
         #    s_vec,
         #    self.zmat_obj,
@@ -423,26 +422,25 @@ class ConcordantModes(object):
         #    True,
         #    self.TED_obj,
         #    self.options.units,
-        #)
-        #cart_conv.run()
+        # )
+        # cart_conv.run()
 
         t2 = time.time()
         print("Frequency Shift (cm^-1): ")
         print(final_GF.freq - init_GF.freq)
         print("This program took " + str(t2 - t1) + " seconds to run.")
 
-
-        #after this point, you could loop through the full FC matrix and compute several other benchmark frequencies
+        # after this point, you could loop through the full FC matrix and compute several other benchmark frequencies
         if self.options.benchmark_full:
             self.options.off_diag = True
             # nate
-            with open('Full_fc_levelB.npy', 'rb') as z:
+            with open("Full_fc_levelB.npy", "rb") as z:
                 FC = np.load(z)
-            self.F = np.zeros((eigs,eigs))
+            self.F = np.zeros((eigs, eigs))
             for q in range(eigs):
-                self.F = np.zeros((eigs,eigs))
-                self.options.off_diag_bands = q 
-                a = eigs 
+                self.F = np.zeros((eigs, eigs))
+                self.options.off_diag_bands = q
+                a = eigs
                 algo = Algorithm(eigs, initial_fc, self.options)
                 algo.run()
                 print(algo.indices)
@@ -452,7 +450,7 @@ class ConcordantModes(object):
                     cma = False
                 for index in algo.indices:
                     i, j = index[0], index[1]
-                    self.F[i,j] = FC[i,j] 
+                    self.F[i, j] = FC[i, j]
                 cf = np.triu_indices(a, 1)
                 il = (cf[1], cf[0])
                 self.F[il] = self.F[cf]
@@ -465,7 +463,7 @@ class ConcordantModes(object):
                     self.options.proj_tol,
                     self.zmat_obj,
                     self.TED_obj,
-                    cma
+                    cma,
                 )
                 final_GF.run()
 
@@ -492,10 +490,10 @@ class ConcordantModes(object):
                 # This code converts the force constants back into cartesian
                 # coordinates and writes out an "output.default.hess" file, which
                 # is of the same format as FCMFINAL of CFOUR.
-                #self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
-                #if self.options.coords != "ZMAT":
+                # self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+                # if self.options.coords != "ZMAT":
                 #    self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
-                #cart_conv = FcConv(
+                # cart_conv = FcConv(
                 #    self.F,
                 #    s_vec,
                 #    self.zmat_obj,
@@ -503,8 +501,8 @@ class ConcordantModes(object):
                 #    True,
                 #    self.TED_obj,
                 #    self.options.units,
-                #)
-                #cart_conv.run()
+                # )
+                # cart_conv.run()
 
                 t2 = time.time()
                 print("Frequency Shift (cm^-1): ")
@@ -522,27 +520,27 @@ class ConcordantModes(object):
 
             algo = Algorithm(eigs, initial_fc, self.options)
             algo.run()
-            print('printing algo indices', algo.indices)
+            print("printing algo indices", algo.indices)
             diagnostic_indices = algo.indices
-            with open('L_full.npy', 'rb') as w:
+            with open("L_full.npy", "rb") as w:
                 L_full = np.load(w)
-            with open('L_0.npy', 'rb') as x:
+            with open("L_0.npy", "rb") as x:
                 L_0 = np.load(x)
             L_inv = LA.inv(L_full)
-            S = np.dot(L_inv,L_0)
-            print('printing overlap')
+            S = np.dot(L_inv, L_0)
+            print("printing overlap")
             print(S)
-            with open('S.npy', 'wb') as y:
-                np.save(y, S) 
+            with open("S.npy", "wb") as y:
+                np.save(y, S)
             self.options.mode_coupling_check = False
             algo = Algorithm(eigs, initial_fc, self.options)
             algo.run()
             newlist = algo.indices + diagnostic_indices
             print(newlist)
- 
+
             for index in newlist:
                 i, j = index[0], index[1]
-                self.F[i,j] = FC[i,j] 
+                self.F[i, j] = FC[i, j]
             cf = np.triu_indices(a, 1)
             il = (cf[1], cf[0])
             self.F[il] = self.F[cf]
@@ -555,7 +553,7 @@ class ConcordantModes(object):
                 self.options.proj_tol,
                 self.zmat_obj,
                 self.TED_obj,
-                cma
+                cma,
             )
             final_GF.run()
 
@@ -578,6 +576,3 @@ class ConcordantModes(object):
                 + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 219474.6313708)
                 + " (hartrees) "
             )
-            
-
-

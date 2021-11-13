@@ -52,16 +52,16 @@ class Reap(object):
             print("Energy failed at " + str("ref"))
             raise RuntimeError
         os.chdir("..")
-        print('this is the energy regex', energy_regex)
+        print("this is the energy regex", energy_regex)
         ref_en = float(re.findall(energy_regex, data)[0])
         print("Reference energy: " + str(ref_en))
 
         indices = self.indices
-        #eigs = self.eigs
-        p_en_array = np.zeros((eigs,eigs))
-        m_en_array = np.zeros((eigs,eigs))
-        rel_en_p =   np.zeros((eigs,eigs))
-        rel_en_m =   np.zeros((eigs,eigs))
+        # eigs = self.eigs
+        p_en_array = np.zeros((eigs, eigs))
+        m_en_array = np.zeros((eigs, eigs))
+        rel_en_p = np.zeros((eigs, eigs))
+        rel_en_m = np.zeros((eigs, eigs))
         relative_energies = []
 
         direc = 2
