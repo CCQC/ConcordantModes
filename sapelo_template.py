@@ -24,11 +24,8 @@ class SapeloTemplate(object):
             "prog": prog,
             "tc": str(job_num),
             "cline": self.progdict[prog_name],
-<<<<<<< HEAD
            # "job_name": options.job_name,
-=======
             # "job_name": options.job_name,
->>>>>>> 82bd267a99aa7ed25ffa603b36b55bdba377344b
         }
         # This can be inserted back in if the sync keyword is sorted
         # $ -sync y
