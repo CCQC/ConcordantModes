@@ -154,7 +154,7 @@ class ConcordantModes(object):
                 self.options.energy_regex_init,
                 self.options.success_regex_init,
             )
-            print('not recalculating', os.getcwd())
+            print("not recalculating", os.getcwd())
             os.chdir(rootdir + "/DispsInit")
             reap_obj_init.run()
 
@@ -207,6 +207,7 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
+            "init",
         )
         init_GF.run()
 
@@ -224,19 +225,17 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
+            False,
         )
         TED_GF.run()
 
         # if os.path.exists(rootdir + '/Intder'):
         # shutil.rmtree(rootdir + '/Intder')
-        S = TED_GF.S
+        # S = TED_GF.S
         initial_fc = TED_GF.eig_v
-        eigs = len(S)
+        eigs = len(TED_GF.S)
 
-        # Coming soon, machinery that computes a diagnostic to aid in off-diagonal force constant
-        # computation priority!!
-
-        algo = Algorithm(eigs, S, initial_fc, self.options)
+        algo = Algorithm(eigs, initial_fc, self.options)
         algo.run()
         print(algo.indices)
 
@@ -261,10 +260,9 @@ class ConcordantModes(object):
         )
         transdisp.run()
         # nate
-        eigs = transdisp.eigs
+        # eigs = transdisp.eigs
         p_disp = transdisp.p_disp
         m_disp = transdisp.m_disp
-
         if self.options.disp_check:
             raise RuntimeError
 
@@ -272,7 +270,6 @@ class ConcordantModes(object):
 
         prog = self.options.program
         progname = prog.split("@")[0]
-
         if self.options.calc:
             dir_obj = DirectoryTree(
                 progname,
@@ -328,6 +325,7 @@ class ConcordantModes(object):
         # the jobs
         if not self.options.calc:
             os.chdir("Disps")
+        print(eigs)
         reap_obj = Reap(
             progname,
             self.zmat_obj,
@@ -357,6 +355,9 @@ class ConcordantModes(object):
 
         # nate
         self.F = fc.FC
+        if self.options.benchmark_full:
+            with open("Full_fc_levelB.npy", "wb") as z:
+                np.save(z, fc.FC)
 
         # Recompute the G-matrix with the new geometry, and then transform
         # the G-matrix using the lower level of theory eigenvalue matrix.
@@ -369,7 +370,8 @@ class ConcordantModes(object):
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
         self.G = np.dot(np.dot(transdisp.eig_inv, g_mat.G), transdisp.eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
-
+        if self.options.benchmark_full:
+            cma = True
         # Final GF Matrix run
         print("Final Frequencies:")
         final_GF = GFMethod(
@@ -379,6 +381,7 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
+            cma,
         )
         final_GF.run()
 
@@ -405,21 +408,171 @@ class ConcordantModes(object):
         # This code converts the force constants back into cartesian
         # coordinates and writes out an "output.default.hess" file, which
         # is of the same format as FCMFINAL of CFOUR.
-        self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
-        if self.options.coords != "ZMAT":
-            self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
-        cart_conv = FcConv(
-            self.F,
-            s_vec,
-            self.zmat_obj,
-            "cartesian",
-            True,
-            self.TED_obj,
-            self.options.units,
-        )
-        cart_conv.run()
+        # print(self.F.shape)
+        # self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+        # print(self.F.shape)
+        # if self.options.coords != "ZMAT":
+        #    self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
+        #    print('what the hell', self.F.shape)
+        # cart_conv = FcConv(
+        #    self.F,
+        #    s_vec,
+        #    self.zmat_obj,
+        #    "cartesian",
+        #    True,
+        #    self.TED_obj,
+        #    self.options.units,
+        # )
+        # cart_conv.run()
 
         t2 = time.time()
         print("Frequency Shift (cm^-1): ")
         print(final_GF.freq - init_GF.freq)
         print("This program took " + str(t2 - t1) + " seconds to run.")
+
+        # after this point, you could loop through the full FC matrix and compute several other benchmark frequencies
+        if self.options.benchmark_full:
+            self.options.off_diag = True
+            # nate
+            with open("Full_fc_levelB.npy", "rb") as z:
+                FC = np.load(z)
+            self.F = np.zeros((eigs, eigs))
+            for q in range(eigs):
+                self.F = np.zeros((eigs, eigs))
+                self.options.off_diag_bands = q
+                a = eigs
+                algo = Algorithm(eigs, initial_fc, self.options)
+                algo.run()
+                print(algo.indices)
+                if q == 0:
+                    cma = None
+                else:
+                    cma = False
+                for index in algo.indices:
+                    i, j = index[0], index[1]
+                    self.F[i, j] = FC[i, j]
+                cf = np.triu_indices(a, 1)
+                il = (cf[1], cf[0])
+                self.F[il] = self.F[cf]
+                # Final GF Matrix run
+                print("Final Frequencies:")
+                final_GF = GFMethod(
+                    self.G,
+                    self.F,
+                    self.options.tol,
+                    self.options.proj_tol,
+                    self.zmat_obj,
+                    self.TED_obj,
+                    cma,
+                )
+                final_GF.run()
+
+                # This code below is a rudimentary table of the TED for the final
+                # frequencies. Actually right now it uses the initial L-matrix,
+                # which may need to be modified by the final L-matrix.
+                print("////////////////////////////////////////////")
+                print("//{:^40s}//".format(" Final TED"))
+                print("////////////////////////////////////////////")
+                self.TED_obj.run(np.dot(init_GF.L, final_GF.L), final_GF.freq)
+
+                # This code prints out the frequencies in order of energy as well
+                # as the ZPVE in several different units.
+                print(
+                    "Final ZPVE in: "
+                    + "{:6.2f}".format(np.sum(final_GF.freq) / 2)
+                    + " (cm^-1) "
+                    + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 349.7550881133)
+                    + " (kcal mol^-1) "
+                    + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 219474.6313708)
+                    + " (hartrees) "
+                )
+
+                # This code converts the force constants back into cartesian
+                # coordinates and writes out an "output.default.hess" file, which
+                # is of the same format as FCMFINAL of CFOUR.
+                # self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+                # if self.options.coords != "ZMAT":
+                #    self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
+                # cart_conv = FcConv(
+                #    self.F,
+                #    s_vec,
+                #    self.zmat_obj,
+                #    "cartesian",
+                #    True,
+                #    self.TED_obj,
+                #    self.options.units,
+                # )
+                # cart_conv.run()
+
+                t2 = time.time()
+                print("Frequency Shift (cm^-1): ")
+                print(final_GF.freq - init_GF.freq)
+                print("This program took " + str(t2 - t1) + " seconds to run.")
+
+                print("////////////////////////////////////////////")
+                print("//{:^40s}//".format(" END OF LOOP"))
+                print("////////////////////////////////////////////")
+            print("////////////////////////////////////////////")
+            print("//{:^40s}//".format("Begin Selective Diagnostic Benchmark"))
+            print("////////////////////////////////////////////")
+            self.options.off_diag = False
+            self.options.mode_coupling_check = True
+
+            algo = Algorithm(eigs, initial_fc, self.options)
+            algo.run()
+            print("printing algo indices", algo.indices)
+            diagnostic_indices = algo.indices
+            with open("L_full.npy", "rb") as w:
+                L_full = np.load(w)
+            with open("L_0.npy", "rb") as x:
+                L_0 = np.load(x)
+            L_inv = LA.inv(L_full)
+            S = np.dot(L_inv, L_0)
+            print("printing overlap")
+            print(S)
+            with open("S.npy", "wb") as y:
+                np.save(y, S)
+            self.options.mode_coupling_check = False
+            algo = Algorithm(eigs, initial_fc, self.options)
+            algo.run()
+            newlist = algo.indices + diagnostic_indices
+            print(newlist)
+
+            for index in newlist:
+                i, j = index[0], index[1]
+                self.F[i, j] = FC[i, j]
+            cf = np.triu_indices(a, 1)
+            il = (cf[1], cf[0])
+            self.F[il] = self.F[cf]
+            # Final GF Matrix run
+            print("Final Frequencies:")
+            final_GF = GFMethod(
+                self.G,
+                self.F,
+                self.options.tol,
+                self.options.proj_tol,
+                self.zmat_obj,
+                self.TED_obj,
+                cma,
+            )
+            final_GF.run()
+
+            # This code below is a rudimentary table of the TED for the final
+            # frequencies. Actually right now it uses the initial L-matrix,
+            # which may need to be modified by the final L-matrix.
+            print("////////////////////////////////////////////")
+            print("//{:^40s}//".format(" Final TED"))
+            print("////////////////////////////////////////////")
+            self.TED_obj.run(np.dot(init_GF.L, final_GF.L), final_GF.freq)
+
+            # This code prints out the frequencies in order of energy as well
+            # as the ZPVE in several different units.
+            print(
+                "Final ZPVE in: "
+                + "{:6.2f}".format(np.sum(final_GF.freq) / 2)
+                + " (cm^-1) "
+                + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 349.7550881133)
+                + " (kcal mol^-1) "
+                + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 219474.6313708)
+                + " (hartrees) "
+            )
