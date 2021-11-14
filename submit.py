@@ -109,5 +109,4 @@ class Submit(object):
                         )
                         break
             print("sleeping")
->>>>>>> 82bd267a99aa7ed25ffa603b36b55bdba377344b
             time.sleep(10)
