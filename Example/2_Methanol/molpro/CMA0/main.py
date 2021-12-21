@@ -7,7 +7,12 @@ options_kwargs = {
     "cart_insert": 9,
     "coords": "Redundant",
     "success_regex": r"Variable memory released",
-    "cluster": "vulcan",
+    "cluster": "sapelo",
+    "calc"   : False,
+    "benchmark_full" : True,
+    "off_diag"     : True,
+    "off_diag_bands" : 12,
+    "clean_house" : True
 }
 options_obj = Options(**options_kwargs)
 

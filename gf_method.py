@@ -39,6 +39,9 @@ class GFMethod(object):
         if self.cma:
             with open("L_full.npy", "wb") as z:
                 np.save(z, L)
+        #if self.cma == False:
+        #    with open("L_intermediate.npy", "wb") as z:
+        #        np.save(z, L)
         if self.cma is None:
             with open("L_0.npy", "wb") as z:
                 np.save(z, L)
@@ -76,3 +79,12 @@ class GFMethod(object):
         print("//{:^40s}//".format("Total Energy Distribution (TED)"))
         print("////////////////////////////////////////////")
         self.ted.run(self.L, self.freq, rect_print=False)
+        if self.cma == "init":
+            for x in range(len(self.freq)):
+                for y in range(x, len(self.freq)):
+                    if x != y: 
+                        diff = np.abs(self.freq[x] - self.freq[y])
+                        if diff <= 150:
+                            print(self.freq[x], self.freq[y])
+
+ 

@@ -302,7 +302,7 @@ class ConcordantModes(object):
 
                 # Submits an array, then checks if all jobs have finished every
                 # 10 seconds.
-                sub = Submit(disp_list)
+                sub = Submit(disp_list, self.options)
                 sub.run()
             else:
                 s_template = SapeloTemplate(
@@ -372,6 +372,8 @@ class ConcordantModes(object):
         self.G[np.abs(self.G) < self.options.tol] = 0
         if self.options.benchmark_full:
             cma = True
+        else: 
+            cma = False
         # Final GF Matrix run
         print("Final Frequencies:")
         final_GF = GFMethod(
@@ -512,6 +514,7 @@ class ConcordantModes(object):
                 print("////////////////////////////////////////////")
                 print("//{:^40s}//".format(" END OF LOOP"))
                 print("////////////////////////////////////////////")
+             
             print("////////////////////////////////////////////")
             print("//{:^40s}//".format("Begin Selective Diagnostic Benchmark"))
             print("////////////////////////////////////////////")
@@ -526,12 +529,13 @@ class ConcordantModes(object):
                 L_full = np.load(w)
             with open("L_0.npy", "rb") as x:
                 L_0 = np.load(x)
+             
             L_inv = LA.inv(L_full)
             S = np.dot(L_inv, L_0)
             print("printing overlap")
             print(S)
-            with open("S.npy", "wb") as y:
-                np.save(y, S)
+            #with open("S.npy", "wb") as y:
+            #    np.save(y, S)
             self.options.mode_coupling_check = False
             algo = Algorithm(eigs, initial_fc, self.options)
             algo.run()
@@ -546,6 +550,7 @@ class ConcordantModes(object):
             self.F[il] = self.F[cf]
             # Final GF Matrix run
             print("Final Frequencies:")
+            cma = False
             final_GF = GFMethod(
                 self.G,
                 self.F,
@@ -556,7 +561,7 @@ class ConcordantModes(object):
                 cma,
             )
             final_GF.run()
-
+           
             # This code below is a rudimentary table of the TED for the final
             # frequencies. Actually right now it uses the initial L-matrix,
             # which may need to be modified by the final L-matrix.
@@ -564,6 +569,8 @@ class ConcordantModes(object):
             print("//{:^40s}//".format(" Final TED"))
             print("////////////////////////////////////////////")
             self.TED_obj.run(np.dot(init_GF.L, final_GF.L), final_GF.freq)
+            if self.options.clean_house:
+                os.system("rm L_full.npy")  
 
             # This code prints out the frequencies in order of energy as well
             # as the ZPVE in several different units.
@@ -576,3 +583,10 @@ class ConcordantModes(object):
                 + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 219474.6313708)
                 + " (hartrees) "
             )
+            if self.options.clean_house:
+                os.system("rm L_0.npy L_full.npy S.npy Full_fc_levelB.npy")  
+        if self.options.clean_house:
+            os.system("rm S_p.npy")     
+            path = os.getcwd() +  "/L_full.npy"
+            if os.path.isfile(path):
+                os.system("rm L_full.npy")     

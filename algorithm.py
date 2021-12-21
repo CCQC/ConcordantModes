@@ -1,5 +1,7 @@
 import numpy as np
-
+import os
+import scipy
+from scipy import stats
 
 class Algorithm(object):
     """
@@ -60,14 +62,14 @@ class Algorithm(object):
         diag = np.zeros((a, a))
         with open("S_p.npy", "rb") as x:
             S = np.load(x)
-
+            print(S, "printing SSSS")
         for x in range(a):
             for y in range(a):
                 if x == y:
                     diag[x, x] = 0
                 elif x != y:
                     diag[x, y] = S[x, y] / (initial_fc[x] - initial_fc[y])
-
+        #print(diag, "printing diag")
         diag = np.absolute(diag)
         print("Diagnostic Matrix")
         print(diag)
@@ -75,9 +77,9 @@ class Algorithm(object):
             np.save(q, diag)
         diag[np.abs(diag) < 1e-31] = 1e-30
         data = np.abs(diag)
-        stdev = np.std(data)
+        hist, bin_edges = np.histogram(data, bins = a)
         for index, i in np.ndenumerate(data):
-            if abs(data[index] - np.mean(data)) > 2 * np.std(data):
+            if data[index]  >= bin_edges[1]:
                 indices.append(list(index))
         indices_new = []
         for index in indices:
@@ -93,4 +95,8 @@ class Algorithm(object):
         #                indices.append([x, y])
         #            else:
         #                break
+        if self.options.clean_house:
+            os.system("rm D.npy  S_p.npy")  
+        
         return indices
+

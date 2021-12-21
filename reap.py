@@ -35,7 +35,7 @@ class Reap(object):
         success_regex = re.compile(self.success_regex)
         eigs = self.eigs
         n_atoms = len(self.zmat.atom_list)
-
+        size = n_atoms * 3 - 6
         n_disp = len(self.disp_cart)
         self.energies = np.array([])
 
@@ -58,10 +58,11 @@ class Reap(object):
 
         indices = self.indices
         # eigs = self.eigs
-        p_en_array = np.zeros((eigs, eigs))
-        m_en_array = np.zeros((eigs, eigs))
-        rel_en_p = np.zeros((eigs, eigs))
-        rel_en_m = np.zeros((eigs, eigs))
+        #eigs = len(eigs)
+        p_en_array = np.zeros((size, size))
+        m_en_array = np.zeros((size, size))
+        rel_en_p = np.zeros((size, size))
+        rel_en_m = np.zeros((size, size))
         relative_energies = []
 
         direc = 2
