@@ -39,7 +39,7 @@ class GFMethod(object):
         if self.cma:
             with open("L_full.npy", "wb") as z:
                 np.save(z, L)
-        #if self.cma == False:
+        # if self.cma == False:
         #    with open("L_intermediate.npy", "wb") as z:
         #        np.save(z, L)
         if self.cma is None:
@@ -82,9 +82,7 @@ class GFMethod(object):
         if self.cma == "init":
             for x in range(len(self.freq)):
                 for y in range(x, len(self.freq)):
-                    if x != y: 
+                    if x != y:
                         diff = np.abs(self.freq[x] - self.freq[y])
                         if diff <= 150:
                             print(self.freq[x], self.freq[y])
-
- 

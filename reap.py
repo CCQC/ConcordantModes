@@ -58,7 +58,7 @@ class Reap(object):
 
         indices = self.indices
         # eigs = self.eigs
-        #eigs = len(eigs)
+        # eigs = len(eigs)
         p_en_array = np.zeros((size, size))
         m_en_array = np.zeros((size, size))
         rel_en_p = np.zeros((size, size))

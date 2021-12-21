@@ -4,10 +4,12 @@ import time
 import os
 from subprocess import Popen
 
+
 class Submit(object):
     def __init__(self, disp_list, options):
         self.disp_list = disp_list
         self.options = options
+
     def run(self):
         if self.options.cluster != "sapelo":
             pipe = subprocess.PIPE

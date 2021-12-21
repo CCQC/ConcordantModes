@@ -3,6 +3,7 @@ import os
 import scipy
 from scipy import stats
 
+
 class Algorithm(object):
     """
     The purpose of this class is to return a list of indicies by which the force constants of the CMA method
@@ -69,7 +70,7 @@ class Algorithm(object):
                     diag[x, x] = 0
                 elif x != y:
                     diag[x, y] = S[x, y] / (initial_fc[x] - initial_fc[y])
-        #print(diag, "printing diag")
+        # print(diag, "printing diag")
         diag = np.absolute(diag)
         print("Diagnostic Matrix")
         print(diag)
@@ -77,9 +78,9 @@ class Algorithm(object):
             np.save(q, diag)
         diag[np.abs(diag) < 1e-31] = 1e-30
         data = np.abs(diag)
-        hist, bin_edges = np.histogram(data, bins = a)
+        hist, bin_edges = np.histogram(data, bins=a)
         for index, i in np.ndenumerate(data):
-            if data[index]  >= bin_edges[1]:
+            if data[index] >= bin_edges[1]:
                 indices.append(list(index))
         indices_new = []
         for index in indices:
@@ -96,7 +97,6 @@ class Algorithm(object):
         #            else:
         #                break
         if self.options.clean_house:
-            os.system("rm D.npy  S_p.npy")  
-        
-        return indices
+            os.system("rm D.npy  S_p.npy")
 
+        return indices

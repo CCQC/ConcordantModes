@@ -8,11 +8,11 @@ options_kwargs = {
     "coords": "Redundant",
     "success_regex": r"Variable memory released",
     "cluster": "sapelo",
-    "calc"   : False,
-    "benchmark_full" : True,
-    "off_diag"     : True,
-    "off_diag_bands" : 12,
-    "clean_house" : True
+    "calc": False,
+    "benchmark_full": True,
+    "off_diag": True,
+    "off_diag_bands": 12,
+    "clean_house": True,
 }
 options_obj = Options(**options_kwargs)
 
