@@ -9,9 +9,6 @@ options_kwargs = {
     "success_regex": r"Variable memory released",
     "cluster": "sapelo",
     # "calc"         : False,
-    "benchmark_full": True,
-    "off_diag": True,
-    "off_diag_bands": 3,
 }
 options_obj = Options(**options_kwargs)
 

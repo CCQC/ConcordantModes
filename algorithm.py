@@ -76,7 +76,7 @@ class Algorithm(object):
         print(diag)
         with open("D.npy", "wb") as q:
             np.save(q, diag)
-        diag[np.abs(diag) < 1e-31] = 1e-30
+        #diag[np.abs(diag) < 1e-31] = 1e-30
         data = np.abs(diag)
         hist, bin_edges = np.histogram(data, bins=a)
         for index, i in np.ndenumerate(data):

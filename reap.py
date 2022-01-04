@@ -34,8 +34,10 @@ class Reap(object):
         energy_regex = re.compile(self.energy_regex)
         success_regex = re.compile(self.success_regex)
         eigs = self.eigs
-        n_atoms = len(self.zmat.atom_list)
-        size = n_atoms * 3 - 6
+        if type(eigs) == int:
+            size = eigs
+        else:
+            size = len(eigs)
         n_disp = len(self.disp_cart)
         self.energies = np.array([])
 
@@ -74,14 +76,14 @@ class Reap(object):
             print(energy)
             rel = ref_en - energy
             rel_en_p[i, j] = rel
-            relative_energies.append([(i, j), rel, direc])
+            relative_energies.append([(i, j), "plus", rel, direc])
             m_en_array[i, j] = energy = self.reap_energies(
                 direc + 1, success_regex, energy_regex
             )
             print(energy)
             rel = ref_en - energy
             rel_en_m[i, j] = rel
-            relative_energies.append([(i, j), rel, direc])
+            relative_energies.append([(i, j), "minus", rel, direc + 1])
             direc += 2
 
         self.p_en_array = p_en_array

@@ -410,22 +410,22 @@ class ConcordantModes(object):
         # This code converts the force constants back into cartesian
         # coordinates and writes out an "output.default.hess" file, which
         # is of the same format as FCMFINAL of CFOUR.
-        # print(self.F.shape)
-        # self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
-        # print(self.F.shape)
-        # if self.options.coords != "ZMAT":
-        #    self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
-        #    print('what the hell', self.F.shape)
-        # cart_conv = FcConv(
-        #    self.F,
-        #    s_vec,
-        #    self.zmat_obj,
-        #    "cartesian",
-        #    True,
-        #    self.TED_obj,
-        #    self.options.units,
-        # )
-        # cart_conv.run()
+        print(self.F.shape)
+        self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+        print(self.F.shape)
+        if self.options.coords != "ZMAT":
+            self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
+            print("what the hell", self.F.shape)
+        cart_conv = FcConv(
+            self.F,
+            s_vec,
+            self.zmat_obj,
+            "cartesian",
+            True,
+            self.TED_obj,
+            self.options.units,
+        )
+        cart_conv.run()
 
         t2 = time.time()
         print("Frequency Shift (cm^-1): ")
