@@ -24,7 +24,7 @@ from concordantmodes.trans_disp import TransDisp
 from concordantmodes.vulcan_template import VulcanTemplate
 from concordantmodes.sapelo_template import SapeloTemplate
 from concordantmodes.zmat import Zmat
-from concordantmodes.second_order import SecOrder 
+#from concordantmodes.second_order import SecOrder 
 
 
 class ConcordantModes(object):
@@ -259,11 +259,11 @@ class ConcordantModes(object):
             algo.indices,
             GF=TED_GF,
         )
-        B_tensor = s_vec.B
-        second_B = SecOrder(
-            self.zmat_obj, self.zmat_obj.cartesians_final, B_tensor, self.options
-        )
-        second_B.run() 
+        #B_tensor = s_vec.B
+        #second_B = SecOrder(
+        #    self.zmat_obj, self.zmat_obj.cartesians_final, B_tensor, self.options
+        #)
+        #second_B.run() 
         transdisp.run()
         # nate
         # eigs = transdisp.eigs
