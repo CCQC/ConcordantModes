@@ -9,10 +9,14 @@ options_kwargs = {
     "success_regex": r"Variable memory released",
     "cluster": "sapelo",
     "calc": False,
+    "benchmark_full": True,
+    "off_diag": True,
+    "off_diag_bands": 3,
+    "clean_house": True,
 }
 options_obj = Options(**options_kwargs)
 
-# 3. call Concordant Modes Program
+# 3. call Mixed Hessian Program
 from concordantmodes.cma import ConcordantModes
 
 CMA_obj = ConcordantModes(options_obj)

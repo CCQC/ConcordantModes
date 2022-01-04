@@ -32,4 +32,5 @@ class Options(object):
         self.tol = kwargs.pop("tol", 1.0e-14)
         self.units = kwargs.pop("units", "HartreeBohr")
         self.cluster = kwargs.pop("cluster", "sapelo")
-
+        self.benchmark_full = kwargs.pop("benchmark_full", False)
+        self.clean_house = kwargs.pop("clean_house", True)

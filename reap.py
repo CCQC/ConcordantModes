@@ -33,9 +33,11 @@ class Reap(object):
         # Define energy search regex
         energy_regex = re.compile(self.energy_regex)
         success_regex = re.compile(self.success_regex)
-
-        n_atoms = len(self.zmat.atom_list)
-
+        eigs = self.eigs
+        if type(eigs) == int:
+            size = eigs
+        else:
+            size = len(eigs)
         n_disp = len(self.disp_cart)
         self.energies = np.array([])
 
@@ -52,15 +54,17 @@ class Reap(object):
             print("Energy failed at " + str("ref"))
             raise RuntimeError
         os.chdir("..")
+        print("this is the energy regex", energy_regex)
         ref_en = float(re.findall(energy_regex, data)[0])
         print("Reference energy: " + str(ref_en))
 
         indices = self.indices
-        eigs = self.eigs
-        p_en_array = np.zeros((len(eigs), len(eigs)))
-        m_en_array = np.zeros((len(eigs), len(eigs)))
-        rel_en_p = np.zeros((len(eigs), len(eigs)))
-        rel_en_m = np.zeros((len(eigs), len(eigs)))
+        # eigs = self.eigs
+        # eigs = len(eigs)
+        p_en_array = np.zeros((size, size))
+        m_en_array = np.zeros((size, size))
+        rel_en_p = np.zeros((size, size))
+        rel_en_m = np.zeros((size, size))
         relative_energies = []
 
         direc = 2
@@ -72,14 +76,14 @@ class Reap(object):
             print(energy)
             rel = ref_en - energy
             rel_en_p[i, j] = rel
-            relative_energies.append([(i, j), rel, direc])
+            relative_energies.append([(i, j), "plus", rel, direc])
             m_en_array[i, j] = energy = self.reap_energies(
                 direc + 1, success_regex, energy_regex
             )
             print(energy)
             rel = ref_en - energy
             rel_en_m[i, j] = rel
-            relative_energies.append([(i, j), rel, direc])
+            relative_energies.append([(i, j), "minus", rel, direc + 1])
             direc += 2
 
         self.p_en_array = p_en_array

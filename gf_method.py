@@ -11,7 +11,7 @@ class GFMethod(object):
     TODO: Insert standard uncertainties of amu_elmass and HARTREE_WAVENUM
     """
 
-    def __init__(self, G, F, tol, proj_tol, zmat, ted):
+    def __init__(self, G, F, tol, proj_tol, zmat, ted, cma):
         self.G = G
         self.F = F
         self.tol = tol
@@ -20,6 +20,7 @@ class GFMethod(object):
         self.AMU_ELMASS = 5.48579909065 * (10 ** (-4))
         self.HARTREE_WAVENUM = 219474.6313708
         self.ted = ted
+        self.cma = cma
 
     def run(self):
         # Construct the orthogonalizer
@@ -30,7 +31,23 @@ class GFMethod(object):
         self.eig_v, self.L_p = LA.eigh(self.F_O)
         self.L_p[np.abs(self.L_p) < self.tol] = 0
         self.L = np.dot(self.G_O, self.L_p)
+        L = np.absolute(np.real(self.L))
+        L_p = np.real(self.L_p)
+        S_p = np.dot(np.absolute(LA.inv(L_p)), np.absolute(L_p))
 
+        # make sure the correct "primed" or unprimed version is being saved in each instance
+        if self.cma:
+            with open("L_full.npy", "wb") as z:
+                np.save(z, L)
+        # if self.cma == False:
+        #    with open("L_intermediate.npy", "wb") as z:
+        #        np.save(z, L)
+        if self.cma is None:
+            with open("L_0.npy", "wb") as z:
+                np.save(z, L)
+        if self.cma == "init":
+            with open("S_p.npy", "wb") as z:
+                np.save(z, S_p)
         # Construct the normal mode overlap matrix. Will be useful for off-diagonal diagnostics.
         L = np.absolute(np.real(self.L))
         L_inv = LA.inv(L)
@@ -62,3 +79,10 @@ class GFMethod(object):
         print("//{:^40s}//".format("Total Energy Distribution (TED)"))
         print("////////////////////////////////////////////")
         self.ted.run(self.L, self.freq, rect_print=False)
+        if self.cma == "init":
+            for x in range(len(self.freq)):
+                for y in range(x, len(self.freq)):
+                    if x != y:
+                        diff = np.abs(self.freq[x] - self.freq[y])
+                        if diff <= 150:
+                            print(self.freq[x], self.freq[y])
