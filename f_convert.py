@@ -45,7 +45,6 @@ class FcConv(object):
                 self.print_const()
         elif self.coord.lower() == "cartesian":
             self.F = np.einsum("ai,bj,ab->ij", self.s_vec.B, self.s_vec.B, self.F)
-            print("i think its being converted", self.F.shape)
             if self.print_f:
                 self.N = len(self.zmat.atom_list) * 3
                 self.print_const()

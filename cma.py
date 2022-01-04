@@ -24,6 +24,7 @@ from concordantmodes.trans_disp import TransDisp
 from concordantmodes.vulcan_template import VulcanTemplate
 from concordantmodes.sapelo_template import SapeloTemplate
 from concordantmodes.zmat import Zmat
+from concordantmodes.second_order import SecOrder 
 
 
 class ConcordantModes(object):
@@ -258,6 +259,11 @@ class ConcordantModes(object):
             algo.indices,
             GF=TED_GF,
         )
+        B_tensor = s_vec.B
+        second_B = SecOrder(
+            self.zmat_obj, self.zmat_obj.cartesians_final, B_tensor, self.options
+        )
+        second_B.run() 
         transdisp.run()
         # nate
         # eigs = transdisp.eigs
@@ -410,12 +416,9 @@ class ConcordantModes(object):
         # This code converts the force constants back into cartesian
         # coordinates and writes out an "output.default.hess" file, which
         # is of the same format as FCMFINAL of CFOUR.
-        print(self.F.shape)
         self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
-        print(self.F.shape)
         if self.options.coords != "ZMAT":
             self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
-            print("what the hell", self.F.shape)
         cart_conv = FcConv(
             self.F,
             s_vec,
