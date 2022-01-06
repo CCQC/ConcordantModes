@@ -25,7 +25,8 @@ class SVectors(object):
         self.options = options
         self.variable_dict = variable_dict
 
-    def run(self, carts, B_proj):
+    def run(self, carts, B_proj, proj=None):
+        self.proj = proj
         # Initialize the cartesian coordinates
         self.carts = carts
         # So, first things first I'll have to code up the
@@ -294,20 +295,20 @@ class SVectors(object):
         tol = 1e-10
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
-        if self.options.coords.upper() != "ZMAT":
-            proj, eigs, _ = LA.svd(self.B)
-            proj[np.abs(proj) < tol] = 0
-            print("proj singular values:")
-            print(eigs)
-            if B_proj:
-                proj_array = np.array(np.where(np.abs(eigs) > tol))
-                self.proj = proj.T[: len(proj_array[0])]
-                self.proj = self.proj.T
-                # for i in range(len(self.proj.T)):
-                # self.proj.T[i][np.abs(self.proj.T[i]) < np.max(np.abs(self.proj.T[i]))*proj_tol] = 0
-        else:
-            self.proj = np.eye(len(self.B))
-
+        if not self.options.man_proj:
+            if self.options.coords.upper() != "ZMAT":
+                proj, eigs, _ = LA.svd(self.B)
+                proj[np.abs(proj) < tol] = 0
+                print("proj singular values:")
+                print(eigs)
+                if B_proj:
+                    proj_array = np.array(np.where(np.abs(eigs) > tol))
+                    self.proj = proj.T[: len(proj_array[0])]
+                    self.proj = self.proj.T
+                    # for i in range(len(self.proj.T)):
+                    # self.proj.T[i][np.abs(self.proj.T[i]) < np.max(np.abs(self.proj.T[i]))*proj_tol] = 0
+            else:
+                self.proj = np.eye(len(self.B))
         # self.proj may be used to transfrom from full set of internal
         # coords to symmetrized internal coords. self.proj.T may be used
         # to transform from the symmetrized set to the full set of internal

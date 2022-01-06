@@ -14,7 +14,7 @@ class Zmat(object):
         self.options = options
         self.Bohr_Ang = 0.529177210903
 
-    def run(self):
+    def run(self,zmat_name="zmat"):
         # Define some regexes
         zmat_begin_regex = re.compile(r"ZMAT begin")
         zmat_end_regex = re.compile(r"ZMAT end")
@@ -41,7 +41,7 @@ class Zmat(object):
         divider_regex = re.compile("^\s*\-\-\-\s*\n")
 
         # Read in the ZMAT file
-        with open("zmat", "r") as file:
+        with open(zmat_name, "r") as file:
             output = file.readlines()
 
         # Read in the input cartesian coordinates

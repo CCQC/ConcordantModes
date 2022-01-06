@@ -31,7 +31,8 @@ class GFMethod(object):
         self.eig_v, self.L_p = LA.eigh(self.F_O)
         self.L_p[np.abs(self.L_p) < self.tol] = 0
         self.L = np.dot(self.G_O, self.L_p)
-        L = np.absolute(np.real(self.L))
+        self.L = np.real(self.L)
+        L = np.absolute(self.L)
         L_p = np.real(self.L_p)
         S_p = np.dot(np.absolute(LA.inv(L_p)), np.absolute(L_p))
 
@@ -79,10 +80,3 @@ class GFMethod(object):
         print("//{:^40s}//".format("Total Energy Distribution (TED)"))
         print("////////////////////////////////////////////")
         self.ted.run(self.L, self.freq, rect_print=False)
-        if self.cma == "init":
-            for x in range(len(self.freq)):
-                for y in range(x, len(self.freq)):
-                    if x != y:
-                        diff = np.abs(self.freq[x] - self.freq[y])
-                        if diff <= 150:
-                            print(self.freq[x], self.freq[y])

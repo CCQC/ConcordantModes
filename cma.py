@@ -37,10 +37,11 @@ class ConcordantModes(object):
     BOHR_ANG: Standard uncertainty of 0.00000000080
     """
 
-    def __init__(self, options):
+    def __init__(self, options, proj=None):
         self.options = options
         self.MDYNE_HART = 4.3597447222071
         self.BOHR_ANG = 0.529177210903
+        self.proj = proj
 
     def run(self):
         t1 = time.time()
@@ -57,7 +58,9 @@ class ConcordantModes(object):
         s_vec = SVectors(
             self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_init
         )
-        s_vec.run(self.zmat_obj.cartesians_init, True)
+        if self.options.man_proj:
+            proj = self.proj
+        s_vec.run(self.zmat_obj.cartesians_init, True, proj=proj)
 
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
 
@@ -97,7 +100,7 @@ class ConcordantModes(object):
             prog_init = self.options.program_init
             prog_name_init = prog_init.split("@")[0]
 
-            if self.options.init_calc:
+            if self.options.calc_init:
                 dir_obj_init = DirectoryTree(
                     prog_name_init,
                     self.zmat_obj,
@@ -246,7 +249,7 @@ class ConcordantModes(object):
         s_vec = SVectors(
             self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_final
         )
-        s_vec.run(self.zmat_obj.cartesians_final, False)
+        s_vec.run(self.zmat_obj.cartesians_final, False, proj=proj)
         transdisp = TransDisp(
             s_vec,
             self.zmat_obj,
