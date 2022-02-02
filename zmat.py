@@ -14,7 +14,7 @@ class Zmat(object):
         self.options = options
         self.Bohr_Ang = 0.529177210903
 
-    def run(self,zmat_name="zmat"):
+    def run(self, zmat_name="zmat"):
         # Define some regexes
         zmat_begin_regex = re.compile(r"ZMAT begin")
         zmat_end_regex = re.compile(r"ZMAT end")
@@ -30,6 +30,8 @@ class Zmat(object):
         torsion_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
         oop_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
         lin_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*L\s*\n")
+        linx_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Lx\s*\n")
+        liny_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Ly\s*\n")
 
         # Cartesian regexes
         cart_begin_regex = re.compile(r"cart begin")
@@ -123,6 +125,10 @@ class Zmat(object):
         self.oop_variables = []
         self.lin_indices = []
         self.lin_variables = []
+        self.linx_indices = []
+        self.linx_variables = []
+        self.liny_indices = []
+        self.liny_variables = []
         self.variable_dictionary_init = {}
         self.variable_dictionary_final = {}
         self.index_dictionary = {}
@@ -282,6 +288,18 @@ class Zmat(object):
                     self.lin_variables.append(
                         "L" + str(i + 1 - Sum + len(self.lin_variables))
                     )
+                elif re.search(linx_regex, zmat_output[i]):
+                    List = re.findall(linx_regex, zmat_output[i])[0]
+                    self.linx_indices.append(List)
+                    self.linx_variables.append(
+                        "Lx" + str(i + 1 - Sum + len(self.linx_variables))
+                    )
+                elif re.search(liny_regex, zmat_output[i]):
+                    List = re.findall(liny_regex, zmat_output[i])[0]
+                    self.liny_indices.append(List)
+                    self.liny_variables.append(
+                        "Ly" + str(i + 1 - Sum + len(self.liny_variables))
+                    )
                 else:
                     blank += 1
                 Sum = (
@@ -290,6 +308,8 @@ class Zmat(object):
                     + len(self.torsion_variables)
                     + len(self.oop_variables)
                     + len(self.lin_variables)
+                    + len(self.linx_variables)
+                    + len(self.liny_variables)
                     + blank
                 )
 
@@ -306,6 +326,8 @@ class Zmat(object):
             + len(self.torsion_indices)
             + len(self.oop_indices)
             + len(self.lin_indices)
+            + len(self.linx_indices)
+            + len(self.liny_indices)
         )
         variables1 = transdisp.int_c(self.cartesians_init, I, I)
         variables2 = transdisp.int_c(self.cartesians_final, I, I)
@@ -314,6 +336,8 @@ class Zmat(object):
             + len(self.torsion_indices)
             + len(self.oop_indices)
             + len(self.lin_indices)
+            + len(self.linx_indices)
+            + len(self.liny_indices)
         ):
             variables1[len(self.bond_indices) + i] *= 180.0 / np.pi
             variables2[len(self.bond_indices) + i] *= 180.0 / np.pi
@@ -324,6 +348,10 @@ class Zmat(object):
             variables = np.append(variables, self.oop_variables)
         if len(self.lin_variables):
             variables = np.append(variables, self.lin_variables)
+        if len(self.linx_variables):
+            variables = np.append(variables, self.linx_variables)
+        if len(self.liny_variables):
+            variables = np.append(variables, self.liny_variables)
 
         # This code is useful for checking the Redundant coordinate
         # generation process.
@@ -448,6 +476,10 @@ class Zmat(object):
             self.index_dictionary["O" + str(i + 1)] = self.oop_indices[i]
         for i in range(len(self.lin_indices)):
             self.index_dictionary["L" + str(i + 1)] = self.lin_indices[i]
+        for i in range(len(self.linx_indices)):
+            self.index_dictionary["Lx" + str(i + 1)] = self.linx_indices[i]
+        for i in range(len(self.liny_indices)):
+            self.index_dictionary["Ly" + str(i + 1)] = self.liny_indices[i]
 
         # Print off the internal coordinate and its value in Bohr/Degree
         print("Initial Geometric Internal Coordinate Values:")

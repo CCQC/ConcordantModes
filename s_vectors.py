@@ -22,6 +22,8 @@ class SVectors(object):
         self.torsion_indices = np.array(zmat.torsion_indices).astype(np.int)
         self.oop_indices = np.array(zmat.oop_indices).astype(np.int)
         self.lin_indices = np.array(zmat.lin_indices).astype(np.int)
+        self.linx_indices = np.array(zmat.linx_indices).astype(np.int)
+        self.liny_indices = np.array(zmat.liny_indices).astype(np.int)
         self.options = options
         self.variable_dict = variable_dict
 
@@ -253,6 +255,112 @@ class SVectors(object):
                     -l_1 - l_3 - l_4
                 )
 
+        # LinX bending.
+        if len(self.linx_indices) > 0:
+            for i in range(len(self.linx_indices)):
+                self.s_4center_dict["Lx" + str(i + 1)] = self.carts.copy()
+                self.s_4center_dict["Lx" + str(i + 1)] = (
+                    0 * self.s_4center_dict["Lx" + str(i + 1)]
+                )
+                r_1 = self.compute_r(
+                    self.carts, self.linx_indices[i][1] - 1, self.linx_indices[i][0] - 1
+                )
+                r_2 = self.compute_r(
+                    self.carts, self.linx_indices[i][2] - 1, self.linx_indices[i][1] - 1
+                )
+                r_3 = self.compute_r(
+                    self.carts, self.linx_indices[i][3] - 1, self.linx_indices[i][2] - 1
+                )
+                e_1 = self.compute_e(
+                    self.carts,
+                    self.linx_indices[i][0] - 1,
+                    self.linx_indices[i][1] - 1,
+                    r_1,
+                )
+                e_2 = self.compute_e(
+                    self.carts,
+                    self.linx_indices[i][1] - 1,
+                    self.linx_indices[i][2] - 1,
+                    r_2,
+                )
+                e_3 = self.compute_e(
+                    self.carts,
+                    self.linx_indices[i][2] - 1,
+                    self.linx_indices[i][3] - 1,
+                    r_3,
+                )
+                ax = self.calc_alpha_x(e_1, e_2, e_3)
+                phi_1 = self.compute_phi(-e_1, e_2)
+                phi_2 = self.compute_phi(-e_2, e_3)
+                lx_1 = self.compute_LINX1(e_1, e_2, e_3, r_1, phi_1, phi_2, ax)
+                lx_2 = self.compute_LINX2(e_1, e_2, e_3, r_1, r_2, phi_1, phi_2, ax)
+                lx_4 = self.compute_LINX4(e_1, e_2, e_3, r_3, phi_1, ax)
+                self.s_4center_dict["Lx" + str(i + 1)][
+                    self.linx_indices[i][0] - 1
+                ] = lx_1
+                self.s_4center_dict["Lx" + str(i + 1)][
+                    self.linx_indices[i][1] - 1
+                ] = lx_2
+                self.s_4center_dict["Lx" + str(i + 1)][
+                    self.linx_indices[i][3] - 1
+                ] = lx_4
+                self.s_4center_dict["Lx" + str(i + 1)][self.linx_indices[i][2] - 1] = (
+                    -lx_1 - lx_2 - lx_4
+                )
+
+        # LinY bending.
+        if len(self.liny_indices) > 0:
+            for i in range(len(self.liny_indices)):
+                self.s_4center_dict["Ly" + str(i + 1)] = self.carts.copy()
+                self.s_4center_dict["Ly" + str(i + 1)] = (
+                    0 * self.s_4center_dict["Ly" + str(i + 1)]
+                )
+                r_1 = self.compute_r(
+                    self.carts, self.liny_indices[i][1] - 1, self.liny_indices[i][0] - 1
+                )
+                r_2 = self.compute_r(
+                    self.carts, self.liny_indices[i][2] - 1, self.liny_indices[i][1] - 1
+                )
+                r_3 = self.compute_r(
+                    self.carts, self.liny_indices[i][3] - 1, self.liny_indices[i][2] - 1
+                )
+                e_1 = self.compute_e(
+                    self.carts,
+                    self.liny_indices[i][0] - 1,
+                    self.liny_indices[i][1] - 1,
+                    r_1,
+                )
+                e_2 = self.compute_e(
+                    self.carts,
+                    self.liny_indices[i][1] - 1,
+                    self.liny_indices[i][2] - 1,
+                    r_2,
+                )
+                e_3 = self.compute_e(
+                    self.carts,
+                    self.liny_indices[i][2] - 1,
+                    self.liny_indices[i][3] - 1,
+                    r_3,
+                )
+                ay = self.calc_alpha_y(e_1, e_2, e_3)
+                phi_1 = self.compute_phi(-e_1, e_2)
+                phi_2 = self.compute_phi(-e_2, e_3)
+                ly_1 = self.compute_LINY1(e_1, e_2, e_3, r_1, phi_1, ay)
+                ly_2 = self.compute_LINY2(e_1, e_2, e_3, r_1, r_2, phi_1, ay)
+                ly_4 = self.compute_LINY4(e_1, e_2, e_3, r_2, r_3, phi_1, ay)
+                self.s_4center_dict["Ly" + str(i + 1)][
+                    self.liny_indices[i][0] - 1
+                ] = ly_1
+                self.s_4center_dict["Ly" + str(i + 1)][
+                    self.liny_indices[i][1] - 1
+                ] = ly_2
+                self.s_4center_dict["Ly" + str(i + 1)][
+                    self.liny_indices[i][3] - 1
+                ] = ly_4
+                self.s_4center_dict["Ly" + str(i + 1)][self.liny_indices[i][2] - 1] = (
+                    -ly_1 - ly_2 - ly_4
+                )
+
         # The last step will be to concatenate all of the s-vectors into a singular B-tensor, in order of stretches, then bends, then torsions.
         # Note: I am going to modify this to hold all 2-center, 3-center, and 4-center internal coordinates.
         self.B = np.array([self.s_2center_dict["B1"].flatten()])
@@ -291,6 +399,21 @@ class SVectors(object):
                 np.array([self.s_4center_dict["L" + str(i + 1)].flatten()]),
                 axis=0,
             )
+        # Append linx bends
+        for i in range(len(self.linx_indices)):
+            self.B = np.append(
+                self.B,
+                np.array([self.s_4center_dict["Lx" + str(i + 1)].flatten()]),
+                axis=0,
+            )
+        # Append liny bends
+        for i in range(len(self.liny_indices)):
+            self.B = np.append(
+                self.B,
+                np.array([self.s_4center_dict["Ly" + str(i + 1)].flatten()]),
+                axis=0,
+            )
+        # raise RuntimeError
 
         tol = 1e-10
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
@@ -364,6 +487,63 @@ class SVectors(object):
         )
         return s
 
+    def compute_LINX1(self, e_1, e_2, e_3, r, phi_1, phi_2, ax):
+        a = -ax * e_1 / (r * np.sin(phi_1) ** 2)
+        b = -e_2 * (ax * (np.tan(phi_1) ** -1) + np.cos(phi_2)) / (r * np.sin(phi_1))
+        c = -e_3 / (r * np.sin(phi_1))
+        s = a + b + c
+        return s
+
+    def compute_LINX2(self, e_1, e_2, e_3, r_1, r_2, phi_1, phi_2, ax):
+        a = (
+            e_1
+            * (ax * (r_2 - r_1 * np.cos(phi_1)) - r_1 * np.sin(phi_1) * np.cos(phi_2))
+            / (r_1 * r_2 * np.sin(phi_1) ** 2)
+        )
+        b = (
+            -e_2
+            * (
+                ax * (np.tan(phi_1) ** -1) * (r_1 * np.cos(phi_1) - r_2)
+                + np.cos(phi_2) * (2 * r_1 * np.cos(phi_1) - r_2)
+            )
+            / (r_1 * r_2 * np.sin(phi_1))
+        )
+        c = -e_3 * (r_1 * np.cos(phi_1) - r_2) / (r_1 * r_2 * np.sin(phi_1))
+        s = a + b + c
+        return s
+
+    def compute_LINX4(self, e_1, e_2, e_3, r, phi, ax):
+        a = e_1 / (r * np.sin(phi))
+        b = e_2 * (np.tan(phi) ** -1) / r
+        c = ax * e_3 / r
+        s = a + b + c
+        return s
+
+    def compute_LINY1(self, e_1, e_2, e_3, r, phi, ay):
+        a = -ay * (np.tan(phi) ** -1) * (e_1 * np.cos(phi) + e_2) / (r * np.sin(phi))
+        b = np.cross(e_2, -e_3) / (r * np.sin(phi))
+        c = -e_1 * ay / r
+        s = a + b + c
+        return s
+
+    def compute_LINY2(self, e_1, e_2, e_3, r_1, r_2, phi, ay):
+        a = (
+            -np.cos(phi)
+            * ay
+            * (e_1 * (r_1 - r_2 * np.cos(phi)) - e_2 * (r_2 - r_1 * np.cos(phi)))
+            / (r_1 * r_2 * np.sin(phi) ** 2)
+        )
+        b = (r_2 * np.cross(e_2, -e_3) + r_1 * np.cross(-e_3, e_1)) / (
+            r_1 * r_2 * np.sin(phi)
+        )
+        c = ay * (e_1 * r_2 + e_2 * r_1) / (r_1 * r_2)
+        s = a + b + c
+        return s
+
+    def compute_LINY4(self, e_1, e_2, e_3, r_1, r_2, phi, ay):
+        s = ((np.sin(phi) ** -1) * np.cross(e_1, e_2) + e_3 * ay) / r_2
+        return s
+
     def compute_e(self, carts, ind1, ind2, r):
         e = (carts[ind1] - carts[ind2]) / r
         return e
@@ -375,3 +555,21 @@ class SVectors(object):
     def compute_phi(self, e_1, e_2):
         phi = np.arccos(np.dot(e_1, e_2))
         return phi
+
+    def calc_alpha_x(self, e_1, e_2, e_3):
+        # e_1 = (x1 - x2) / self.calc_bond(x1, x2)
+        # e_2 = (x3 - x2) / self.calc_bond(x2, x3)
+        # e_3 = (x4 - x3) / self.calc_bond(x3, x4)
+        theta = self.compute_phi(e_1, e_2)
+        s = np.dot(np.cross(e_1, e_2), np.cross(-e_2, e_3))
+        ax = s / np.sin(theta)
+        return ax
+
+    def calc_alpha_y(self, e_1, e_2, e_3):
+        # e_1 = (x1 - x2) / self.calc_bond(x1, x2)
+        # e_2 = (x3 - x2) / self.calc_bond(x2, x3)
+        # e_3 = (x4 - x3) / self.calc_bond(x3, x4)
+        theta = self.compute_phi(e_1, e_2)
+        s = np.dot(e_1, np.cross(-e_2, e_3))
+        ay = s / np.sin(theta)
+        return ay

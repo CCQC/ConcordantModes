@@ -224,6 +224,8 @@ class TransDisp(object):
                 if condition_2:
                     o = o + 2 * np.pi
             int_coord = np.append(int_coord, o)
+
+        # These angles will have to be tempered at some point in the same manner as above.
         for i in range(len(self.zmat.lin_indices)):
             x1 = np.array(carts[int(self.zmat.lin_indices[i][0]) - 1]).astype(float)
             x2 = np.array(carts[int(self.zmat.lin_indices[i][1]) - 1]).astype(float)
@@ -231,6 +233,23 @@ class TransDisp(object):
             x4 = np.array(carts[int(self.zmat.lin_indices[i][3]) - 1]).astype(float)
             l = self.calc_Lin(x1, x2, x3, x4)
             int_coord = np.append(int_coord, l)
+
+        for i in range(len(self.zmat.linx_indices)):
+            x1 = np.array(carts[int(self.zmat.linx_indices[i][0]) - 1]).astype(float)
+            x2 = np.array(carts[int(self.zmat.linx_indices[i][1]) - 1]).astype(float)
+            x3 = np.array(carts[int(self.zmat.linx_indices[i][2]) - 1]).astype(float)
+            x4 = np.array(carts[int(self.zmat.linx_indices[i][3]) - 1]).astype(float)
+            lx = self.calc_Linx(x1, x2, x3, x4)
+            int_coord = np.append(int_coord, lx)
+
+        for i in range(len(self.zmat.liny_indices)):
+            x1 = np.array(carts[int(self.zmat.liny_indices[i][0]) - 1]).astype(float)
+            x2 = np.array(carts[int(self.zmat.liny_indices[i][1]) - 1]).astype(float)
+            x3 = np.array(carts[int(self.zmat.liny_indices[i][2]) - 1]).astype(float)
+            x4 = np.array(carts[int(self.zmat.liny_indices[i][3]) - 1]).astype(float)
+            ly = self.calc_Liny(x1, x2, x3, x4)
+            int_coord = np.append(int_coord, ly)
+
         int_coord = np.dot(proj.T, int_coord)
         # int_coord[np.abs(int_coord) < tol*np.max(np.abs(int_coord))] = 0
         int_coord = np.dot(eig_inv, int_coord)
@@ -290,6 +309,24 @@ class TransDisp(object):
         e4 = (x4 - x2) / self.calc_bond(x4, x2)
         theta = np.arcsin(np.dot(e4, np.cross(e3, e1)))
         return theta
+
+    def calc_Linx(self, x1, x2, x3, x4):
+        e1 = (x2 - x1) / self.calc_bond(x1, x2)
+        e2 = (x3 - x2) / self.calc_bond(x2, x3)
+        e3 = (x4 - x3) / self.calc_bond(x3, x4)
+        theta = self.calc_angle(x1, x2, x3)
+        s = np.dot(np.cross(-e1, e2), np.cross(-e2, e3))
+        ax = s / np.sin(theta)
+        return ax
+
+    def calc_Liny(self, x1, x2, x3, x4):
+        e1 = (x2 - x1) / self.calc_bond(x1, x2)
+        e2 = (x3 - x2) / self.calc_bond(x2, x3)
+        e3 = (x4 - x3) / self.calc_bond(x3, x4)
+        theta = self.calc_angle(x1, x2, x3)
+        s = np.dot(-e1, np.cross(-e2, e3))
+        ay = s / np.sin(theta)
+        return ay
 
     def coord_convert(
         self,

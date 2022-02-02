@@ -24,7 +24,8 @@ from concordantmodes.trans_disp import TransDisp
 from concordantmodes.vulcan_template import VulcanTemplate
 from concordantmodes.sapelo_template import SapeloTemplate
 from concordantmodes.zmat import Zmat
-#from concordantmodes.second_order import SecOrder 
+
+# from concordantmodes.second_order import SecOrder
 
 
 class ConcordantModes(object):
@@ -60,7 +61,9 @@ class ConcordantModes(object):
         )
         if self.options.man_proj:
             proj = self.proj
-        s_vec.run(self.zmat_obj.cartesians_init, True, proj=proj)
+            s_vec.run(self.zmat_obj.cartesians_init, True, proj=proj)
+        else:
+            s_vec.run(self.zmat_obj.cartesians_init, True)
 
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
 
@@ -147,37 +150,37 @@ class ConcordantModes(object):
                     sub = Submit(disp_list, self.options)
                     sub.run()
 
-            reap_obj_init = Reap(
-                prog_name_init,
-                self.zmat_obj,
-                init_disp.disp_cart,
-                self.options,
-                init_disp.n_coord,
-                eigs_init,
-                indices,
-                self.options.energy_regex_init,
-                self.options.success_regex_init,
-            )
-            print("not recalculating", os.getcwd())
-            os.chdir(rootdir + "/DispsInit")
-            reap_obj_init.run()
+                    reap_obj_init = Reap(
+                        prog_name_init,
+                        self.zmat_obj,
+                        init_disp.disp_cart,
+                        self.options,
+                        init_disp.n_coord,
+                        eigs_init,
+                        indices,
+                        self.options.energy_regex_init,
+                        self.options.success_regex_init,
+                    )
+                    print("not recalculating", os.getcwd())
+                    os.chdir(rootdir + "/DispsInit")
+                    reap_obj_init.run()
 
-            # nate
-            p_en_array_init = reap_obj_init.p_en_array
-            m_en_array_init = reap_obj_init.m_en_array
-            ref_en_init = reap_obj_init.ref_en
+                    # nate
+                    p_en_array_init = reap_obj_init.p_en_array
+                    m_en_array_init = reap_obj_init.m_en_array
+                    ref_en_init = reap_obj_init.ref_en
 
-            fc_init = ForceConstant(
-                init_disp,
-                p_en_array_init,
-                m_en_array_init,
-                ref_en_init,
-                self.options,
-                indices,
-            )
-            fc_init.run()
-            print("Computed Force Constants:")
-            print(fc_init.FC)
+                    fc_init = ForceConstant(
+                        init_disp,
+                        p_en_array_init,
+                        m_en_array_init,
+                        ref_en_init,
+                        self.options,
+                        indices,
+                    )
+                    fc_init.run()
+                    print("Computed Force Constants:")
+                    print(fc_init.FC)
 
             # raise RuntimeError
 
@@ -249,7 +252,7 @@ class ConcordantModes(object):
         s_vec = SVectors(
             self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_final
         )
-        s_vec.run(self.zmat_obj.cartesians_final, False, proj=proj)
+        s_vec.run(self.zmat_obj.cartesians_final, False, proj=self.TED_obj.proj)
         transdisp = TransDisp(
             s_vec,
             self.zmat_obj,
@@ -262,11 +265,11 @@ class ConcordantModes(object):
             algo.indices,
             GF=TED_GF,
         )
-        #B_tensor = s_vec.B
-        #second_B = SecOrder(
+        # B_tensor = s_vec.B
+        # second_B = SecOrder(
         #    self.zmat_obj, self.zmat_obj.cartesians_final, B_tensor, self.options
-        #)
-        #second_B.run() 
+        # )
+        # second_B.run()
         transdisp.run()
         # nate
         # eigs = transdisp.eigs

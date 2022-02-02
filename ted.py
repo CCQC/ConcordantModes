@@ -171,6 +171,226 @@ class TED(object):
                             )
                             + " TORS: "
                         )
+                    elif (
+                        i
+                        < len(self.zmat.bond_indices)
+                        + len(self.zmat.angle_indices)
+                        + len(self.zmat.torsion_indices)
+                        + len(self.zmat.oop_indices)
+                        and j == 0
+                    ):
+                        k = (
+                            i
+                            - len(self.zmat.bond_indices)
+                            - len(self.zmat.angle_indices)
+                            - len(self.zmat.torsion_indices)
+                        )
+                        table_output += (
+                            "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.oop_indices[k][0]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.oop_indices[k][0])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.oop_indices[k][1]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.oop_indices[k][1])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.oop_indices[k][2]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.oop_indices[k][2])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.oop_indices[k][3]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.oop_indices[k][3])
+                            )
+                            + "  OOP: "
+                        )
+                    elif (
+                        i
+                        < len(self.zmat.bond_indices)
+                        + len(self.zmat.angle_indices)
+                        + len(self.zmat.torsion_indices)
+                        + len(self.zmat.oop_indices)
+                        + len(self.zmat.lin_indices)
+                        and j == 0
+                    ):
+                        k = (
+                            i
+                            - len(self.zmat.bond_indices)
+                            - len(self.zmat.angle_indices)
+                            - len(self.zmat.torsion_indices)
+                            - len(self.zmat.oop_indices)
+                        )
+                        table_output += (
+                            "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.lin_indices[k][0]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.lin_indices[k][0])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.lin_indices[k][1]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.lin_indices[k][1])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.lin_indices[k][2]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.lin_indices[k][2])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.lin_indices[k][3]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.lin_indices[k][3])
+                            )
+                            + "  LIN: "
+                        )
+                    elif (
+                        i
+                        < len(self.zmat.bond_indices)
+                        + len(self.zmat.angle_indices)
+                        + len(self.zmat.torsion_indices)
+                        + len(self.zmat.oop_indices)
+                        + len(self.zmat.lin_indices)
+                        + len(self.zmat.linx_indices)
+                        and j == 0
+                    ):
+                        k = (
+                            i
+                            - len(self.zmat.bond_indices)
+                            - len(self.zmat.angle_indices)
+                            - len(self.zmat.torsion_indices)
+                            - len(self.zmat.oop_indices)
+                            - len(self.zmat.lin_indices)
+                        )
+                        table_output += (
+                            "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.linx_indices[k][0]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.linx_indices[k][0])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.linx_indices[k][1]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.linx_indices[k][1])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.linx_indices[k][2]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.linx_indices[k][2])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.linx_indices[k][3]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.linx_indices[k][3])
+                            )
+                            + " LINX: "
+                        )
+                    elif (
+                        i
+                        < len(self.zmat.bond_indices)
+                        + len(self.zmat.angle_indices)
+                        + len(self.zmat.torsion_indices)
+                        + len(self.zmat.oop_indices)
+                        + len(self.zmat.lin_indices)
+                        + len(self.zmat.linx_indices)
+                        + len(self.zmat.liny_indices)
+                        and j == 0
+                    ):
+                        k = (
+                            i
+                            - len(self.zmat.bond_indices)
+                            - len(self.zmat.angle_indices)
+                            - len(self.zmat.torsion_indices)
+                            - len(self.zmat.oop_indices)
+                            - len(self.zmat.lin_indices)
+                            - len(self.zmat.linx_indices)
+                        )
+                        table_output += (
+                            "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.liny_indices[k][0]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.liny_indices[k][0])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.liny_indices[k][1]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.liny_indices[k][1])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.liny_indices[k][2]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.liny_indices[k][2])
+                            )
+                            + " "
+                            + "{:4s}".format(
+                                str(
+                                    self.zmat.atom_list[
+                                        int(self.zmat.liny_indices[k][3]) - 1
+                                    ]
+                                )
+                                + str(self.zmat.liny_indices[k][3])
+                            )
+                            + " LINY: "
+                        )
                     table_output += "{:8.1f}".format(TED[i][j + div * int_div])
                 table_output += "\n"
         else:
