@@ -66,7 +66,11 @@ class ConcordantModes(object):
             s_vec.run(self.zmat_obj.cartesians_init, True)
 
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
-
+        
+        # Print out the percentage composition of the projected coordinates
+        if self.options.coords != "ZMAT":
+            self.TED_obj.run(np.eye(len(self.TED_obj.proj.T)),np.zeros(len(self.TED_obj.proj.T)))
+        
         # Compute G-Matrix
         g_mat = GMatrix(self.zmat_obj, s_vec, self.options)
         g_mat.run()
@@ -132,7 +136,7 @@ class ConcordantModes(object):
 
                     # Submits an array, then checks if all jobs have finished every
                     # 10 seconds.
-                    sub = Submit(disp_list)
+                    sub = Submit(disp_list,self.options)
                     sub.run()
                 else:
                     s_template = SapeloTemplate(
@@ -150,37 +154,37 @@ class ConcordantModes(object):
                     sub = Submit(disp_list, self.options)
                     sub.run()
 
-                    reap_obj_init = Reap(
-                        prog_name_init,
-                        self.zmat_obj,
-                        init_disp.disp_cart,
-                        self.options,
-                        init_disp.n_coord,
-                        eigs_init,
-                        indices,
-                        self.options.energy_regex_init,
-                        self.options.success_regex_init,
-                    )
-                    print("not recalculating", os.getcwd())
-                    os.chdir(rootdir + "/DispsInit")
-                    reap_obj_init.run()
+            reap_obj_init = Reap(
+                prog_name_init,
+                self.zmat_obj,
+                init_disp.disp_cart,
+                self.options,
+                init_disp.n_coord,
+                eigs_init,
+                indices,
+                self.options.energy_regex_init,
+                self.options.success_regex_init,
+            )
+            # print("not recalculating", os.getcwd())
+            os.chdir(rootdir + "/DispsInit")
+            reap_obj_init.run()
 
-                    # nate
-                    p_en_array_init = reap_obj_init.p_en_array
-                    m_en_array_init = reap_obj_init.m_en_array
-                    ref_en_init = reap_obj_init.ref_en
+            # nate
+            p_en_array_init = reap_obj_init.p_en_array
+            m_en_array_init = reap_obj_init.m_en_array
+            ref_en_init = reap_obj_init.ref_en
 
-                    fc_init = ForceConstant(
-                        init_disp,
-                        p_en_array_init,
-                        m_en_array_init,
-                        ref_en_init,
-                        self.options,
-                        indices,
-                    )
-                    fc_init.run()
-                    print("Computed Force Constants:")
-                    print(fc_init.FC)
+            fc_init = ForceConstant(
+                init_disp,
+                p_en_array_init,
+                m_en_array_init,
+                ref_en_init,
+                self.options,
+                indices,
+            )
+            fc_init.run()
+            print("Computed Force Constants:")
+            print(fc_init.FC)
 
             # raise RuntimeError
 

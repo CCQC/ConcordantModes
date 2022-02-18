@@ -437,6 +437,7 @@ class SVectors(object):
         # to transform from the symmetrized set to the full set of internal
         # coords.
 
+
         # Beware! The projected B matrix cannot be psuedo inverted to form
         # the A-matrix. You lose information.
 
@@ -553,7 +554,12 @@ class SVectors(object):
         return r
 
     def compute_phi(self, e_1, e_2):
-        phi = np.arccos(np.dot(e_1, e_2))
+        p = np.dot(e_1, e_2)
+        if p > 1:
+            p = 1
+        if p < -1:
+            p = -1
+        phi = np.arccos(p)
         return phi
 
     def calc_alpha_x(self, e_1, e_2, e_3):
