@@ -46,14 +46,21 @@ class Reap(object):
                 these energies!"
         )
         print("(Job number 1 == Reference energy) :D")
+        if self.options.dir_reap:
+            os.chdir("./" + str(1))
+            with open("output.dat", "r") as file:
+                data = file.read()
+            if not re.search(success_regex, data):
+                print("Energy failed at " + str("ref"))
+                raise RuntimeError
+            os.chdir("..")
+        else:
+            with open("output.1.dat", "r") as file:
+                data = file.read()
+            if not re.search(success_regex, data):
+                print("Energy failed at " + str("ref"))
+                raise RuntimeError
 
-        os.chdir("./" + str(1))
-        with open("output.dat", "r") as file:
-            data = file.read()
-        if not re.search(success_regex, data):
-            print("Energy failed at " + str("ref"))
-            raise RuntimeError
-        os.chdir("..")
         print("this is the energy regex", energy_regex)
         ref_en = float(re.findall(energy_regex, data)[0])
         print("Reference energy: " + str(ref_en))
@@ -109,15 +116,24 @@ class Reap(object):
                     file.writelines(str(energy) + "\n")
 
     def reap_energies(self, direc, success_regex, energy_regex):
-        os.chdir("./" + str(direc))
-        with open("output.dat", "r") as file:
-            data = file.read()
-        if not re.search(success_regex, data):
-            print("Energy failed at " + os.getcwd())
-            raise RuntimeError
-        energy = float(re.findall(energy_regex, data)[0])
+        if self.options.dir_reap:
+            os.chdir("./" + str(direc))
+            with open("output.dat", "r") as file:
+                data = file.read()
+            if not re.search(success_regex, data):
+                print("Energy failed at " + os.getcwd())
+                raise RuntimeError
+            energy = float(re.findall(energy_regex, data)[0])
 
-        os.chdir("..")
+            os.chdir("..")
+        else:
+            with open("output." + str(direc) + ".dat", "r") as file:
+                data = file.read()
+            if not re.search(success_regex, data):
+                print("Energy failed at " + os.getcwd())
+                raise RuntimeError
+            energy = float(re.findall(energy_regex, data)[0])
+            
         return energy
         # with open("auxillary.dat", 'w') as file:
         #    for energy in relative_energies:
@@ -125,23 +141,3 @@ class Reap(object):
         # print(relative_energies)
         # np.set_printoptions(precision=8)
 
-
-#        self.energiesDict['ref'] = float(self.energies[0])
-#        Sum = 0
-#        for i in range(n_disp - np.sum(self.dispSym) - 1):
-#            j = Sum % 2
-#            k = Sum // 2
-#            if j == 0:
-#                self.energiesDict[str(k+1)+'_plus'] = float(self.energies[i+1])
-#            if j == 1:
-#                self.energiesDict[str(k+1)+'_minus'] = float(self.energies[i+1])
-#            # if self.dispSym[k] == 0:
-#                # if j == 0:
-#                    # self.energiesDict[str(k+1)+'_plus'] = float(self.energies[i+1])
-#                # if j == 1:
-#                    # self.energiesDict[str(k+1)+'_minus'] = float(self.energies[i+1])
-#            # elif self.dispSym[k] == 1:
-#                # self.energiesDict[str(k+1)+'_plus'] = float(self.energies[i+1])
-#                # self.energiesDict[str(k+1)+'_minus'] = float(self.energies[i+1])
-##            Sum += 1
-#            # Sum += self.dispSym[k]

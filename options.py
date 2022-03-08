@@ -10,6 +10,7 @@ class Options(object):
         self.clean_house = kwargs.pop("clean_house", True)
         self.cluster = kwargs.pop("cluster", "sapelo")
         self.coords = kwargs.pop("coords", "ZMAT")
+        self.dir_reap = kwargs.pop("dir_reap",True)
         self.disp = kwargs.pop("disp", 0.01)
         self.disp_check = kwargs.pop("disp_check", False)
         self.disp_tol = kwargs.pop("disp_tol", 0.0)
