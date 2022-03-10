@@ -1,4 +1,5 @@
 import numpy as np
+import json
 import os
 import shutil
 import re
@@ -73,6 +74,7 @@ class Reap(object):
         rel_en_p = np.zeros((size, size))
         rel_en_m = np.zeros((size, size))
         relative_energies = []
+        absolute_energies = [[("ref", "ref"), "ref", ref_en, 1]]
 
         direc = 2
         for index in indices:
@@ -84,6 +86,7 @@ class Reap(object):
             rel = ref_en - energy
             rel_en_p[i, j] = rel
             relative_energies.append([(i, j), "plus", rel, direc])
+            absolute_energies.append([(i, j), "plus", energy, direc])
             m_en_array[i, j] = energy = self.reap_energies(
                 direc + 1, success_regex, energy_regex
             )
@@ -91,11 +94,14 @@ class Reap(object):
             rel = ref_en - energy
             rel_en_m[i, j] = rel
             relative_energies.append([(i, j), "minus", rel, direc + 1])
+            absolute_energies.append([(i, j), "minus", energy, direc + 1])
             direc += 2
 
         self.p_en_array = p_en_array
         self.m_en_array = m_en_array
         self.ref_en = ref_en
+        # print_en = np.insert(absolute_energies,0,[("ref", "ref"), "ref", ref_en, 1],axis=0)
+        print_en = absolute_energies
         np.set_printoptions(precision=2, linewidth=120)
         print(
             "Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements"
@@ -109,9 +115,13 @@ class Reap(object):
         if self.options.printout_rel_e:
             auxiliary = ""
             header = "Index, relative energy, directory \n"
+            print(json.dumps(energy))
+            raise RuntimeError
             with open("auxiliary", "a") as file:
+                file.seek(0)
+                file.truncate()
                 file.writelines(header)
-            for energy in relative_energies:
+            for energy in print_en:
                 with open("auxiliary", "a") as file:
                     file.writelines(str(energy) + "\n")
 

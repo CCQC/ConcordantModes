@@ -21,8 +21,8 @@ class TED(object):
         if rect_print:
             proj_eigs = np.dot(self.proj, proj_eigs)
         proj_eigs_inv = LA.pinv(proj_eigs)
-        TED = np.multiply(proj_eigs, proj_eigs_inv.T) * 100
-        self.table_print(freq, TED, rect_print)
+        self.TED = np.multiply(proj_eigs, proj_eigs_inv.T) * 100
+        self.table_print(freq, self.TED, rect_print)
 
     def table_print(self, freq, TED, rect_print):
         if len(freq) != len(TED[0]):
