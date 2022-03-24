@@ -35,7 +35,7 @@ class GFMethod(object):
         L = np.absolute(self.L)
         L_p = np.real(self.L_p)
         S_p = np.dot(np.absolute(LA.inv(L_p)), np.absolute(L_p))
-
+        self.L_p = L_p 
         # make sure the correct "primed" or unprimed version is being saved in each instance
         if self.cma:
             with open("L_full.npy", "wb") as z:
@@ -80,3 +80,4 @@ class GFMethod(object):
         print("//{:^40s}//".format("Total Energy Distribution (TED)"))
         print("////////////////////////////////////////////")
         self.ted.run(self.L, self.freq, rect_print=False)
+        self.ted_breakdown = self.ted.ted_breakdown
