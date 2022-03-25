@@ -8,7 +8,7 @@ class Options(object):
         self.cart_insert = kwargs.pop("cart_insert", -1)
         self.cart_insert_init = kwargs.pop("cart_insert_init", -1)
         self.clean_house = kwargs.pop("clean_house", True)
-        self.cluster = kwargs.pop("cluster", "sapelo")
+        self.cluster = kwargs.pop("cluster", "vulcan")
         self.coords = kwargs.pop("coords", "ZMAT")
         self.dir_reap = kwargs.pop("dir_reap",True)
         self.disp = kwargs.pop("disp", 0.01)
