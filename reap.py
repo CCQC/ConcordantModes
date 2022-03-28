@@ -116,7 +116,6 @@ class Reap(object):
             auxiliary = ""
             header = "Index, relative energy, directory \n"
             print(json.dumps(energy))
-            raise RuntimeError
             with open("auxiliary", "a") as file:
                 file.seek(0)
                 file.truncate()

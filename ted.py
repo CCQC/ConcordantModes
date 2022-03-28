@@ -22,6 +22,7 @@ class TED(object):
             proj_eigs = np.dot(self.proj, proj_eigs)
         proj_eigs_inv = LA.pinv(proj_eigs)
         self.TED = np.multiply(proj_eigs, proj_eigs_inv.T) * 100
+        self.ted_breakdown = self.TED
         self.table_print(freq, self.TED, rect_print)
 
     def table_print(self, freq, TED, rect_print):
