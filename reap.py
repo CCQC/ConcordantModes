@@ -102,6 +102,7 @@ class Reap(object):
         self.ref_en = ref_en
         # print_en = np.insert(absolute_energies,0,[("ref", "ref"), "ref", ref_en, 1],axis=0)
 ￼       print_en = absolute_energies 
+        print_en = absolute_energies
         np.set_printoptions(precision=2, linewidth=120)
         print(
             "Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements"
@@ -121,6 +122,11 @@ class Reap(object):
             file.seek(0)
             file.truncate()    
             file.writelines(header)
+            raise RuntimeError
+            with open("auxiliary", "a") as file:
+                file.seek(0)
+                file.truncate()
+                file.writelines(header)
             for energy in print_en:
                 with open("auxiliary", "a") as file:
                     file.writelines(str(energy) + "\n")
