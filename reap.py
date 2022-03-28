@@ -101,7 +101,6 @@ class Reap(object):
         self.m_en_array = m_en_array
         self.ref_en = ref_en
         # print_en = np.insert(absolute_energies,0,[("ref", "ref"), "ref", ref_en, 1],axis=0)
-￼       print_en = absolute_energies 
         print_en = absolute_energies
         np.set_printoptions(precision=2, linewidth=120)
         print(
@@ -117,12 +116,6 @@ class Reap(object):
             auxiliary = ""
             header = "Index, relative energy, directory \n"
             print(json.dumps(energy))
-            raise RuntimeError     
-        with open("auxiliary", "a") as file:
-            file.seek(0)
-            file.truncate()    
-            file.writelines(header)
-            raise RuntimeError
             with open("auxiliary", "a") as file:
                 file.seek(0)
                 file.truncate()
