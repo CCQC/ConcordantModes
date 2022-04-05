@@ -88,10 +88,13 @@ class ConcordantModes(object):
             init_bool = True
 
             # First generate displacements in internal coordinates
-            indices = np.triu_indices(len(s_vec.proj.T))
-            indices = np.array(indices).T
             eigs_init = np.eye(len(s_vec.proj.T))
-
+            if not self.options.deriv_level_init:
+                indices = np.triu_indices(len(s_vec.proj.T))
+                indices = np.array(indices).T
+            else:
+                indices = np.arange(len(eigs_init))
+            
             init_disp = TransDisp(
                 s_vec,
                 self.zmat_obj,
@@ -102,8 +105,10 @@ class ConcordantModes(object):
                 self.TED_obj,
                 self.options,
                 indices,
+                deriv_level = self.options.deriv_level_init
             )
             init_disp.run()
+            # raise RuntimeError
             prog_init = self.options.program_init
             prog_name_init = prog_init.split("@")[0]
 
@@ -119,8 +124,10 @@ class ConcordantModes(object):
                     indices,
                     "templateInit.dat",
                     "DispsInit",
+                    deriv_level = self.options.deriv_level_init
                 )
                 dir_obj_init.run()
+                # raise RuntimeError
                 os.chdir(rootdir + "/DispsInit")
                 disp_list = []
                 for i in os.listdir(rootdir + "/DispsInit"):
@@ -164,29 +171,59 @@ class ConcordantModes(object):
                 indices,
                 self.options.energy_regex_init,
                 self.options.success_regex_init,
+                deriv_level = self.options.deriv_level_init
             )
             # print("not recalculating", os.getcwd())
             os.chdir(rootdir + "/DispsInit")
             reap_obj_init.run()
+            # os.chdir('..')
+            # raise RuntimeError
 
             # nate
-            p_en_array_init = reap_obj_init.p_en_array
-            m_en_array_init = reap_obj_init.m_en_array
-            ref_en_init = reap_obj_init.ref_en
+            if not self.options.deriv_level_init:
+                p_array_init = reap_obj_init.p_en_array
+                m_array_init = reap_obj_init.m_en_array
+                ref_en_init = reap_obj_init.ref_en
+                deriv_level = 0
+            else:
+                cart_p_array_init = reap_obj_init.p_grad_array
+                cart_m_array_init = reap_obj_init.m_grad_array
+                p_array_init = np.zeros(np.eye(len(eigs_init)).shape)
+                m_array_init = np.zeros(np.eye(len(eigs_init)).shape)
+                ref_en_init = None
+                # Need to convert this array here from cartesians to internals using projected A-tensor
+                for i in indices:
+                    grad_s_vec = SVectors(
+                        self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_init
+                    )
+                    grad_s_vec.run(init_disp.p_disp[i],False)
+                    A_proj = np.dot(LA.pinv(grad_s_vec.B),self.TED_obj.proj)
+                    p_array_init[i] = np.dot(cart_p_array_init[i].T,A_proj)
+                    grad_s_vec.run(init_disp.m_disp[i],False)
+                    A_proj = np.dot(LA.pinv(grad_s_vec.B),self.TED_obj.proj)
+                    m_array_init[i] = np.dot(cart_m_array_init[i].T,A_proj)
+                
+                deriv_level = 1
+                # raise RuntimeError
 
             fc_init = ForceConstant(
                 init_disp,
-                p_en_array_init,
-                m_en_array_init,
+                p_array_init,
+                m_array_init,
                 ref_en_init,
                 self.options,
                 indices,
+                deriv_level=deriv_level
             )
             fc_init.run()
             print("Computed Force Constants:")
             print(fc_init.FC)
 
             # raise RuntimeError
+        
+        # Temporary code to ensure nothing breaks in my code in the meantime
+        self.options.deriv_level_init = 0
+        self.options.deriv_level = 0
 
         if not init_bool:
             f_read_obj.run()
@@ -208,7 +245,6 @@ class ConcordantModes(object):
             F = np.dot(self.TED_obj.proj.T, np.dot(F, self.TED_obj.proj))
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
-
         # Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         print("Initial Frequencies:")
         init_GF = GFMethod(
@@ -239,6 +275,8 @@ class ConcordantModes(object):
             False,
         )
         TED_GF.run()
+
+        # raise RuntimeError
 
         # if os.path.exists(rootdir + '/Intder'):
         # shutil.rmtree(rootdir + '/Intder')
@@ -287,6 +325,7 @@ class ConcordantModes(object):
         prog = self.options.program
         progname = prog.split("@")[0]
         if self.options.calc:
+            print(os.getcwd())
             dir_obj = DirectoryTree(
                 progname,
                 self.zmat_obj,

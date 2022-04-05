@@ -10,6 +10,8 @@ class Options(object):
         self.clean_house = kwargs.pop("clean_house", True)
         self.cluster = kwargs.pop("cluster", "vulcan")
         self.coords = kwargs.pop("coords", "ZMAT")
+        self.deriv_level = kwargs.pop("deriv_level", 0)
+        self.deriv_level_init = kwargs.pop("deriv_level_init", 0)
         self.dir_reap = kwargs.pop("dir_reap",True)
         self.disp = kwargs.pop("disp", 0.01)
         self.disp_check = kwargs.pop("disp_check", False)
