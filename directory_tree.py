@@ -18,7 +18,7 @@ class DirectoryTree(object):
         indices,
         template,
         dir_name,
-        deriv_level=0
+        deriv_level=0,
     ):
         # self.dispSym = dispSym
         self.prog_name = prog_name
@@ -231,5 +231,7 @@ class DirectoryTree(object):
                 direc += 2
             # raise RuntimeError
         else:
-            print("Only energy and gradient derivatives are supported. Check your deriv_level keyword.")
+            print(
+                "Only energy and gradient derivatives are supported. Check your deriv_level keyword."
+            )
             raise RuntimeError

@@ -12,7 +12,7 @@ class Options(object):
         self.coords = kwargs.pop("coords", "ZMAT")
         self.deriv_level = kwargs.pop("deriv_level", 0)
         self.deriv_level_init = kwargs.pop("deriv_level_init", 0)
-        self.dir_reap = kwargs.pop("dir_reap",True)
+        self.dir_reap = kwargs.pop("dir_reap", True)
         self.disp = kwargs.pop("disp", 0.01)
         self.disp_check = kwargs.pop("disp_check", False)
         self.disp_tol = kwargs.pop("disp_tol", 0.0)

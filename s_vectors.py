@@ -199,7 +199,16 @@ class SVectors(object):
                     r_3,
                 )
                 phi = self.compute_phi(e_2, e_3)
-                theta = self.calc_OOP(self.oop_indices[i][0],self.oop_indices[i][1],self.oop_indices[i][2],self.oop_indices[i][3]) * np.pi / 180.0
+                theta = (
+                    self.calc_OOP(
+                        self.carts[self.oop_indices[i][0] - 1],
+                        self.carts[self.oop_indices[i][1] - 1],
+                        self.carts[self.oop_indices[i][2] - 1],
+                        self.carts[self.oop_indices[i][3] - 1],
+                    )
+                    * np.pi
+                    / 180.0
+                )
                 o_1 = self.compute_OOP1(e_1, e_2, e_3, r_1, theta, phi)
                 o_3 = self.compute_OOP2(e_1, e_2, e_3, r_2, theta, phi)
                 o_4 = self.compute_OOP2(-e_1, e_3, e_2, r_3, theta, phi)
@@ -244,7 +253,16 @@ class SVectors(object):
                     self.lin_indices[i][1] - 1,
                     r_3,
                 )
-                theta = self.calc_LIN(self.lin_indices[i][0],self.lin_indices[i][1],self.lin_indices[i][2],self.lin_indices[i][3]) * np.pi / 180.0
+                theta = (
+                    self.calc_LIN(
+                        self.carts[self.lin_indices[i][0] - 1],
+                        self.carts[self.lin_indices[i][1] - 1],
+                        self.carts[self.lin_indices[i][2] - 1],
+                        self.carts[self.lin_indices[i][3] - 1],
+                    )
+                    * np.pi
+                    / 180.0
+                )
                 l_1 = self.compute_LIN(e_1, e_2, e_3, r_1, theta)
                 l_3 = self.compute_LIN(e_2, e_3, e_1, r_2, theta)
                 l_4 = self.compute_LIN(e_3, e_1, e_2, r_3, theta)
@@ -437,7 +455,6 @@ class SVectors(object):
         # to transform from the symmetrized set to the full set of internal
         # coords.
 
-
         # Beware! The projected B matrix cannot be psuedo inverted to form
         # the A-matrix. You lose information.
 
@@ -544,7 +561,7 @@ class SVectors(object):
     def compute_LINY4(self, e_1, e_2, e_3, r_1, r_2, phi, ay):
         s = ((np.sin(phi) ** -1) * np.cross(e_1, e_2) + e_3 * ay) / r_2
         return s
-    
+
     def calc_OOP(self, x1, x2, x3, x4):
         """
         This function will compute an out of plane angle between one bond
@@ -556,17 +573,17 @@ class SVectors(object):
         3-->4
         4-->2.
         """
-        e1 = (x1 - x2) / self.calc_bond(x1, x2)
-        e3 = (x3 - x2) / self.calc_bond(x3, x2)
-        e4 = (x4 - x2) / self.calc_bond(x4, x2)
-        phi = self.calc_angle(x3, x2, x4)
+        e1 = (x1 - x2) / LA.norm(x1 - x2)
+        e3 = (x3 - x2) / LA.norm(x3 - x2)
+        e4 = (x4 - x2) / LA.norm(x4 - x2)
+        phi = np.arccos(np.dot(e3, e4))
         theta = np.arcsin(np.dot(np.cross(e3, e4) / np.sin(phi), e1))
         return theta
 
     def calc_Lin(self, x1, x2, x3, x4):
-        e1 = (x1 - x2) / self.calc_bond(x1, x2)
-        e3 = (x3 - x2) / self.calc_bond(x3, x2)
-        e4 = (x4 - x2) / self.calc_bond(x4, x2)
+        e1 = (x1 - x2) / LA.norm(x1 - x2)
+        e3 = (x3 - x2) / LA.norm(x3 - x2)
+        e4 = (x4 - x2) / LA.norm(x4 - x2)
         theta = np.arcsin(np.dot(e4, np.cross(e3, e1)))
         return theta
 

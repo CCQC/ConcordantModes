@@ -37,7 +37,7 @@ class TransDisp(object):
         options,
         indices,
         GF=None,
-        deriv_level=0
+        deriv_level=0,
     ):
         # As is generally the case for Programmers, GF = None by default.
         self.disp_tol = disp_tol
@@ -116,7 +116,7 @@ class TransDisp(object):
                 disp[i] = self.disp[i]
                 disp[j] = self.disp[j]
                 # a = self.coord_convert(
-                p_disp[i,j] = self.coord_convert(
+                p_disp[i, j] = self.coord_convert(
                     disp,
                     self.n_coord.copy(),
                     self.ref_carts.copy(),
@@ -129,7 +129,7 @@ class TransDisp(object):
                 )
                 # print(a.shape)
                 # raise RuntimeError
-                m_disp[i,j] = self.coord_convert(
+                m_disp[i, j] = self.coord_convert(
                     -disp,
                     self.n_coord.copy(),
                     self.ref_carts.copy(),
@@ -176,7 +176,9 @@ class TransDisp(object):
             # print(m_disp)
             # raise RuntimeError
         else:
-            print("Only energy and gradient derivatives are supported. Check your deriv_level_init keyword.")
+            print(
+                "Only energy and gradient derivatives are supported. Check your deriv_level_init keyword."
+            )
             raise RuntimeError
         self.p_disp = p_disp
         self.m_disp = m_disp

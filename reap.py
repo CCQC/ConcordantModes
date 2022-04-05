@@ -17,7 +17,7 @@ class Reap(object):
         indices,
         energy_regex,
         success_regex,
-        deriv_level=0
+        deriv_level=0,
     ):
         self.prog_name = prog_name
         self.zmat = zmat
@@ -136,15 +136,14 @@ class Reap(object):
             p_grad_array = np.array([])
             m_grad_array = np.array([])
             for index in indices:
-                grad = self.reap_gradients(2*index+1,grad_regex1,grad_regex2)
-                p_grad_array = np.append(p_grad_array,grad,axis=0)
-                grad = self.reap_gradients(2*index+2,grad_regex1,grad_regex2)
-                m_grad_array = np.append(m_grad_array,grad,axis=0)
-            
-            self.p_grad_array = p_grad_array.reshape((-1,len(grad)))
-            self.m_grad_array = m_grad_array.reshape((-1,len(grad)))
+                grad = self.reap_gradients(2 * index + 1, grad_regex1, grad_regex2)
+                p_grad_array = np.append(p_grad_array, grad, axis=0)
+                grad = self.reap_gradients(2 * index + 2, grad_regex1, grad_regex2)
+                m_grad_array = np.append(m_grad_array, grad, axis=0)
+
+            self.p_grad_array = p_grad_array.reshape((-1, len(grad)))
+            self.m_grad_array = m_grad_array.reshape((-1, len(grad)))
             os.chdir("..")
-                
 
     def reap_energies(self, direc, success_regex, energy_regex):
         if self.options.dir_reap:
@@ -164,31 +163,31 @@ class Reap(object):
                 print("Energy failed at " + os.getcwd())
                 raise RuntimeError
             energy = float(re.findall(energy_regex, data)[0])
-            
+
         return energy
 
     def reap_gradients(self, direc, grad_regex1, grad_regex2):
-        os.chdir("./"+str(direc))
+        os.chdir("./" + str(direc))
         # print(direc)
         grad_array = np.array([])
         with open("output.dat", "r") as file:
             data = file.readlines()
         for i in range(len(data)):
-            grad1 = re.search(grad_regex1,data[i])
+            grad1 = re.search(grad_regex1, data[i])
             if grad1:
                 beg_grad = i + 1
                 break
         for i in range(len(data) - beg_grad):
-            grad2 = re.search(grad_regex2,data[i+beg_grad])
+            grad2 = re.search(grad_regex2, data[i + beg_grad])
             if grad2:
                 end_grad = i + beg_grad
                 break
         label_xyz = r"(\s*.*(\s*-?\d+\.\d+){3})+"
         for line in data[beg_grad:end_grad]:
-            if re.search(label_xyz,line):
+            if re.search(label_xyz, line):
                 temp = line.split()[-3:]
                 # print(temp)
-                grad_array = np.append(grad_array,np.array(temp))
+                grad_array = np.append(grad_array, np.array(temp))
             # regex = grad_regex + label_xyz
             # grad_str = re.search(regex,data).group()
         grad_array = grad_array.astype("float64")
@@ -204,4 +203,3 @@ class Reap(object):
         # print(grad_array)
         return grad_array
         # return 0
-

@@ -49,7 +49,7 @@ class FcConv(object):
                 self.N = len(self.zmat.atom_list) * 3
                 self.print_const()
 
-    def print_const(self):
+    def print_const(self, fc_name="fcFinal.dat"):
         fc_output = ""
         fc_output += "{:5d}{:5d}\n".format(len(self.zmat.atom_list), self.N)
         self.F_print = self.F.copy()
@@ -65,5 +65,5 @@ class FcConv(object):
                     self.F_print[3 * (len(self.F_print) // 3) + i]
                 )
             fc_output += "\n"
-        with open("fcFinal.dat", "w+") as file:
+        with open(fc_name, "w+") as file:
             file.write(fc_output)

@@ -15,13 +15,13 @@ class ForceConstant(object):
     Diagonal Second Derivative
     [f(x+h) - 2f(x) + f(x-h)] / h^2 =
     [E_(i_plus) - 2*E_(ref) + E_(i_minus)] / disp_size^2
-    
+
     Off-diagonal Second Derivative
     [f(x+h,y+k) - f(x+h,y) - f(x,y+k) + 2f(x,y) - f(x-h,y) - f(x,y-k) + f(x-h,y-k) / 2*h^2
     [E_(ij_plus) - E_(i_plus,j) - E_(i,j_plus) + E_(ref) - E_(i_minus,j) - E_(i,j_minus) + E_(i_minus,j_minus) / 2*disp_size^2
     """
 
-    def __init__(self, disp, p_array, m_array, ref_en, options, indices,deriv_level=0):
+    def __init__(self, disp, p_array, m_array, ref_en, options, indices, deriv_level=0):
         self.options = options
         self.disp = disp
         self.p_array = p_array
@@ -55,7 +55,7 @@ class ForceConstant(object):
             il = (cf[1], cf[0])
             self.FC[il] = self.FC[cf]
         elif self.deriv_level == 1:
-            self.FC = (self.p_array - self.m_array) / (2*self.disp.disp[0])
+            self.FC = (self.p_array - self.m_array) / (2 * self.disp.disp[0])
             # raise RuntimeError
         else:
             print("Higher order deriv_level computations aren't yet supported")

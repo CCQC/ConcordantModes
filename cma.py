@@ -66,11 +66,13 @@ class ConcordantModes(object):
             s_vec.run(self.zmat_obj.cartesians_init, True)
 
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
-        
+
         # Print out the percentage composition of the projected coordinates
         if self.options.coords != "ZMAT":
-            self.TED_obj.run(np.eye(len(self.TED_obj.proj.T)),np.zeros(len(self.TED_obj.proj.T)))
-        
+            self.TED_obj.run(
+                np.eye(len(self.TED_obj.proj.T)), np.zeros(len(self.TED_obj.proj.T))
+            )
+
         # Compute G-Matrix
         g_mat = GMatrix(self.zmat_obj, s_vec, self.options)
         g_mat.run()
@@ -94,7 +96,7 @@ class ConcordantModes(object):
                 indices = np.array(indices).T
             else:
                 indices = np.arange(len(eigs_init))
-            
+
             init_disp = TransDisp(
                 s_vec,
                 self.zmat_obj,
@@ -105,7 +107,7 @@ class ConcordantModes(object):
                 self.TED_obj,
                 self.options,
                 indices,
-                deriv_level = self.options.deriv_level_init
+                deriv_level=self.options.deriv_level_init,
             )
             init_disp.run()
             # raise RuntimeError
@@ -124,7 +126,7 @@ class ConcordantModes(object):
                     indices,
                     "templateInit.dat",
                     "DispsInit",
-                    deriv_level = self.options.deriv_level_init
+                    deriv_level=self.options.deriv_level_init,
                 )
                 dir_obj_init.run()
                 # raise RuntimeError
@@ -143,7 +145,7 @@ class ConcordantModes(object):
 
                     # Submits an array, then checks if all jobs have finished every
                     # 10 seconds.
-                    sub = Submit(disp_list,self.options)
+                    sub = Submit(disp_list, self.options)
                     sub.run()
                 else:
                     s_template = SapeloTemplate(
@@ -171,7 +173,7 @@ class ConcordantModes(object):
                 indices,
                 self.options.energy_regex_init,
                 self.options.success_regex_init,
-                deriv_level = self.options.deriv_level_init
+                deriv_level=self.options.deriv_level_init,
             )
             # print("not recalculating", os.getcwd())
             os.chdir(rootdir + "/DispsInit")
@@ -194,15 +196,17 @@ class ConcordantModes(object):
                 # Need to convert this array here from cartesians to internals using projected A-tensor
                 for i in indices:
                     grad_s_vec = SVectors(
-                        self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_init
+                        self.zmat_obj,
+                        self.options,
+                        self.zmat_obj.variable_dictionary_init,
                     )
-                    grad_s_vec.run(init_disp.p_disp[i],False)
-                    A_proj = np.dot(LA.pinv(grad_s_vec.B),self.TED_obj.proj)
-                    p_array_init[i] = np.dot(cart_p_array_init[i].T,A_proj)
-                    grad_s_vec.run(init_disp.m_disp[i],False)
-                    A_proj = np.dot(LA.pinv(grad_s_vec.B),self.TED_obj.proj)
-                    m_array_init[i] = np.dot(cart_m_array_init[i].T,A_proj)
-                
+                    grad_s_vec.run(init_disp.p_disp[i], False)
+                    A_proj = np.dot(LA.pinv(grad_s_vec.B), self.TED_obj.proj)
+                    p_array_init[i] = np.dot(cart_p_array_init[i].T, A_proj)
+                    grad_s_vec.run(init_disp.m_disp[i], False)
+                    A_proj = np.dot(LA.pinv(grad_s_vec.B), self.TED_obj.proj)
+                    m_array_init[i] = np.dot(cart_m_array_init[i].T, A_proj)
+
                 deriv_level = 1
                 # raise RuntimeError
 
@@ -213,14 +217,14 @@ class ConcordantModes(object):
                 ref_en_init,
                 self.options,
                 indices,
-                deriv_level=deriv_level
+                deriv_level=deriv_level,
             )
             fc_init.run()
             print("Computed Force Constants:")
             print(fc_init.FC)
 
             # raise RuntimeError
-        
+
         # Temporary code to ensure nothing breaks in my code in the meantime
         self.options.deriv_level_init = 0
         self.options.deriv_level = 0
