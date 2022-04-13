@@ -37,6 +37,7 @@ class TransDisp(object):
         options,
         indices,
         GF=None,
+        deriv_level=0,
     ):
         # As is generally the case for Programmers, GF = None by default.
         self.disp_tol = disp_tol
@@ -55,6 +56,7 @@ class TransDisp(object):
         self.indices = indices
         if GF:
             self.GF = GF
+        self.deriv_level = deriv_level
 
     def run(self):
 
@@ -103,45 +105,83 @@ class TransDisp(object):
         # This code loops through a list of indices that the force constants will be computed at and
         # generates the displacements for the diagonal and (if specified) the off-diagonals. Where
         # the displacement matrix D[i,j] = D[j,i].
-        p_disp = np.zeros((len(self.eigs), len(self.eigs)), dtype=object)
-        m_disp = np.zeros((len(self.eigs), len(self.eigs)), dtype=object)
-        a = p_disp.shape[0]
+        # a = p_disp.shape[0]
+        disp = np.zeros(len(self.eigs.T))
+        buff = disp.copy()
+        if not self.deriv_level:
+            p_disp = np.zeros((len(self.eigs), len(self.eigs)), dtype=object)
+            m_disp = np.zeros((len(self.eigs), len(self.eigs)), dtype=object)
+            for index in self.indices:
+                i, j = index[0], index[1]
+                disp[i] = self.disp[i]
+                disp[j] = self.disp[j]
+                # a = self.coord_convert(
+                p_disp[i, j] = self.coord_convert(
+                    disp,
+                    self.n_coord.copy(),
+                    self.ref_carts.copy(),
+                    50,
+                    1.0e-9,
+                    self.A.copy(),
+                    False,
+                    self.zmat,
+                    self.options,
+                )
+                # print(a.shape)
+                # raise RuntimeError
+                m_disp[i, j] = self.coord_convert(
+                    -disp,
+                    self.n_coord.copy(),
+                    self.ref_carts.copy(),
+                    50,
+                    1.0e-9,
+                    self.A.copy(),
+                    False,
+                    self.zmat,
+                    self.options,
+                )
+                disp = buff.copy()
 
-        for index in self.indices:
-            i, j = index[0], index[1]
-            disp = np.zeros(len(self.eigs.T))
-            disp[i] = self.disp[i]
-            disp[j] = self.disp[j]
-            p_disp[i, j] = self.p_displacements(disp)
-            m_disp[i, j] = self.m_displacements(disp)
+            # raise RuntimeError
+        elif self.deriv_level == 1:
+            p_disp = np.zeros(len(self.eigs), dtype=object)
+            m_disp = np.zeros(len(self.eigs), dtype=object)
+            for i in range(len(self.eigs)):
+                disp[i] = self.disp[i]
+                print(disp)
+                p_disp[i] = self.coord_convert(
+                    disp,
+                    self.n_coord.copy(),
+                    self.ref_carts.copy(),
+                    50,
+                    1.0e-9,
+                    self.A.copy(),
+                    False,
+                    self.zmat,
+                    self.options,
+                )
+                m_disp[i] = self.coord_convert(
+                    -disp,
+                    self.n_coord.copy(),
+                    self.ref_carts.copy(),
+                    50,
+                    1.0e-9,
+                    self.A.copy(),
+                    False,
+                    self.zmat,
+                    self.options,
+                )
+                disp = buff.copy()
+            # print(p_disp)
+            # print(m_disp)
+            # raise RuntimeError
+        else:
+            print(
+                "Only energy and gradient derivatives are supported. Check your deriv_level_init keyword."
+            )
+            raise RuntimeError
         self.p_disp = p_disp
         self.m_disp = m_disp
-
-    def p_displacements(self, disp):
-        return self.coord_convert(
-            disp,
-            self.n_coord.copy(),
-            self.ref_carts.copy(),
-            50,
-            1.0e-9,
-            self.A.copy(),
-            False,
-            self.zmat,
-            self.options,
-        )
-
-    def m_displacements(self, disp):
-        return self.coord_convert(
-            -disp,
-            self.n_coord.copy(),
-            self.ref_carts.copy(),
-            50,
-            1.0e-9,
-            self.A.copy(),
-            False,
-            self.zmat,
-            self.options,
-        )
 
     def int_c(self, carts, eig_inv, proj):
         # This is a function that computes all currently implemented and
