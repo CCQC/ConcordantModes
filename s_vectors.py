@@ -254,7 +254,7 @@ class SVectors(object):
                     r_3,
                 )
                 theta = (
-                    self.calc_LIN(
+                    self.calc_Lin(
                         self.carts[self.lin_indices[i][0] - 1],
                         self.carts[self.lin_indices[i][1] - 1],
                         self.carts[self.lin_indices[i][2] - 1],
@@ -433,7 +433,7 @@ class SVectors(object):
             )
         # raise RuntimeError
 
-        tol = 1e-10
+        tol = 1e-8
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
         if not self.options.man_proj:
