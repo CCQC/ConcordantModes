@@ -174,6 +174,7 @@ class ConcordantModes(object):
                 self.options.energy_regex_init,
                 self.options.success_regex_init,
                 deriv_level=self.options.deriv_level_init,
+                # disp_sym = init_disp.disp_sym
             )
             # print("not recalculating", os.getcwd())
             os.chdir(rootdir + "/DispsInit")
@@ -395,6 +396,7 @@ class ConcordantModes(object):
             algo.indices,
             self.options.energy_regex,
             self.options.success_regex,
+            # disp_sym = transdisp.disp_sym
         )
         reap_obj.run()
         # os.chdir('..')

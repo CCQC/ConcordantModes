@@ -77,14 +77,19 @@ class TransDisp(object):
 
         # Generate the normal coordinate values for the reference structure
         self.n_coord = self.int_c(self.ref_carts, self.eig_inv, self.ted.proj)
+        # self.disp_sym = np.zeros(len(self.n_coord))
 
         print("Normal Coordinate Values:")
         for i in range(len(self.n_coord)):
-            print("Normal Coordinate #{:<4n}: {: 3.3f}".format(i + 1, self.n_coord[i]))
+            print("Normal Coordinate #{:<4n}: {: 3.5f}".format(i + 1, self.n_coord[i]))
+            # if abs(self.n_coord[i]) < self.disp_tol:
+                # self.disp_sym[i] = 1
+
+        # print("List of symmetric displacements according to disp_tol:")
+        # print(self.disp_sym)
 
         # Next, we will have to specify our Normal mode internal coordinate
         # displacement sizes
-        self.disp_sym = np.zeros(len(self.eigs))
 
         Disp = self.disp
         self.disp = []

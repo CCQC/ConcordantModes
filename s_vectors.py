@@ -199,6 +199,7 @@ class SVectors(object):
                     r_3,
                 )
                 phi = self.compute_phi(e_2, e_3)
+                
                 theta = (
                     self.calc_OOP(
                         self.carts[self.oop_indices[i][0] - 1],
@@ -206,8 +207,6 @@ class SVectors(object):
                         self.carts[self.oop_indices[i][2] - 1],
                         self.carts[self.oop_indices[i][3] - 1],
                     )
-                    * np.pi
-                    / 180.0
                 )
                 o_1 = self.compute_OOP1(e_1, e_2, e_3, r_1, theta, phi)
                 o_3 = self.compute_OOP2(e_1, e_2, e_3, r_2, theta, phi)
@@ -260,8 +259,6 @@ class SVectors(object):
                         self.carts[self.lin_indices[i][2] - 1],
                         self.carts[self.lin_indices[i][3] - 1],
                     )
-                    * np.pi
-                    / 180.0
                 )
                 l_1 = self.compute_LIN(e_1, e_2, e_3, r_1, theta)
                 l_3 = self.compute_LIN(e_2, e_3, e_1, r_2, theta)
