@@ -30,6 +30,7 @@ class Options(object):
         self.proj_tol = kwargs.pop("proj_tol", 1.0e-14)
         self.queue = kwargs.pop("queue", "gen4.q")
         self.reduced_disp = kwargs.pop("reduced_disp", False)
+        self.rmsd = kwargs.pop("rmsd", True)
         self.spin = kwargs.pop("spin", 1)
         self.success_regex = kwargs.pop("success_regex", "")
         self.success_regex_init = kwargs.pop("success_regex_init", "")
