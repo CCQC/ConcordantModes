@@ -15,7 +15,7 @@ class Options(object):
         self.dir_reap = kwargs.pop("dir_reap", True)
         self.disp = kwargs.pop("disp", 0.01)
         self.disp_check = kwargs.pop("disp_check", False)
-        self.disp_tol = kwargs.pop("disp_tol", 0.0)
+        self.disp_tol = kwargs.pop("disp_tol", 0.0001)
         self.energy_regex = kwargs.pop("energy_regex", "")
         self.energy_regex_init = kwargs.pop("energy_regex_init", "")
         self.geom_check = kwargs.pop("geom_check", False)

@@ -18,13 +18,14 @@ class Reap(object):
         energy_regex,
         success_regex,
         deriv_level=0,
+        disp_sym = None
     ):
         self.prog_name = prog_name
         self.zmat = zmat
         self.disp_cart = disp_cart
         self.options = options
         self.n_coord = n_coord
-        self.dispSym = [0]
+        # self.disp_sym =disp_sym
         # nate
         self.eigs = eigs
         self.energy_regex = energy_regex
@@ -95,6 +96,15 @@ class Reap(object):
                 rel_en_p[i, j] = rel
                 relative_energies.append([(i, j), "plus", rel, direc])
                 absolute_energies.append([(i, j), "plus", energy, direc])
+
+                # if self.disp_sym[i] and self.disp_sym[j]:
+                    # direc -= 1
+                    # m_en_array[i, j] = energy = p_en_array[i, j]
+                # else:
+                    # m_en_array[i, j] = energy = self.reap_energies(
+                        # direc + 1, success_regex, energy_regex
+                    # )
+                    # print(energy)
                 m_en_array[i, j] = energy = self.reap_energies(
                     direc + 1, success_regex, energy_regex
                 )
@@ -135,10 +145,17 @@ class Reap(object):
             indices = self.indices
             p_grad_array = np.array([])
             m_grad_array = np.array([])
+            Sum = 0
             for index in indices:
-                grad = self.reap_gradients(2 * index + 1, grad_regex1, grad_regex2)
+                grad = self.reap_gradients(2 * index + 1 - Sum, grad_regex1, grad_regex2)
                 p_grad_array = np.append(p_grad_array, grad, axis=0)
-                grad = self.reap_gradients(2 * index + 2, grad_regex1, grad_regex2)
+                # if self.disp.disp_sym[i]:
+                    # m_grad_array = np.append(m_grad_array, -grad, axis=0)
+                    # Sum += 1
+                # else:
+                    # grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
+                    # m_grad_array = np.append(m_grad_array, grad, axis=0)
+                grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
                 m_grad_array = np.append(m_grad_array, grad, axis=0)
 
             self.p_grad_array = p_grad_array.reshape((-1, len(grad)))
