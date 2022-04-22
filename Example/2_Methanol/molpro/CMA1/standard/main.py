@@ -11,6 +11,8 @@ options_kwargs = {
     "coords": "Redundant",
     "success_regex": r"Variable memory released",
     "success_regex_init": r"Variable memory released",
+    #"calc_init" : False,
+    "rmsd" : True
 }
 options_obj = Options(**options_kwargs)
 

@@ -17,6 +17,7 @@ from concordantmodes.gf_method import GFMethod
 from concordantmodes.g_matrix import GMatrix
 from concordantmodes.int2cart import Int2Cart
 from concordantmodes.reap import Reap
+from concordantmodes.rmsd import RMSD
 from concordantmodes.s_vectors import SVectors
 from concordantmodes.submit import Submit
 from concordantmodes.ted import TED
@@ -64,7 +65,10 @@ class ConcordantModes(object):
             s_vec.run(self.zmat_obj.cartesians_init, True, proj=proj)
         else:
             s_vec.run(self.zmat_obj.cartesians_init, True)
-
+        
+        mol1 = np.array(self.zmat_obj.cartesians_init)
+        mol2 = np.array(self.zmat_obj.cartesians_final)
+        
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
 
         # Print out the percentage composition of the projected coordinates
@@ -484,6 +488,13 @@ class ConcordantModes(object):
             self.options.units,
         )
         cart_conv.run()
+    
+        if mol2.size != 0:
+            print('I cant believe its not CMA1!') 
+            if self.options.rmsd:
+                 
+                rmsd_geom = RMSD()
+                rmsd_geom.run(mol1,mol2)
 
         t2 = time.time()
         print("Frequency Shift (cm^-1): ")
