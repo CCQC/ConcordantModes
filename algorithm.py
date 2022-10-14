@@ -63,7 +63,6 @@ class Algorithm(object):
         diag = np.zeros((a, a))
         with open("S_p.npy", "rb") as x:
             S = np.load(x)
-            print(S, "printing SSSS")
         for x in range(a):
             for y in range(a):
                 if x == y:
@@ -72,7 +71,6 @@ class Algorithm(object):
                     diag[x, y] = S[x, y] / (initial_fc[x] - initial_fc[y])
         # print(diag, "printing diag")
         diag = np.absolute(diag)
-        print("Diagnostic Matrix")
         print(diag)
         with open("D.npy", "wb") as q:
             np.save(q, diag)
@@ -87,15 +85,6 @@ class Algorithm(object):
             if index[1] > index[0]:
                 indices_new.append(index)
         indices = indices_new
-        # for x in range(a):
-        #    for y in range(a):
-        #        if x == y:
-        #            indices.append([x, y])
-        #        if x != y:
-        #            if diag[x, y] > tolerance:
-        #                indices.append([x, y])
-        #            else:
-        #                break
         if self.options.clean_house:
             os.system("rm D.npy  S_p.npy")
 

@@ -19,6 +19,7 @@ class Options(object):
         self.energy_regex = kwargs.pop("energy_regex", "")
         self.energy_regex_init = kwargs.pop("energy_regex_init", "")
         self.geom_check = kwargs.pop("geom_check", False)
+        self.gradient_regex = kwargs.pop("gradient_regex", "")
         self.interatomic_distance = kwargs.pop("interatomic_distance", False)
         self.man_proj = kwargs.pop("man_proj", False)
         self.mode_coupling_check = kwargs.pop("mode_coupling_check", False)

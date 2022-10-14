@@ -16,6 +16,7 @@ class Reap(object):
         eigs,
         indices,
         energy_regex,
+        gradient_regex,
         molly_regex,
         success_regex,
         deriv_level=0,
@@ -30,6 +31,7 @@ class Reap(object):
         # nate
         self.eigs = eigs
         self.energy_regex = energy_regex
+        self.gradient_regex = gradient_regex
         self.molly_regex = molly_regex
         self.success_regex = success_regex
         self.indices = indices
@@ -38,15 +40,14 @@ class Reap(object):
     def run(self):
         # Define energy/gradient search regex
         if not self.deriv_level:
-            energy_regex = re.compile(self.energy_regex[0])
-            self.energy_regex = re.compile(self.energy_regex[0])
+            energy_regex = re.compile(self.energy_regex)
             success_regex = re.compile(self.success_regex)
             self.energies = np.array([])
         else:
-            grad_regex1 = re.compile(self.energy_regex[1])
-            grad_regex2 = re.compile(self.energy_regex[2])
-            molly_regex1  = re.compile(self.molly_regex[0])
-            molly_regex2  = re.compile(self.molly_regex[1])
+            grad_regex1 = re.compile(self.gradient_regex[0])
+            grad_regex2 = re.compile(self.gradient_regex[1])
+            #molly_regex1  = re.compile(self.molly_regex[0])
+            #molly_regex2  = re.compile(self.molly_regex[1])
  
         eigs = self.eigs
         if type(eigs) == int:
@@ -75,7 +76,6 @@ class Reap(object):
                     print("Energy failed at " + str("ref"))
                     raise RuntimeError
 
-            print("this is the energy regex", energy_regex)
             ref_en = float(re.findall(energy_regex, data)[0])
             print("Reference energy: " + str(ref_en))
 
@@ -152,8 +152,9 @@ class Reap(object):
             Sum = 0
             #print(indices)
             for index in indices:
-                pmolly_re,insertion = self.reap_molly(2 * index + 1 - Sum, molly_regex1, molly_regex2)
-                grad = self.reap_gradients(2 * index + 1 - Sum, grad_regex1, grad_regex2, pmolly_re, insertion)
+                #pmolly_re,insertion = self.reap_molly(2 * index + 1 - Sum, molly_regex1, molly_regex2)
+                #grad = self.reap_gradients(2 * index + 1 - Sum, grad_regex1, grad_regex2, pmolly_re, insertion)
+                grad = self.reap_gradients(2 * index + 1 - Sum, grad_regex1, grad_regex2)
                 p_grad_array = np.append(p_grad_array, grad, axis=0)
                 # if self.disp.disp_sym[i]:
                     # m_grad_array = np.append(m_grad_array, -grad, axis=0)
@@ -161,8 +162,9 @@ class Reap(object):
                 # else:
                     # grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
                     # m_grad_array = np.append(m_grad_array, grad, axis=0)
-                mmolly_re,insertion = self.reap_molly(2 * index + 2 - Sum, molly_regex1, molly_regex2)
-                grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2, mmolly_re, insertion)
+                #mmolly_re,insertion = self.reap_molly(2 * index + 2 - Sum, molly_regex1, molly_regex2)
+                #grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2, mmolly_re, insertion)
+                grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
                 m_grad_array = np.append(m_grad_array, grad, axis=0)
             self.p_grad_array = p_grad_array.reshape((-1, len(grad)))
             self.m_grad_array = m_grad_array.reshape((-1, len(grad)))
@@ -179,7 +181,7 @@ class Reap(object):
         label_xyz = r"(\s*.*(\s*-?\d+\.\d+){3})+"
         molly_init = np.array([])
         insertion = [] 
-        succ = 0 
+        c = 0 
         for x, line in enumerate(initmol):
             if re.search(label_xyz, line):
                 if re.search(r"\s*[xX]", line):
@@ -188,7 +190,7 @@ class Reap(object):
                     re.search(label_xyz, line)
                     temp = line.split()[-3:]
                     molly_init = np.append(molly_init, np.array(temp))
-                succ += 1
+                c += 1
         
         molly_init = molly_init.astype("float64")
         molly_init = np.split(molly_init, len(molly_init)/3)
@@ -243,7 +245,8 @@ class Reap(object):
 
         return energy
 
-    def reap_gradients(self, direc, grad_regex1, grad_regex2, shuffle,insertion):
+    #def reap_gradients(self, direc, grad_regex1, grad_regex2, shuffle,insertion):
+    def reap_gradients(self, direc, grad_regex1, grad_regex2):
         os.chdir("./" + str(direc))
         grad_array = []
         with open("output.dat", "r") as file:
@@ -265,13 +268,13 @@ class Reap(object):
                 grad_array.append(temp)
         grad_array = np.array(grad_array)
         grad_array = grad_array.astype("float64")
-        grad_array = grad_array[shuffle]
-        if len(insertion) > 0:
-            counter = 0
-            for x in insertion:
-                grad_array = np.insert(grad_array, x, [0.0, 0.0, 0.0], axis = 0)
-                counter += 1
-                grad_array = np.reshape(grad_array, (-1, 3))
+        #grad_array = grad_array[shuffle]
+        #if len(insertion) > 0:
+        #    counter = 0
+        #    for x in insertion:
+        #        grad_array = np.insert(grad_array, x, [0.0, 0.0, 0.0], axis = 0)
+        #        counter += 1
+        #        grad_array = np.reshape(grad_array, (-1, 3))
         grad_array = grad_array.flatten() 
         if not grad1:
             print("Gradient failed at " + os.getcwd())
