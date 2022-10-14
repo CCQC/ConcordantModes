@@ -211,7 +211,6 @@ class RMSD(object):
         qab = self.compute_QAB(iab)
            
         SminX = self.compute_SminX(mol1,mol2,qab,n)
- 
         mxx1, myy1, mzz1 = self.compute_moi(mol1, n)
         mxx2, myy2, mzz2 = self.compute_moi(mol2, n)
         mxy1, mxz1, myz1 = self.compute_poi(mol1, n)
@@ -230,7 +229,6 @@ class RMSD(object):
 
         W1, V1 = np.linalg.eig(M1_I) 
         W2, V2 = np.linalg.eig(M2_I) 
-
         #sort eigensolutions, not sorted because np only autosorts eigenvalues of self-adjoint systems using np.eigh
         idx1 = W1.argsort()[::-1]
         W1 = W1[idx1]

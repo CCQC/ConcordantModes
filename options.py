@@ -22,6 +22,7 @@ class Options(object):
         self.interatomic_distance = kwargs.pop("interatomic_distance", False)
         self.man_proj = kwargs.pop("man_proj", False)
         self.mode_coupling_check = kwargs.pop("mode_coupling_check", False)
+        self.molly_regex_init = kwargs.pop("molly_regex_init", "")
         self.nslots = kwargs.pop("nslots", 1)
         self.off_diag = kwargs.pop("off_diag", False)
         self.off_diag_bands = kwargs.pop("off_diag_bands", 1)

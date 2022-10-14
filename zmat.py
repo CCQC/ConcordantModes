@@ -20,10 +20,11 @@ class Zmat(object):
         zmat_end_regex = re.compile(r"ZMAT end")
 
         # ZMAT regexes
-        first_atom_regex = re.compile("^\s*([A-Z][a-z]*)\s*\n")
-        second_atom_regex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s*\n")
-        third_atom_regex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s*\n")
-        full_atom_regex = re.compile("^\s*([A-Z][a-z]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        #allows for regex of O18 and the like, for heavy isotopes
+        first_atom_regex =  re.compile("^\s*([A-Z][a-z]?\d*)\s*\n")
+        second_atom_regex = re.compile("^\s*([A-Z][a-z]?\d*)\s+(\d+)\s*\n")
+        third_atom_regex =  re.compile("^\s*([A-Z][a-z]?\d*)\s+(\d+)\s+(\d+)\s*\n")
+        full_atom_regex =   re.compile("^\s*([A-Z][a-z]?\d*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
         # Custom int coord regexes
         bond_regex = re.compile("^\s*(\d+)\s+(\d+)\s*\n")
         angle_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
@@ -36,9 +37,9 @@ class Zmat(object):
         # Cartesian regexes
         cart_begin_regex = re.compile(r"cart begin")
         cart_end_regex = re.compile(r"cart end")
-        s = "[A-Z][A-Za-z]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n"
+        s = "[A-Z][A-Za-z]?\d*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n"
         cartesian_regex = re.compile(s)
-        s = "([A-Z][A-Za-z]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
+        s = "([A-Z][A-Za-z]?\d*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
         cartesian_atom_regex = re.compile(s)
         divider_regex = re.compile("^\s*\-\-\-\s*\n")
 

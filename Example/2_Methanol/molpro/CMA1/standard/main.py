@@ -1,7 +1,7 @@
 from concordantmodes.options import Options
 
 options_kwargs = {
-    "queue": "gen4.q,gen6.q",
+    "queue": "gen4.q","gen6.q",
     "program_init": "molpro@2010.1.67+mpi",
     "program": "molpro@2010.1.67+mpi",
     "energy_regex": r"\(T\) total energy\s+(\-\d+\.\d+)",
@@ -11,8 +11,6 @@ options_kwargs = {
     "coords": "Redundant",
     "success_regex": r"Variable memory released",
     "success_regex_init": r"Variable memory released",
-    #"calc_init" : False,
-    "rmsd" : True
 }
 options_obj = Options(**options_kwargs)
 
