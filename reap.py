@@ -38,6 +38,8 @@ class Reap(object):
         self.deriv_level = deriv_level
 
     def run(self):
+        print("energy gegexxxx")
+        print(self.energy_regex) 
         # Define energy/gradient search regex
         if not self.deriv_level:
             energy_regex = re.compile(self.energy_regex)
@@ -48,7 +50,6 @@ class Reap(object):
             grad_regex2 = re.compile(self.gradient_regex[1])
             #molly_regex1  = re.compile(self.molly_regex[0])
             #molly_regex2  = re.compile(self.molly_regex[1])
- 
         eigs = self.eigs
         if type(eigs) == int:
             size = eigs
