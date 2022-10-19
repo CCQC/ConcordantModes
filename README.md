@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
-<\p>
+</p>
 
 This method allows the user to compute an approximate higher level of theory hessian from a lower level of theory hessian, using a linearly scaling number of single point energies at the higher level of theory. [Gradient cost findif as opposed to a full hessian cost]
 So, one could compute frequencies at a CCSD(T)/cc-pVDZ level of theory, then compute the diagonal, 
