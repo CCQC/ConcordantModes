@@ -1,11 +1,16 @@
 # ConcordantModes
+
+<p align="center">
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+<\p>
+
 This method allows the user to compute an approximate higher level of theory hessian from a lower level of theory hessian, using a linearly scaling number of single point energies at the higher level of theory. [Gradient cost findif as opposed to a full hessian cost]
 So, one could compute frequencies at a CCSD(T)/cc-pVDZ level of theory, then compute the diagonal, 
 lower level normal coordinate force constants at a CCSD(T)/cc-pVTZ level of theory, to get a very good approximation to CCSD(T)/cc-pVTZ frequencies.
 
 As of right now, the user must be on the Vulcan cluster.
 
-// Dependencies //
+## Installation
 
 User must have at least:
 Python version 3.5.4
@@ -18,7 +23,7 @@ conda create --name CMA python=3.9 sympy numpy scipy
 If you need to install anaconda, consult this website:
 https://www.anaconda.com/products/individual
 
-// Quickstart Guide //
+## Quickstart Guide
 
 An example is provided in the "Example" directory.
 

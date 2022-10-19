@@ -1,0 +1,8 @@
+recursive-include concordantmodes *.py
+recursive-include examples
+
+include pyproject.toml
+include README.md
+include LICENSE
+include MANIFEST.in
+

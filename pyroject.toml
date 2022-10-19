@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "versioningit~=2.0"]
+build-backend = "setuptools.build_meta"
+
+# Self-descriptive entries which should always be present
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
+[project]
+name = "Concordant Modes"
+description = "The Concordant Mode Approach utilizes lower level of theory normal modes to compute higher level force constants at a fraction of the cost!"
+dynamic = ["version"]
+readme = "README.md"
+authors = [
+    { name = "Mitchell Lahm"}, { name = "Nate Kitzmiller"}, {name = "Wesley D. Allen"}
+]
+license = { text = "BSD 3-Clause License" }
+# See https://pypi.org/classifiers/
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.8"
+# Declare any run-time dependencies that should be installed with the package.
+dependencies = [
+    "numpy >= 1.9",
+    "scipy >= 1.18.5",
+    "sympy"
+]
+
+# Update the urls once the hosting is set up.
+[project.urls]
+"Source" = "https://github.com/CCQC/ConcordantModes/"
+#"Documentation" = "https://{{cookiecutter.repo_name}}.readthedocs.io/"
+
+[project.optional-dependencies]
+test = [
+  "pytest>=6.1.2",
+  "pytest-runner"
+]
+
