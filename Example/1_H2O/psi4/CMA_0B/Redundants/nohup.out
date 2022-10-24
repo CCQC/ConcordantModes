@@ -1,0 +1,121 @@
+Initial Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.8130525861320914
+['2' '3'] R2 = 1.8130525861320914
+['1' '2' '3'] A1 = 103.58217001794341
+Final Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.8130525861320914
+['2' '3'] R2 = 1.8130525861320914
+['1' '2' '3'] A1 = 103.58217001794341
+Final - Initial Geometric Internal Coordinate Values:
+R1 = 0.0
+R2 = 0.0
+A1 = 0.0
+proj singular values:
+[1.53208488 1.494938   0.88182498]
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:      0.0     0.0     0.0
+--------------------------------------------------
+          H1   O2   STRE:     31.5    50.0    18.5
+          O2   H3   STRE:     31.5    50.0    18.5
+     H1   O2   H3   BEND:     37.1     0.0    62.9
+
+Initial Frequencies:
+/home/vulcan/mel64643/packages/concordantmodes/gf_method.py:67: ComplexWarning: Casting complex values to real discards the imaginary part
+  self.freq = self.freq.astype(float)
+frequency #  1:    1657.94
+frequency #  2:    3907.43
+frequency #  3:    4021.15
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:   1657.9  3907.4  4021.2
+--------------------------------------------------
+               Mode #  1      41.4    58.6     0.0
+               Mode #  2       0.0     0.0   100.0
+               Mode #  3      58.6    41.4     0.0
+
+TED Frequencies:
+frequency #  1:    1657.94
+frequency #  2:    3907.43
+frequency #  3:    4021.15
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:   1657.9  3907.4  4021.2
+--------------------------------------------------
+               Mode #  1     100.0     0.0     0.0
+               Mode #  2       0.0   100.0     0.0
+               Mode #  3       0.0     0.0   100.0
+
+3
+[[0, 0], [1, 1], [2, 2]]
+proj singular values:
+[1.53208488 1.494938   0.88182498]
+Normal Coordinate Values:
+Normal Coordinate #1   :  1.79244
+Normal Coordinate #2   : -2.70385
+Normal Coordinate #3   :  0.00000
+printing disp list
+['7', '1', '5', '3', '4', '6', '2']
+3
+If something looks wrong with the final frequencies, check these energies!
+(Job number 1 == Reference energy) :D
+/home/vulcan/mel64643/packages/concordantmodes/Example/1_H2O/psi4/CMA_0B/Redundants/Disps
+this is the energy regex re.compile('Giraffe The Energy is\\s+(\\-\\d+\\.\\d+)')
+Reference energy: -76.332216518896
+-76.332208449592
+-76.332208401451
+-76.332189170353
+-76.332189646734
+-76.332188973956
+-76.332188973957
+Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements
+[[-8.07e-06  0.00e+00  0.00e+00]
+ [ 0.00e+00 -2.73e-05  0.00e+00]
+ [ 0.00e+00  0.00e+00 -2.75e-05]]
+Relative energies minus-displacements on the diagonal and minus/minus-displacements on the off-diagonal elements
+[[-8.12e-06  0.00e+00  0.00e+00]
+ [ 0.00e+00 -2.69e-05  0.00e+00]
+ [ 0.00e+00  0.00e+00 -2.75e-05]]
+Computed Force Constants:
+[[0.16 0.   0.  ]
+ [0.   0.54 0.  ]
+ [0.   0.   0.55]]
+Final Frequencies:
+/home/vulcan/mel64643/packages/concordantmodes/gf_method.py:67: ComplexWarning: Casting complex values to real discards the imaginary part
+  self.freq = self.freq.astype(float)
+frequency #  1:    1669.02
+frequency #  2:    3840.96
+frequency #  3:    3945.64
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:   1669.0  3841.0  3945.6
+--------------------------------------------------
+               Mode #  1     100.0     0.0     0.0
+               Mode #  2       0.0   100.0     0.0
+               Mode #  3       0.0     0.0   100.0
+
+////////////////////////////////////////////
+//                Final TED               //
+////////////////////////////////////////////
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:   1669.0  3841.0  3945.6
+--------------------------------------------------
+          H1   O2   STRE:      0.0    50.0    50.0
+          O2   H3   STRE:      0.0    50.0    50.0
+     H1   O2   H3   BEND:    100.0     0.0    -0.0
+
+Final ZPVE in: 4727.81 (cm^-1)  13.52 (kcal mol^-1)   0.02 (hartrees) 
+print_const has run
+Frequency Shift (cm^-1): 
+[ 11.08 -66.47 -75.51]
+This program took 34.301504611968994 seconds to run.

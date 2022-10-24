@@ -1,12 +1,12 @@
 from concordantmodes.options import Options
 
 options_kwargs = {
-    "queue": "gen3.q,gen4.q,gen6.q,debug.q",
+    "queue": "gen5.q,gen4.q,gen6.q",
     "program_init": "psi4@master",
     "program": "psi4@master",
     "deriv_level_init": 1,
     # "disp" : 0.001,
-    "calc_init": False,
+    # "calc_init": False,
     "energy_regex": r"Giraffe The Energy is\s+(\-\d+\.\d+)",
     "energy_regex_init": [r"Total Gradient", r"tstop"],
     # "energy_regex_init": [r"Total gradient",r"Psi4"],

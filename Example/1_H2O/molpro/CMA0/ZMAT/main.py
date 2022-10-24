@@ -1,11 +1,12 @@
 from concordantmodes.options import Options
 
 options_kwargs = {
-    "queue": "gen4.q,gen6.q,debug.q",
+    "queue": "gen4.q,gen6.q",
     "program": "molpro@2010.1.67+mpi",
     "energy_regex": r"\(T\) total energy\s+(\-\d+\.\d+)",
     "cart_insert": 9,
     "success_regex": r"Variable memory released",
+    "second_order": True,
 }
 options_obj = Options(**options_kwargs)
 

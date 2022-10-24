@@ -61,9 +61,18 @@ class ConcordantModes(object):
         )
         if self.options.man_proj:
             proj = self.proj
-            s_vec.run(self.zmat_obj.cartesians_init, True, proj=proj)
+            s_vec.run(
+                self.zmat_obj.cartesians_init,
+                True,
+                proj=proj,
+                second_order=self.options.second_order,
+            )
         else:
-            s_vec.run(self.zmat_obj.cartesians_init, True)
+            s_vec.run(
+                self.zmat_obj.cartesians_init,
+                True,
+                second_order=self.options.second_order,
+            )
 
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
 
@@ -110,11 +119,17 @@ class ConcordantModes(object):
                 deriv_level=self.options.deriv_level_init,
             )
             init_disp.run()
-            # raise RuntimeError
+            
             prog_init = self.options.program_init
             prog_name_init = prog_init.split("@")[0]
 
-            if self.options.calc_init:
+            if self.options.gen_disps_init:
+                if os.path.exists(rootdir + '/DispsInit'):
+                    if os.path.exists(rootdir + '/oldDispsInit'):
+                        shutil.rmtree(rootdir + '/oldDispsInit')
+                    shutil.copytree(rootdir + '/DispsInit',rootdir + '/oldDispsInit')
+                    shutil.rmtree(rootdir + '/DispsInit')
+
                 dir_obj_init = DirectoryTree(
                     prog_name_init,
                     self.zmat_obj,
@@ -129,8 +144,18 @@ class ConcordantModes(object):
                     deriv_level=self.options.deriv_level_init,
                 )
                 dir_obj_init.run()
-                # raise RuntimeError
-                os.chdir(rootdir + "/DispsInit")
+
+                if not self.options.calc_init:
+                    print("The initial displacements have been generated, now they must be run locally.")
+                    raise RuntimeError
+            else:
+                if not os.path.exists(rootdir + '/DispsInit'):
+                    print("You need to have a DispsInit directory already present if you want to proceed under current conditions!")
+                    raise RuntimeError
+
+            os.chdir(rootdir + "/DispsInit")
+
+            if self.options.calc_init:
                 disp_list = []
                 for i in os.listdir(rootdir + "/DispsInit"):
                     disp_list.append(i)
@@ -176,13 +201,8 @@ class ConcordantModes(object):
                 deriv_level=self.options.deriv_level_init,
                 # disp_sym = init_disp.disp_sym
             )
-            # print("not recalculating", os.getcwd())
-            os.chdir(rootdir + "/DispsInit")
             reap_obj_init.run()
-            # os.chdir('..')
-            # raise RuntimeError
 
-            # nate
             if not self.options.deriv_level_init:
                 p_array_init = reap_obj_init.p_en_array
                 m_array_init = reap_obj_init.m_en_array
@@ -194,6 +214,7 @@ class ConcordantModes(object):
                 p_array_init = np.zeros(np.eye(len(eigs_init)).shape)
                 m_array_init = np.zeros(np.eye(len(eigs_init)).shape)
                 ref_en_init = None
+                
                 # Need to convert this array here from cartesians to internals using projected A-tensor
                 for i in indices:
                     grad_s_vec = SVectors(
@@ -209,7 +230,6 @@ class ConcordantModes(object):
                     m_array_init[i] = np.dot(cart_m_array_init[i].T, A_proj)
 
                 deriv_level = 1
-                # raise RuntimeError
 
             fc_init = ForceConstant(
                 init_disp,
@@ -223,8 +243,6 @@ class ConcordantModes(object):
             fc_init.run()
             print("Computed Force Constants:")
             print(fc_init.FC)
-
-            # raise RuntimeError
 
         # Temporary code to ensure nothing breaks in my code in the meantime
         self.options.deriv_level_init = 0
@@ -250,6 +268,7 @@ class ConcordantModes(object):
             F = np.dot(self.TED_obj.proj.T, np.dot(F, self.TED_obj.proj))
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
+        
         # Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         print("Initial Frequencies:")
         init_GF = GFMethod(
@@ -281,10 +300,7 @@ class ConcordantModes(object):
         )
         TED_GF.run()
 
-        # raise RuntimeError
 
-        # if os.path.exists(rootdir + '/Intder'):
-        # shutil.rmtree(rootdir + '/Intder')
         # S = TED_GF.S
         initial_fc = TED_GF.eig_v
         eigs = len(TED_GF.S)
@@ -300,6 +316,7 @@ class ConcordantModes(object):
             self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_final
         )
         s_vec.run(self.zmat_obj.cartesians_final, False, proj=self.TED_obj.proj)
+        
         transdisp = TransDisp(
             s_vec,
             self.zmat_obj,
@@ -318,8 +335,6 @@ class ConcordantModes(object):
         # )
         # second_B.run()
         transdisp.run()
-        # nate
-        # eigs = transdisp.eigs
         p_disp = transdisp.p_disp
         m_disp = transdisp.m_disp
         if self.options.disp_check:
@@ -329,8 +344,12 @@ class ConcordantModes(object):
 
         prog = self.options.program
         progname = prog.split("@")[0]
-        if self.options.calc:
-            print(os.getcwd())
+        if self.options.gen_disps:
+            if os.path.exists(rootdir+'Disps'): 
+                if os.path.exists(rootdir + '/oldDisps'):
+                    shutil.rmtree(rootdir + '/oldDisps')
+                shutil.copytree(rootdir + '/Disps',rootdir + '/oldDisps')
+                shutil.rmtree(rootdir + '/Disps')
             dir_obj = DirectoryTree(
                 progname,
                 self.zmat_obj,
@@ -344,7 +363,18 @@ class ConcordantModes(object):
                 "Disps",
             )
             dir_obj.run()
-            os.chdir(rootdir + "/Disps")
+            
+            if not self.options.calc:
+                print("The displacements have been generated, now they must be run locally.")
+                raise RuntimeError
+        else:
+            if not os.path.exists(rootdir + '/Disps'):
+                print("You need to have a Disps directory already present if you want to proceed under current conditions!")
+                raise RuntimeError
+        
+        os.chdir(rootdir + "/Disps")
+        
+        if self.options.calc:
             disp_list = []
             for i in os.listdir(rootdir + "/Disps"):
                 disp_list.append(i)
@@ -383,8 +413,6 @@ class ConcordantModes(object):
         # After this point, all of the jobs will have finished, and its time
         # to reap the energies as well as checking for sucesses on all of
         # the jobs
-        if not self.options.calc:
-            os.chdir("Disps")
         print(eigs)
         reap_obj = Reap(
             progname,
@@ -399,14 +427,11 @@ class ConcordantModes(object):
             # disp_sym = transdisp.disp_sym
         )
         reap_obj.run()
-        # os.chdir('..')
 
-        # nate
         p_en_array = reap_obj.p_en_array
         m_en_array = reap_obj.m_en_array
         ref_en = reap_obj.ref_en
 
-        # nate
         fc = ForceConstant(
             transdisp, p_en_array, m_en_array, ref_en, self.options, algo.indices
         )
@@ -414,7 +439,6 @@ class ConcordantModes(object):
         print("Computed Force Constants:")
         print(fc.FC)
 
-        # nate
         self.F = fc.FC
         if self.options.benchmark_full:
             with open("Full_fc_levelB.npy", "wb") as z:
@@ -427,14 +451,18 @@ class ConcordantModes(object):
 
         g_mat = GMatrix(self.zmat_obj, s_vec, self.options)
         g_mat.run()
+        
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
+        
         self.G = np.dot(np.dot(transdisp.eig_inv, g_mat.G), transdisp.eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
+        
         if self.options.benchmark_full:
             cma = True
         else:
             cma = False
+        
         # Final GF Matrix run
         print("Final Frequencies:")
         final_GF = GFMethod(

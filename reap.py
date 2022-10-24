@@ -18,7 +18,7 @@ class Reap(object):
         energy_regex,
         success_regex,
         deriv_level=0,
-        disp_sym = None
+        disp_sym=None,
     ):
         self.prog_name = prog_name
         self.zmat = zmat
@@ -56,6 +56,8 @@ class Reap(object):
                 "If something looks wrong with the final frequencies, check these energies!"
             )
             print("(Job number 1 == Reference energy) :D")
+            print(os.getcwd())
+            # self.options.dir_reap = True
             if self.options.dir_reap:
                 os.chdir("./" + str(1))
                 with open("output.dat", "r") as file:
@@ -98,13 +100,13 @@ class Reap(object):
                 absolute_energies.append([(i, j), "plus", energy, direc])
 
                 # if self.disp_sym[i] and self.disp_sym[j]:
-                    # direc -= 1
-                    # m_en_array[i, j] = energy = p_en_array[i, j]
+                # direc -= 1
+                # m_en_array[i, j] = energy = p_en_array[i, j]
                 # else:
-                    # m_en_array[i, j] = energy = self.reap_energies(
-                        # direc + 1, success_regex, energy_regex
-                    # )
-                    # print(energy)
+                # m_en_array[i, j] = energy = self.reap_energies(
+                # direc + 1, success_regex, energy_regex
+                # )
+                # print(energy)
                 m_en_array[i, j] = energy = self.reap_energies(
                     direc + 1, success_regex, energy_regex
                 )
@@ -147,15 +149,19 @@ class Reap(object):
             m_grad_array = np.array([])
             Sum = 0
             for index in indices:
-                grad = self.reap_gradients(2 * index + 1 - Sum, grad_regex1, grad_regex2)
+                grad = self.reap_gradients(
+                    2 * index + 1 - Sum, grad_regex1, grad_regex2
+                )
                 p_grad_array = np.append(p_grad_array, grad, axis=0)
                 # if self.disp.disp_sym[i]:
-                    # m_grad_array = np.append(m_grad_array, -grad, axis=0)
-                    # Sum += 1
+                # m_grad_array = np.append(m_grad_array, -grad, axis=0)
+                # Sum += 1
                 # else:
-                    # grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
-                    # m_grad_array = np.append(m_grad_array, grad, axis=0)
-                grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
+                # grad = self.reap_gradients(2 * index + 2 - Sum, grad_regex1, grad_regex2)
+                # m_grad_array = np.append(m_grad_array, grad, axis=0)
+                grad = self.reap_gradients(
+                    2 * index + 2 - Sum, grad_regex1, grad_regex2
+                )
                 m_grad_array = np.append(m_grad_array, grad, axis=0)
 
             self.p_grad_array = p_grad_array.reshape((-1, len(grad)))

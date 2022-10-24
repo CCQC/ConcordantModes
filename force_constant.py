@@ -4,22 +4,20 @@ from numpy import linalg as LA
 
 
 class ForceConstant(object):
-    """
-    This script will calculate the force constants of the CMA normal
-    modes using numerical differentiation.
+    # This script will calculate the force constants of the CMA normal
+    # modes using numerical differentiation.
 
-    Symmetric First Derivative
-    [f(x+h) - f(x-h)] / 2*h =
-    [g_(i_plus) - g_(i_minus)] / 2*disp_size
+    # Symmetric First Derivative
+    # [f(x+h) - f(x-h)] / 2*h =
+    # [g_(i_plus) - g_(i_minus)] / 2*disp_size
 
-    Diagonal Second Derivative
-    [f(x+h) - 2f(x) + f(x-h)] / h^2 =
-    [E_(i_plus) - 2*E_(ref) + E_(i_minus)] / disp_size^2
+    # Diagonal Second Derivative
+    # [f(x+h) - 2f(x) + f(x-h)] / h^2 =
+    # [E_(i_plus) - 2*E_(ref) + E_(i_minus)] / disp_size^2
 
-    Off-diagonal Second Derivative
-    [f(x+h,y+k) - f(x+h,y) - f(x,y+k) + 2f(x,y) - f(x-h,y) - f(x,y-k) + f(x-h,y-k) / 2*h^2
-    [E_(ij_plus) - E_(i_plus,j) - E_(i,j_plus) + E_(ref) - E_(i_minus,j) - E_(i,j_minus) + E_(i_minus,j_minus) / 2*disp_size^2
-    """
+    # Off-diagonal Second Derivative
+    # [f(x+h,y+k) - f(x+h,y) - f(x,y+k) + 2f(x,y) - f(x-h,y) - f(x,y-k) + f(x-h,y-k) / 2*h^2
+    # [E_(ij_plus) - E_(i_plus,j) - E_(i,j_plus) + E_(ref) - E_(i_minus,j) - E_(i,j_minus) + E_(i_minus,j_minus) / 2*disp_size^2
 
     def __init__(self, disp, p_array, m_array, ref_en, options, indices, deriv_level=0):
         self.options = options

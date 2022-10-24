@@ -1,0 +1,27 @@
+# o-Benzyne preliminary computations
+
+memory 14 gb
+
+molecule {
+  0 1
+  units bohr
+ C   -1.3750812791   -0.0242802406    0.0015700855
+ O    1.3060147294    0.1207000216    0.0010279667
+ H   -2.0778755807    1.9096022879   -0.0045210159
+ H   -2.1066455860   -0.9824430026    1.6824882492
+ H   -2.1113096028   -0.9762168625   -1.6813953274
+ H    1.9411731592   -1.5774943238    0.0008216320
+}
+
+set {
+  basis cc-pvtz
+  reference rhf
+  e_convergence 10 
+  d_convergence 10
+  r_convergence 8
+  maxiter 300
+  freeze_core True
+}
+
+e, wfn = energy('ccsd(t)', return_wfn = True)
+psi4.print_out('Giraffe The Energy is %.12f \n'%(e))

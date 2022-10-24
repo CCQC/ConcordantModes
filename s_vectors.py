@@ -1,6 +1,7 @@
 import os
 import shutil
 import numpy as np
+from concordantmodes.ted import TED
 from numpy.linalg import inv
 from numpy import linalg as LA
 
@@ -26,8 +27,9 @@ class SVectors(object):
         self.liny_indices = np.array(zmat.liny_indices).astype(np.int)
         self.options = options
         self.variable_dict = variable_dict
+        self.zmat = zmat
 
-    def run(self, carts, B_proj, proj=None):
+    def run(self, carts, B_proj, proj=None, second_order=False):
         self.proj = proj
         # Initialize the cartesian coordinates
         self.carts = carts
@@ -199,14 +201,12 @@ class SVectors(object):
                     r_3,
                 )
                 phi = self.compute_phi(e_2, e_3)
-                
-                theta = (
-                    self.calc_OOP(
-                        self.carts[self.oop_indices[i][0] - 1],
-                        self.carts[self.oop_indices[i][1] - 1],
-                        self.carts[self.oop_indices[i][2] - 1],
-                        self.carts[self.oop_indices[i][3] - 1],
-                    )
+
+                theta = self.calc_OOP(
+                    self.carts[self.oop_indices[i][0] - 1],
+                    self.carts[self.oop_indices[i][1] - 1],
+                    self.carts[self.oop_indices[i][2] - 1],
+                    self.carts[self.oop_indices[i][3] - 1],
                 )
                 o_1 = self.compute_OOP1(e_1, e_2, e_3, r_1, theta, phi)
                 o_3 = self.compute_OOP2(e_1, e_2, e_3, r_2, theta, phi)
@@ -252,13 +252,11 @@ class SVectors(object):
                     self.lin_indices[i][1] - 1,
                     r_3,
                 )
-                theta = (
-                    self.calc_Lin(
-                        self.carts[self.lin_indices[i][0] - 1],
-                        self.carts[self.lin_indices[i][1] - 1],
-                        self.carts[self.lin_indices[i][2] - 1],
-                        self.carts[self.lin_indices[i][3] - 1],
-                    )
+                theta = self.calc_Lin(
+                    self.carts[self.lin_indices[i][0] - 1],
+                    self.carts[self.lin_indices[i][1] - 1],
+                    self.carts[self.lin_indices[i][2] - 1],
+                    self.carts[self.lin_indices[i][3] - 1],
                 )
                 l_1 = self.compute_LIN(e_1, e_2, e_3, r_1, theta)
                 l_3 = self.compute_LIN(e_2, e_3, e_1, r_2, theta)
@@ -379,6 +377,9 @@ class SVectors(object):
         # The last step will be to concatenate all of the s-vectors into a singular B-tensor, in order of stretches, then bends, then torsions.
         # Note: I am going to modify this to hold all 2-center, 3-center, and 4-center internal coordinates.
         self.B = np.array([self.s_2center_dict["B1"].flatten()])
+        # print("B-time Baby:")
+        # print(self.B.shape)
+        # print(self.B)
         # Append stretches
         for i in range(len(self.s_2center_dict) - 1):
             self.B = np.append(
@@ -430,7 +431,8 @@ class SVectors(object):
             )
         # raise RuntimeError
 
-        tol = 1e-8
+        # tol = 1e-8
+        tol = 1e-4
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
         if not self.options.man_proj:
@@ -454,6 +456,29 @@ class SVectors(object):
 
         # Beware! The projected B matrix cannot be psuedo inverted to form
         # the A-matrix. You lose information.
+
+        # Option to run numerical second order B-tensor here.
+        # Update: I differentiated along internal coordinate when I should have differentiated along cartesians.
+        # I will need to update this code
+        # if second_order:
+        # B2 = self.second_order_B()
+        # B2[np.abs(B2) < 1e-10] = 0
+        # np.set_printoptions(precision=2, linewidth=2000)
+
+        # # Average the off-diagonal elements to mitigate the numerical errors
+        # for i in range(len(B2[0][0])):
+        # for j in range(len(B2)):
+        # for k in range(j):
+        # if j != k:
+        # B2[j,k,i] = (B2[j,k,i] + B2[k,j,i]) / 2
+        # B2[k,j,i] = B2[j,k,i]
+
+        # print(B2.shape)
+        # print(B2)
+
+        # raise RuntimeError
+
+        # Once we have confirmed these second order B-tensors are good, we can then project them in our standard fashion.
 
     def compute_STRE(self, bond_indices, carts, r):
         s = (carts[bond_indices[0] - 1] - carts[bond_indices[1] - 1]) / r
@@ -618,3 +643,53 @@ class SVectors(object):
         s = np.dot(e_1, np.cross(-e_2, e_3))
         ay = s / np.sin(theta)
         return ay
+
+    def num_differentiate(self, B_list_p, B_list_m):
+        disp_size = self.options.disp
+
+        # Numerical first derivative
+        B = np.array([(B_list_p[0] - B_list_m[0]) / 2 * disp_size])
+        for i in range(len(B_list_p) - 1):
+            B = np.append(
+                B, [(B_list_p[i + 1] - B_list_m[i + 1]) / 2 * disp_size], axis=0
+            )
+
+        return B
+
+    def second_order_B(self):
+        # Set some initial necessary variables
+        B_buff = self.B.copy()
+        TED_obj = TED(np.eye(len(self.B)), self.zmat)
+
+        # Initialize then generate the internal coordinate displacements
+        from concordantmodes.trans_disp import TransDisp
+
+        B_disp = TransDisp(
+            self,
+            self.zmat,
+            self.options.disp,
+            np.eye(len(self.B)),
+            True,
+            self.options.disp_tol,
+            TED_obj,
+            self.options,
+            np.arange(len(self.B)),
+            deriv_level=1,
+        )
+
+        B_disp.run()
+        self.run(B_disp.p_disp[0], False, second_order=False)
+        B_list_p = np.array([self.B], dtype=object)
+        self.run(B_disp.m_disp[0], False, second_order=False)
+        B_list_m = np.array([self.B], dtype=object)
+
+        for i in range(len(B_disp.p_disp) - 1):
+            self.run(B_disp.p_disp[i + 1], False, second_order=False)
+            B_list_p = np.append(B_list_p, [self.B], axis=0)
+            self.run(B_disp.m_disp[i + 1], False, second_order=False)
+            B_list_m = np.append(B_list_m, [self.B], axis=0)
+
+        # And differentiate
+        B2 = self.num_differentiate(B_list_p, B_list_m)
+
+        return B2

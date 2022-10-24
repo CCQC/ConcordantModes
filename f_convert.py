@@ -52,6 +52,7 @@ class FcConv(object):
     def print_const(self, fc_name="fcFinal.dat"):
         fc_output = ""
         fc_output += "{:5d}{:5d}\n".format(len(self.zmat.atom_list), self.N)
+        print("print_const has run")
         self.F_print = self.F.copy()
         self.F_print = self.F_print.flatten()
         for i in range(len(self.F_print) // 3):
