@@ -17,6 +17,7 @@ from concordantmodes.gf_method import GFMethod
 from concordantmodes.g_matrix import GMatrix
 from concordantmodes.int2cart import Int2Cart
 from concordantmodes.reap import Reap
+from concordantmodes.rmsd import RMSD
 from concordantmodes.s_vectors import SVectors
 from concordantmodes.submit import Submit
 from concordantmodes.ted import TED
@@ -197,9 +198,11 @@ class ConcordantModes(object):
                 eigs_init,
                 indices,
                 self.options.energy_regex_init,
+                self.options.gradient_regex,
+                self.options.molly_regex_init,
                 self.options.success_regex_init,
                 deriv_level=self.options.deriv_level_init,
-                # disp_sym = init_disp.disp_sym
+                #disp_sym = init_disp.disp_sym
             )
             reap_obj_init.run()
 
@@ -423,8 +426,10 @@ class ConcordantModes(object):
             eigs,
             algo.indices,
             self.options.energy_regex,
+            self.options.gradient_regex,
+            self.options.molly_regex_init,
             self.options.success_regex,
-            # disp_sym = transdisp.disp_sym
+            #disp_sym = transdisp.disp_sym
         )
         reap_obj.run()
 
@@ -512,6 +517,13 @@ class ConcordantModes(object):
             self.options.units,
         )
         cart_conv.run()
+    
+        #if mol2.size != 0:
+        #    print('I cant believe its not CMA1!') 
+        #    if self.options.rmsd:
+        #         
+        #        rmsd_geom = RMSD()
+        #        rmsd_geom.run(mol1,mol2)
 
         t2 = time.time()
         print("Frequency Shift (cm^-1): ")

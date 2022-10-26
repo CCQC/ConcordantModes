@@ -65,7 +65,6 @@ class SVectors(object):
                 self.s_2center_dict["B" + str(i + 1)][
                     self.bond_indices[i][1] - 1
                 ] = -self.s_2center_dict["B" + str(i + 1)][self.bond_indices[i][0] - 1]
-
         # Next, angles.
         if len(self.angle_indices) > 0:
             for i in range(len(self.angle_indices)):
@@ -107,7 +106,6 @@ class SVectors(object):
                 self.s_3center_dict["A" + str(i + 1)][self.angle_indices[i][1] - 1] = (
                     -a_1 - a_2
                 )
-
         # Next, torsions.
         if len(self.torsion_indices) > 0:
             for i in range(len(self.torsion_indices)):
@@ -430,12 +428,13 @@ class SVectors(object):
                 axis=0,
             )
         # raise RuntimeError
-
-        # tol = 1e-8
-        tol = 1e-4
+        tol = 1e-8
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
         if not self.options.man_proj:
+        #if self.options.man_proj:
+        #if True:
+            #print("just this once bb")
             if self.options.coords.upper() != "ZMAT":
                 proj, eigs, _ = LA.svd(self.B)
                 proj[np.abs(proj) < tol] = 0
