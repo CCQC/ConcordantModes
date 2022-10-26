@@ -83,7 +83,7 @@ class TransDisp(object):
         for i in range(len(self.n_coord)):
             print("Normal Coordinate #{:<4n}: {: 3.5f}".format(i + 1, self.n_coord[i]))
             # if abs(self.n_coord[i]) < self.disp_tol:
-                # self.disp_sym[i] = 1
+            # self.disp_sym[i] = 1
 
         # print("List of symmetric displacements according to disp_tol:")
         # print(self.disp_sym)
@@ -121,12 +121,13 @@ class TransDisp(object):
                 disp[i] = self.disp[i]
                 disp[j] = self.disp[j]
                 # a = self.coord_convert(
+                # print('['+str(i)+', '+str(j)+']')
                 p_disp[i, j] = self.coord_convert(
                     disp,
                     self.n_coord.copy(),
                     self.ref_carts.copy(),
                     50,
-                    1.0e-9,
+                    1.0e-7,
                     self.A.copy(),
                     False,
                     self.zmat,
@@ -139,7 +140,7 @@ class TransDisp(object):
                     self.n_coord.copy(),
                     self.ref_carts.copy(),
                     50,
-                    1.0e-9,
+                    1.0e-7,
                     self.A.copy(),
                     False,
                     self.zmat,
@@ -153,7 +154,7 @@ class TransDisp(object):
             m_disp = np.zeros(len(self.eigs), dtype=object)
             for i in range(len(self.eigs)):
                 disp[i] = self.disp[i]
-                print(disp)
+                # print(disp)
                 p_disp[i] = self.coord_convert(
                     disp,
                     self.n_coord.copy(),

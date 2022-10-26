@@ -166,25 +166,25 @@ class DirectoryTree(object):
 
                 # Don't generate a displacement if full symmetry is present
                 # if self.disps.disp_sym[i] and self.disps.disp_sym[j]:
-                    # direc -= 1
+                # direc -= 1
                 # else:
-                    # m_data = self.make_input(
-                        # data,
-                        # m_disp[i, j],
-                        # str(n_atoms),
-                        # self.zmat.atom_list,
-                        # self.insertion_index,
-                    # )
-                    # os.mkdir(str(direc + 1))
-                    # os.chdir("./" + str(direc + 1))
-                    # with open(inp, "w") as file:
-                        # file.writelines(m_data)
-                    # data = data_buff.copy()
-                    # if init:
-                        # shutil.copy("../../initden.dat", ".")
-                    # if genbas:
-                        # shutil.copy("../../GENBAS", ".")
-                    # os.chdir("..")
+                # m_data = self.make_input(
+                # data,
+                # m_disp[i, j],
+                # str(n_atoms),
+                # self.zmat.atom_list,
+                # self.insertion_index,
+                # )
+                # os.mkdir(str(direc + 1))
+                # os.chdir("./" + str(direc + 1))
+                # with open(inp, "w") as file:
+                # file.writelines(m_data)
+                # data = data_buff.copy()
+                # if init:
+                # shutil.copy("../../initden.dat", ".")
+                # if genbas:
+                # shutil.copy("../../GENBAS", ".")
+                # os.chdir("..")
 
                 m_data = self.make_input(
                     data,
@@ -230,25 +230,25 @@ class DirectoryTree(object):
                 os.chdir("..")
 
                 # if self.disps.disp_sym[i] and self.disps.disp_sym[j]:
-                    # direc -= 1
+                # direc -= 1
                 # else:
-                    # m_data = self.make_input(
-                        # data,
-                        # self.m_disp[index],
-                        # str(n_atoms),
-                        # self.zmat.atom_list,
-                        # self.insertion_index,
-                    # )
-                    # os.mkdir(str(direc + 1))
-                    # os.chdir("./" + str(direc + 1))
-                    # with open(inp, "w") as file:
-                        # file.writelines(m_data)
-                    # data = data_buff.copy()
-                    # if init:
-                        # shutil.copy("../../initden.dat", ".")
-                    # if genbas:
-                        # shutil.copy("../../GENBAS", ".")
-                    # os.chdir("..")
+                # m_data = self.make_input(
+                # data,
+                # self.m_disp[index],
+                # str(n_atoms),
+                # self.zmat.atom_list,
+                # self.insertion_index,
+                # )
+                # os.mkdir(str(direc + 1))
+                # os.chdir("./" + str(direc + 1))
+                # with open(inp, "w") as file:
+                # file.writelines(m_data)
+                # data = data_buff.copy()
+                # if init:
+                # shutil.copy("../../initden.dat", ".")
+                # if genbas:
+                # shutil.copy("../../GENBAS", ".")
+                # os.chdir("..")
                 m_data = self.make_input(
                     data,
                     self.m_disp[index],

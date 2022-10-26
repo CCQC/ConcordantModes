@@ -18,6 +18,12 @@ class TED(object):
     def run(self, eigs, freq, rect_print=True):
 
         proj_eigs = eigs
+        if len(np.shape(self.proj)) > 2 and np.shape(self.proj)[0] > 1:
+            proj_buff = self.proj[0]
+            for i in range(len(self.proj) - 1):
+                proj_buff = np.append(proj_buff, self.proj[i + 1], axis=1)
+            print(proj_buff)
+            raise RuntimeError
         if rect_print:
             proj_eigs = np.dot(self.proj, proj_eigs)
         proj_eigs_inv = LA.pinv(proj_eigs)

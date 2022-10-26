@@ -1,0 +1,33 @@
+Initial Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.8130525861320914
+['2' '3'] R2 = 1.8130525861320914
+['1' '2' '3'] A1 = 103.58217001794341
+Final Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.8130525861320914
+['2' '3'] R2 = 1.8130525861320914
+['1' '2' '3'] A1 = 103.58217001794341
+Final - Initial Geometric Internal Coordinate Values:
+R1 = 0.0
+R2 = 0.0
+A1 = 0.0
+proj singular values:
+[1.53208488 1.494938   0.88182498]
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:      0.0     0.0     0.0
+--------------------------------------------------
+          H1   O2   STRE:     31.5    50.0    18.5
+          O2   H3   STRE:     31.5    50.0    18.5
+     H1   O2   H3   BEND:     37.1     0.0    62.9
+
+Normal Coordinate Values:
+Normal Coordinate #1   : -0.93281
+Normal Coordinate #2   : -0.00000
+Normal Coordinate #3   :  2.99541
+The initial displacements have been generated, now they must be run locally.
+Traceback (most recent call last):
+  File "/home/vulcan/mel64643/packages/concordantmodes/Example/1_H2O/psi4/CMA_0A/manual_submission/Step1/main.py", line 23, in <module>
+    CMA_obj.run()
+  File "/home/vulcan/mel64643/packages/concordantmodes/cma.py", line 150, in run
+    raise RuntimeError
+RuntimeError

@@ -1,0 +1,103 @@
+Initial Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.8130525861320914
+['2' '3'] R2 = 1.8130525861320914
+['1' '2' '3'] A1 = 103.58217001794341
+Final Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.8130525861320914
+['2' '3'] R2 = 1.8130525861320914
+['1' '2' '3'] A1 = 103.58217001794341
+Final - Initial Geometric Internal Coordinate Values:
+R1 = 0.0
+R2 = 0.0
+A1 = 0.0
+proj singular values:
+[1.53208488 1.494938   0.88182498]
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:      0.0     0.0     0.0
+--------------------------------------------------
+          H1   O2   STRE:     31.5    50.0    18.5
+          O2   H3   STRE:     31.5    50.0    18.5
+     H1   O2   H3   BEND:     37.1     0.0    62.9
+
+Normal Coordinate Values:
+Normal Coordinate #1   : -0.93281
+Normal Coordinate #2   : -0.00000
+Normal Coordinate #3   :  2.99541
+If something looks wrong with the final frequencies, check these energies!
+(Job number 1 == Reference energy) :D
+/home/vulcan/mel64643/packages/concordantmodes/Example/1_H2O/psi4/CMA_0A/manual_submission/Step3/DispsInit
+this is the energy regex re.compile('Giraffe The Energy is\\s+(\\-\\d+\\.\\d+)')
+Reference energy: -76.408793347022
+-76.408679142277
+-76.408871148713
+-76.408650600287
+-76.408843769597
+-76.408770406232
+-76.408781576165
+-76.408765391572
+-76.408765391583
+-76.408838294805
+-76.408656816558
+-76.408865826436
+-76.408685200596
+Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements
+[[-1.14e-04 -1.43e-04 -2.29e-05]
+ [ 0.00e+00 -2.80e-05  4.49e-05]
+ [ 0.00e+00  0.00e+00  7.25e-05]]
+Relative energies minus-displacements on the diagonal and minus/minus-displacements on the off-diagonal elements
+[[ 7.78e-05  5.04e-05 -1.18e-05]
+ [ 0.00e+00 -2.80e-05 -1.37e-04]
+ [ 0.00e+00  0.00e+00 -1.08e-04]]
+-76.408685200596
+Computed Force Constants:
+[[ 3.64e-01  5.11e-05 -1.87e-01]
+ [ 5.11e-05  5.59e-01  2.39e-05]
+ [-1.87e-01  2.39e-05  3.57e-01]]
+Initial Frequencies:
+/home/vulcan/mel64643/packages/concordantmodes/gf_method.py:67: ComplexWarning: Casting complex values to real discards the imaginary part
+  self.freq = self.freq.astype(float)
+frequency #  1:    1735.85
+frequency #  2:    3852.40
+frequency #  3:    3974.94
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:   1735.8  3852.4  3974.9
+--------------------------------------------------
+               Mode #  1      41.6    58.4     0.0
+               Mode #  2       0.0     0.0   100.0
+               Mode #  3      58.4    41.6     0.0
+
+TED Frequencies:
+frequency #  1:    1735.85
+frequency #  2:    3852.40
+frequency #  3:    3974.94
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3
+--------------------------------------------------
+               frequency:   1735.8  3852.4  3974.9
+--------------------------------------------------
+               Mode #  1     100.0     0.0     0.0
+               Mode #  2       0.0   100.0     0.0
+               Mode #  3       0.0     0.0   100.0
+
+3
+[[0, 0], [1, 1], [2, 2]]
+proj singular values:
+[1.53 1.49 0.88]
+Normal Coordinate Values:
+Normal Coordinate #1   : -1.78832
+Normal Coordinate #2   : -2.70786
+Normal Coordinate #3   : -0.00000
+The displacements have been generated, now they must be run locally.
+Traceback (most recent call last):
+  File "/home/vulcan/mel64643/packages/concordantmodes/Example/1_H2O/psi4/CMA_0A/manual_submission/Step3/main.py", line 25, in <module>
+    CMA_obj.run()
+  File "/home/vulcan/mel64643/packages/concordantmodes/cma.py", line 369, in run
+    raise RuntimeError
+RuntimeError
