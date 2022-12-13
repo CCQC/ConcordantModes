@@ -61,8 +61,8 @@ class Algorithm(object):
     def coupling_diagnostic(self, a, initial_fc, tolerance):
         indices = []
         diag = np.zeros((a, a))
-        with open("S_p.npy", "rb") as x:
-            S = np.load(x)
+        # with open("S_p.npy", "rb") as x:
+            # S = np.load(x)
         for x in range(a):
             for y in range(a):
                 if x == y:
@@ -72,8 +72,8 @@ class Algorithm(object):
         # print(diag, "printing diag")
         diag = np.absolute(diag)
         print(diag)
-        with open("D.npy", "wb") as q:
-            np.save(q, diag)
+        # with open("D.npy", "wb") as q:
+            # np.save(q, diag)
         # diag[np.abs(diag) < 1e-31] = 1e-30
         data = np.abs(diag)
         hist, bin_edges = np.histogram(data, bins=a)
@@ -85,7 +85,7 @@ class Algorithm(object):
             if index[1] > index[0]:
                 indices_new.append(index)
         indices = indices_new
-        if self.options.clean_house:
-            os.system("rm D.npy  S_p.npy")
+        # if self.options.clean_house:
+            # os.system("rm D.npy  S_p.npy")
 
         return indices

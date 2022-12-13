@@ -21,7 +21,7 @@ from concordantmodes.rmsd import RMSD
 from concordantmodes.s_vectors import SVectors
 from concordantmodes.submit import Submit
 from concordantmodes.ted import TED
-from concordantmodes.trans_disp import TransDisp
+from concordantmodes.transf_disp import TransfDisp
 from concordantmodes.vulcan_template import VulcanTemplate
 from concordantmodes.sapelo_template import SapeloTemplate
 from concordantmodes.zmat import Zmat
@@ -62,6 +62,8 @@ class ConcordantModes(object):
         )
         if self.options.man_proj:
             proj = self.proj
+            print(proj.shape)
+            print(proj)
             s_vec.run(
                 self.zmat_obj.cartesians_init,
                 True,
@@ -107,7 +109,7 @@ class ConcordantModes(object):
             else:
                 indices = np.arange(len(eigs_init))
 
-            init_disp = TransDisp(
+            init_disp = TransfDisp(
                 s_vec,
                 self.zmat_obj,
                 self.options.disp,
@@ -281,7 +283,7 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
-            "init",
+            cma="init",
         )
         init_GF.run()
 
@@ -299,7 +301,7 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
-            False,
+            cma=False,
         )
         TED_GF.run()
 
@@ -320,7 +322,7 @@ class ConcordantModes(object):
         )
         s_vec.run(self.zmat_obj.cartesians_final, False, proj=self.TED_obj.proj)
         
-        transdisp = TransDisp(
+        transf_disp = TransfDisp(
             s_vec,
             self.zmat_obj,
             self.options.disp,
@@ -337,9 +339,9 @@ class ConcordantModes(object):
         #    self.zmat_obj, self.zmat_obj.cartesians_final, B_tensor, self.options
         # )
         # second_B.run()
-        transdisp.run()
-        p_disp = transdisp.p_disp
-        m_disp = transdisp.m_disp
+        transf_disp.run()
+        p_disp = transf_disp.p_disp
+        m_disp = transf_disp.m_disp
         if self.options.disp_check:
             raise RuntimeError
 
@@ -356,7 +358,7 @@ class ConcordantModes(object):
             dir_obj = DirectoryTree(
                 progname,
                 self.zmat_obj,
-                transdisp,
+                transf_disp,
                 self.options.cart_insert,
                 p_disp,
                 m_disp,
@@ -420,16 +422,16 @@ class ConcordantModes(object):
         reap_obj = Reap(
             progname,
             self.zmat_obj,
-            transdisp.disp_cart,
+            transf_disp.disp_cart,
             self.options,
-            transdisp.n_coord,
+            transf_disp.n_coord,
             eigs,
             algo.indices,
             self.options.energy_regex,
             self.options.gradient_regex,
             self.options.molly_regex_init,
             self.options.success_regex,
-            #disp_sym = transdisp.disp_sym
+            #disp_sym = transf_disp.disp_sym
         )
         reap_obj.run()
 
@@ -438,7 +440,7 @@ class ConcordantModes(object):
         ref_en = reap_obj.ref_en
 
         fc = ForceConstant(
-            transdisp, p_en_array, m_en_array, ref_en, self.options, algo.indices
+            transf_disp, p_en_array, m_en_array, ref_en, self.options, algo.indices
         )
         fc.run()
         print("Computed Force Constants:")
@@ -460,7 +462,7 @@ class ConcordantModes(object):
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
         
-        self.G = np.dot(np.dot(transdisp.eig_inv, g_mat.G), transdisp.eig_inv.T)
+        self.G = np.dot(np.dot(transf_disp.eig_inv, g_mat.G), transf_disp.eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
         
         if self.options.benchmark_full:
@@ -477,7 +479,7 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
-            cma,
+            cma=cma,
         )
         final_GF.run()
 
@@ -504,7 +506,7 @@ class ConcordantModes(object):
         # This code converts the force constants back into cartesian
         # coordinates and writes out an "output.default.hess" file, which
         # is of the same format as FCMFINAL of CFOUR.
-        self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+        self.F = np.dot(np.dot(transf_disp.eig_inv.T, self.F), transf_disp.eig_inv)
         if self.options.coords != "ZMAT":
             self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
         cart_conv = FcConv(
@@ -563,7 +565,7 @@ class ConcordantModes(object):
                     self.options.proj_tol,
                     self.zmat_obj,
                     self.TED_obj,
-                    cma,
+                    cma=cma,
                 )
                 final_GF.run()
 
@@ -590,7 +592,7 @@ class ConcordantModes(object):
                 # This code converts the force constants back into cartesian
                 # coordinates and writes out an "output.default.hess" file, which
                 # is of the same format as FCMFINAL of CFOUR.
-                # self.F = np.dot(np.dot(transdisp.eig_inv.T, self.F), transdisp.eig_inv)
+                # self.F = np.dot(np.dot(transf_disp.eig_inv.T, self.F), transf_disp.eig_inv)
                 # if self.options.coords != "ZMAT":
                 #    self.F = np.dot(self.TED_obj.proj, np.dot(self.F, self.TED_obj.proj.T))
                 # cart_conv = FcConv(
@@ -623,15 +625,15 @@ class ConcordantModes(object):
             algo.run()
             print("printing algo indices", algo.indices)
             diagnostic_indices = algo.indices
-            with open("L_full.npy", "rb") as w:
-                L_full = np.load(w)
-            with open("L_0.npy", "rb") as x:
-                L_0 = np.load(x)
+            # with open("L_full.npy", "rb") as w:
+                # L_full = np.load(w)
+            # with open("L_0.npy", "rb") as x:
+                # L_0 = np.load(x)
 
-            L_inv = LA.inv(L_full)
-            S = np.dot(L_inv, L_0)
-            print("printing overlap")
-            print(S)
+            # L_inv = LA.inv(L_full)
+            # S = np.dot(L_inv, L_0)
+            # print("printing overlap")
+            # print(S)
             # with open("S.npy", "wb") as y:
             #    np.save(y, S)
             self.options.mode_coupling_check = False
@@ -656,7 +658,7 @@ class ConcordantModes(object):
                 self.options.proj_tol,
                 self.zmat_obj,
                 self.TED_obj,
-                cma,
+                cma=cma,
             )
             final_GF.run()
 
@@ -667,8 +669,8 @@ class ConcordantModes(object):
             print("//{:^40s}//".format(" Final TED"))
             print("////////////////////////////////////////////")
             self.TED_obj.run(np.dot(init_GF.L, final_GF.L), final_GF.freq)
-            if self.options.clean_house:
-                os.system("rm L_full.npy")
+            # if self.options.clean_house:
+                # os.system("rm L_full.npy")
 
             # This code prints out the frequencies in order of energy as well
             # as the ZPVE in several different units.
@@ -681,10 +683,10 @@ class ConcordantModes(object):
                 + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 219474.6313708)
                 + " (hartrees) "
             )
-            if self.options.clean_house:
-                os.system("rm L_0.npy L_full.npy S.npy Full_fc_levelB.npy")
-        if self.options.clean_house:
-            os.system("rm S_p.npy")
-            path = os.getcwd() + "/L_full.npy"
-            if os.path.isfile(path):
-                os.system("rm L_full.npy")
+            # if self.options.clean_house:
+                # os.system("rm L_0.npy L_full.npy S.npy Full_fc_levelB.npy")
+        # if self.options.clean_house:
+            # os.system("rm S_p.npy")
+            # path = os.getcwd() + "/L_full.npy"
+            # if os.path.isfile(path):
+                # os.system("rm L_full.npy")

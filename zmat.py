@@ -4,7 +4,7 @@ import shutil
 import re
 from . import masses
 from concordantmodes.int2cart import Int2Cart
-from concordantmodes.trans_disp import TransDisp
+from concordantmodes.transf_disp import TransfDisp
 
 
 class Zmat(object):
@@ -15,34 +15,53 @@ class Zmat(object):
         self.Bohr_Ang = 0.529177210903
 
     def run(self, zmat_name="zmat"):
+        
+        # Read in the ZMAT file
+        zmat_output = self.zmat_read(zmat_name)
+
+        # Process the read in information
+        self.zmat_process(zmat_output)
+
+        # Calculate internal coordinate values from reference cartesian coordinates
+        self.zmat_calc()
+        
+        # 
+        self.zmat_compile()
+
+        #
+        self.zmat_print()
+
+
+
+    def zmat_read(self,zmat_name):
         # Define some regexes
-        zmat_begin_regex = re.compile(r"ZMAT begin")
-        zmat_end_regex = re.compile(r"ZMAT end")
+        self.zmat_begin_regex = re.compile(r"ZMAT begin")
+        self.zmat_end_regex = re.compile(r"ZMAT end")
 
         # ZMAT regexes
-        first_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s*\n")
-        second_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s*\n")
-        third_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s*\n")
-        full_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        self.first_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s*\n")
+        self.second_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s*\n")
+        self.third_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s*\n")
+        self.full_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
         # Custom int coord regexes
-        bond_regex = re.compile("^\s*(\d+)\s+(\d+)\s*\n")
-        angle_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
-        torsion_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
-        oop_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
-        lin_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*L\s*\n")
-        linx_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Lx\s*\n")
-        liny_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Ly\s*\n")
+        self.bond_regex = re.compile("^\s*(\d+)\s+(\d+)\s*\n")
+        self.angle_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        self.torsion_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
+        self.oop_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
+        self.lin_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*L\s*\n")
+        self.linx_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Lx\s*\n")
+        self.liny_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Ly\s*\n")
 
         # Cartesian regexes
-        cart_begin_regex = re.compile(r"cart begin")
-        cart_end_regex = re.compile(r"cart end")
+        self.cart_begin_regex = re.compile(r"cart begin")
+        self.cart_end_regex = re.compile(r"cart end")
         s = "[A-Za-z]+[0-9]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n"
-        cartesian_regex = re.compile(s)
+        self.cartesian_regex = re.compile(s)
         s = "([A-Za-z]+[0-9]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
-        cartesian_atom_regex = re.compile(s)
-        divider_regex = re.compile("^\s*\-\-\-\s*\n")
+        self.cartesian_atom_regex = re.compile(s)
+        self.divider_regex = re.compile("^\s*\-\-\-\s*\n")
 
-        # Read in the ZMAT file
+
         with open(zmat_name, "r") as file:
             output = file.readlines()
 
@@ -53,13 +72,13 @@ class Zmat(object):
         self.atom_list = []
 
         for i in range(len(output)):
-            beg_cart = re.search(cart_begin_regex, output[i])
+            beg_cart = re.search(self.cart_begin_regex, output[i])
             if beg_cart:
                 cart_range.append(i)
                 break
 
         for i in range(len(output) - cart_range[0]):
-            end_cart = re.search(cart_end_regex, output[i + cart_range[0]])
+            end_cart = re.search(self.cart_end_regex, output[i + cart_range[0]])
             if end_cart:
                 cart_range.append(i + cart_range[0])
                 break
@@ -67,28 +86,28 @@ class Zmat(object):
         cart_output = output[cart_range[0] : cart_range[1]].copy()
 
         for i in range(len(cart_output)):
-            divider = re.search(divider_regex, cart_output[i])
-            if divider:
+            self.divider = re.search(self.divider_regex, cart_output[i])
+            if self.divider:
                 divide_index = i
                 break
-        if divider:
+        if self.divider:
             cart_output_init = cart_output[:divide_index].copy()
             cart_output_final = cart_output[divide_index + 1 :].copy()
         else:
             cart_output_init = cart_output.copy()
 
         for i in range(len(cart_output_init)):
-            if re.search(cartesian_regex, cart_output_init[i]):
-                temp = re.findall(cartesian_regex, cart_output_init[i])
-                atom = re.findall(cartesian_atom_regex, cart_output_init[i])
+            if re.search(self.cartesian_regex, cart_output_init[i]):
+                temp = re.findall(self.cartesian_regex, cart_output_init[i])
+                atom = re.findall(self.cartesian_atom_regex, cart_output_init[i])
                 self.cartesians_init.append(temp[0])
                 self.atom_list.append(atom[0])
         self.cartesians_init = np.array(self.cartesians_init).astype(float)
 
-        if divider:
+        if self.divider:
             for i in range(len(cart_output_final)):
-                if re.search(cartesian_regex, cart_output_final[i]):
-                    temp = re.findall(cartesian_regex, cart_output_final[i])
+                if re.search(self.cartesian_regex, cart_output_final[i]):
+                    temp = re.findall(self.cartesian_regex, cart_output_final[i])
                     self.cartesians_final.append(temp[0])
             self.cartesians_final = np.array(self.cartesians_final).astype(float)
         else:
@@ -102,18 +121,24 @@ class Zmat(object):
         zmat_range = []
 
         for i in range(len(output)):
-            beg_zmat = re.search(zmat_begin_regex, output[i])
+            beg_zmat = re.search(self.zmat_begin_regex, output[i])
             if beg_zmat:
                 zmat_range.append(i)
 
         for i in range(len(output) - zmat_range[0]):
-            end_zmat = re.search(zmat_end_regex, output[i + zmat_range[0]])
+            end_zmat = re.search(self.zmat_end_regex, output[i + zmat_range[0]])
             if end_zmat:
                 zmat_range.append(i + zmat_range[0])
                 break
 
-        zmat_output = output[zmat_range[0] : zmat_range[1]].copy()
+        zmat_output = output[zmat_range[0] + 1 : zmat_range[1]].copy()
+        
+        # print(output)
+        # print(zmat_output)
 
+        return zmat_output
+
+    def zmat_process(self,zmat_output):
         # Initialize necessary lists
         self.bond_indices = []
         self.bond_variables = []
@@ -138,17 +163,17 @@ class Zmat(object):
             # This code reaps ZMAT data
             for i in range(len(zmat_output)):
                 # This case if we are at the first atom of the ZMAT
-                if re.search(first_atom_regex, zmat_output[i]) and count < 1:
+                if re.search(self.first_atom_regex, zmat_output[i]) and count < 1:
                     first_index = i
                     count += 1
                 # Second atom of the ZMAT, will have one bond term
-                if re.search(second_atom_regex, zmat_output[i]):
-                    List = re.findall(second_atom_regex, zmat_output[i])[0]
+                if re.search(self.second_atom_regex, zmat_output[i]):
+                    List = re.findall(self.second_atom_regex, zmat_output[i])[0]
                     self.bond_indices.append([str(i - first_index + 1), List[1]])
                     self.bond_variables.append("R" + str(i - first_index))
                 # Third atom of the ZMAT, will have bond and angle term
-                if re.search(third_atom_regex, zmat_output[i]):
-                    List = re.findall(third_atom_regex, zmat_output[i])[0]
+                if re.search(self.third_atom_regex, zmat_output[i]):
+                    List = re.findall(self.third_atom_regex, zmat_output[i])[0]
                     self.bond_indices.append([str(i - first_index + 1), List[1]])
                     self.bond_variables.append("R" + str(i - first_index))
                     self.angle_indices.append(
@@ -157,8 +182,8 @@ class Zmat(object):
                     self.angle_variables.append("A" + str(i - first_index))
                 # All remaining ZMAT atoms, will have bond, angle, and torsion
                 # term
-                if re.search(full_atom_regex, zmat_output[i]):
-                    List = re.findall(full_atom_regex, zmat_output[i])[0]
+                if re.search(self.full_atom_regex, zmat_output[i]):
+                    List = re.findall(self.full_atom_regex, zmat_output[i])[0]
                     self.bond_indices.append([str(i - first_index + 1), List[1]])
                     self.bond_variables.append("R" + str(i - first_index))
                     self.angle_indices.append(
@@ -174,7 +199,7 @@ class Zmat(object):
             if self.options.interatomic_distance:
                 self.bond_indices = np.array([])
                 indices = []
-                transdisp_inter = TransDisp(
+                transdisp_inter = TransfDisp(
                     1,
                     self,
                     1,
@@ -208,12 +233,13 @@ class Zmat(object):
                 print(self.bond_indices)
             else:
                 for i in range(len(zmat_output)):
-                    if re.search(bond_regex, zmat_output[i]):
+                    if re.search(self.bond_regex, zmat_output[i]):
                         count += 1
-                        List = re.findall(bond_regex, zmat_output[i])[0]
+                        List = re.findall(self.bond_regex, zmat_output[i])[0]
                         self.bond_indices.append(List)
                         self.bond_variables.append("R" + str(count))
                 self.bond_indices = np.array(self.bond_indices)
+            
             # Form all possible angles from bonds
             self.angle_indices = np.array([])
             count = 0
@@ -258,44 +284,44 @@ class Zmat(object):
             Sum = 0
             blank = 0
             for i in range(len(zmat_output)):
-                if re.search(bond_regex, zmat_output[i]):
-                    List = re.findall(bond_regex, zmat_output[i])[0]
+                if re.search(self.bond_regex, zmat_output[i]):
+                    List = re.findall(self.bond_regex, zmat_output[i])[0]
                     self.bond_indices.append(List)
                     self.bond_variables.append(
                         "R" + str(i + 1 - Sum + len(self.bond_variables))
                     )
-                elif re.search(angle_regex, zmat_output[i]):
-                    List = re.findall(angle_regex, zmat_output[i])[0]
+                elif re.search(self.angle_regex, zmat_output[i]):
+                    List = re.findall(self.angle_regex, zmat_output[i])[0]
                     self.angle_indices.append(List)
                     self.angle_variables.append(
                         "A" + str(i + 1 - Sum + len(self.angle_variables))
                     )
-                elif re.search(torsion_regex, zmat_output[i]):
-                    List = re.findall(torsion_regex, zmat_output[i])[0]
+                elif re.search(self.torsion_regex, zmat_output[i]):
+                    List = re.findall(self.torsion_regex, zmat_output[i])[0]
                     self.torsion_indices.append(List)
                     self.torsion_variables.append(
                         "D" + str(i + 1 - Sum + len(self.torsion_variables))
                     )
-                elif re.search(oop_regex, zmat_output[i]):
-                    List = re.findall(oop_regex, zmat_output[i])[0]
+                elif re.search(self.oop_regex, zmat_output[i]):
+                    List = re.findall(self.oop_regex, zmat_output[i])[0]
                     self.oop_indices.append(List)
                     self.oop_variables.append(
                         "O" + str(i + 1 - Sum + len(self.oop_variables))
                     )
-                elif re.search(lin_regex, zmat_output[i]):
-                    List = re.findall(lin_regex, zmat_output[i])[0]
+                elif re.search(self.lin_regex, zmat_output[i]):
+                    List = re.findall(self.lin_regex, zmat_output[i])[0]
                     self.lin_indices.append(List)
                     self.lin_variables.append(
                         "L" + str(i + 1 - Sum + len(self.lin_variables))
                     )
-                elif re.search(linx_regex, zmat_output[i]):
-                    List = re.findall(linx_regex, zmat_output[i])[0]
+                elif re.search(self.linx_regex, zmat_output[i]):
+                    List = re.findall(self.linx_regex, zmat_output[i])[0]
                     self.linx_indices.append(List)
                     self.linx_variables.append(
                         "Lx" + str(i + 1 - Sum + len(self.linx_variables))
                     )
-                elif re.search(liny_regex, zmat_output[i]):
-                    List = re.findall(liny_regex, zmat_output[i])[0]
+                elif re.search(self.liny_regex, zmat_output[i]):
+                    List = re.findall(self.liny_regex, zmat_output[i])[0]
                     self.liny_indices.append(List)
                     self.liny_variables.append(
                         "Ly" + str(i + 1 - Sum + len(self.liny_variables))
@@ -313,11 +339,12 @@ class Zmat(object):
                     + blank
                 )
 
-        # This code utilizes the INTC function from the TransDisp module to
+    def zmat_calc(self):
+        # This code utilizes the INTC function from the TransfDisp module to
         # calculate the initial variable values from the cartesian
         # coordinates.
         indices = []
-        transdisp = TransDisp(
+        transdisp = TransfDisp(
             1, self, 1, 1, False, self.disp_tol, np.array([]), self.options, indices
         )
         I = np.eye(
@@ -329,8 +356,8 @@ class Zmat(object):
             + len(self.linx_indices)
             + len(self.liny_indices)
         )
-        variables1 = transdisp.int_c(self.cartesians_init, I, I)
-        variables2 = transdisp.int_c(self.cartesians_final, I, I)
+        self.variables1 = transdisp.int_c(self.cartesians_init, I, I)
+        self.variables2 = transdisp.int_c(self.cartesians_final, I, I)
         for i in range(
             len(self.angle_indices)
             + len(self.torsion_indices)
@@ -339,19 +366,19 @@ class Zmat(object):
             + len(self.linx_indices)
             + len(self.liny_indices)
         ):
-            variables1[len(self.bond_indices) + i] *= 180.0 / np.pi
-            variables2[len(self.bond_indices) + i] *= 180.0 / np.pi
-        variables = np.append(
+            self.variables1[len(self.bond_indices) + i] *= 180.0 / np.pi
+            self.variables2[len(self.bond_indices) + i] *= 180.0 / np.pi
+        self.variables = np.append(
             self.bond_variables, np.append(self.angle_variables, self.torsion_variables)
         )
         if len(self.oop_variables):
-            variables = np.append(variables, self.oop_variables)
+            self.variables = np.append(self.variables, self.oop_variables)
         if len(self.lin_variables):
-            variables = np.append(variables, self.lin_variables)
+            self.variables = np.append(self.variables, self.lin_variables)
         if len(self.linx_variables):
-            variables = np.append(variables, self.linx_variables)
+            self.variables = np.append(self.variables, self.linx_variables)
         if len(self.liny_variables):
-            variables = np.append(variables, self.liny_variables)
+            self.variables = np.append(self.variables, self.liny_variables)
 
         # This code is useful for checking the Redundant coordinate
         # generation process.
@@ -365,12 +392,12 @@ class Zmat(object):
                 indices.append(self.torsion_indices[i].tolist())
             # print(indices)
 
-        for i in range(len(variables1)):
-            self.variable_dictionary_init[variables[i]] = variables1[i]
+        for i in range(len(self.variables1)):
+            self.variable_dictionary_init[self.variables[i]] = self.variables1[i]
 
-        if divider:
-            for i in range(len(variables2)):
-                self.variable_dictionary_final[variables[i]] = variables2[i]
+        if self.divider:
+            for i in range(len(self.variables2)):
+                self.variable_dictionary_final[self.variables[i]] = self.variables2[i]
         else:
             self.variable_dictionary_final = self.variable_dictionary_init.copy()
             # And now we must temper the torsion angles! For consistency's sake
@@ -446,7 +473,8 @@ class Zmat(object):
                     >= 270.0
                 ):
                     self.variable_dictionary_final[self.torsion_variables[i]] -= 360.0
-
+    
+    def zmat_compile(self):
         # The masses are assigned to the respective atom from the masses.py file
         self.masses = [masses.get_mass(label) for label in self.atom_list]
         for i in range(len(self.masses)):
@@ -480,38 +508,39 @@ class Zmat(object):
             self.index_dictionary["Lx" + str(i + 1)] = self.linx_indices[i]
         for i in range(len(self.liny_indices)):
             self.index_dictionary["Ly" + str(i + 1)] = self.liny_indices[i]
-
+    
+    def zmat_print(self):
         # Print off the internal coordinate and its value in Bohr/Degree
         print("Initial Geometric Internal Coordinate Values:")
-        for i in range(len(variables)):
+        for i in range(len(self.variables)):
             print(
-                str(self.index_dictionary[variables[i]])
+                str(self.index_dictionary[self.variables[i]])
                 + " "
-                + variables[i]
+                + self.variables[i]
                 + " = "
-                + str(self.variable_dictionary_init[variables[i]])
+                + str(self.variable_dictionary_init[self.variables[i]])
             )
             # if self.options.coords.upper() == "REDUNDANT":
             # print(indices[i])
         print("Final Geometric Internal Coordinate Values:")
-        for i in range(len(variables)):
+        for i in range(len(self.variables)):
             print(
-                str(self.index_dictionary[variables[i]])
+                str(self.index_dictionary[self.variables[i]])
                 + " "
-                + variables[i]
+                + self.variables[i]
                 + " = "
-                + str(self.variable_dictionary_final[variables[i]])
+                + str(self.variable_dictionary_final[self.variables[i]])
             )
             # if self.options.coords.upper() == "REDUNDANT":
             # print(indices[i])
         print("Final - Initial Geometric Internal Coordinate Values:")
-        for i in range(len(variables)):
+        for i in range(len(self.variables)):
             print(
-                variables[i]
+                self.variables[i]
                 + " = "
                 + str(
-                    self.variable_dictionary_final[variables[i]]
-                    - self.variable_dictionary_init[variables[i]]
+                    self.variable_dictionary_final[self.variables[i]]
+                    - self.variable_dictionary_init[self.variables[i]]
                 )
             )
             # if self.options.coords.upper() == "REDUNDANT":
@@ -520,8 +549,8 @@ class Zmat(object):
             Sum = 0
             for i in range(len(self.bond_indices)):
                 Sum += (
-                    self.variable_dictionary_final[variables[i]]
-                    - self.variable_dictionary_init[variables[i]]
+                    self.variable_dictionary_final[self.variables[i]]
+                    - self.variable_dictionary_init[self.variables[i]]
                 ) ** 2
 
             # print("squared sum: ")

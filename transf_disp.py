@@ -4,7 +4,7 @@ from numpy import linalg as LA
 from concordantmodes.s_vectors import SVectors as s_vec
 
 
-class TransDisp(object):
+class TransfDisp(object):
     """
     The purpose of this script is to perform an iterative transformation
     between internal coordinate displacements and cartesian displacements,

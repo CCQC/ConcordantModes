@@ -18,13 +18,13 @@ class SVectors(object):
         self.s_2center_dict = {}
         self.s_3center_dict = {}
         self.s_4center_dict = {}
-        self.bond_indices = np.array(zmat.bond_indices).astype(np.int)
-        self.angle_indices = np.array(zmat.angle_indices).astype(np.int)
-        self.torsion_indices = np.array(zmat.torsion_indices).astype(np.int)
-        self.oop_indices = np.array(zmat.oop_indices).astype(np.int)
-        self.lin_indices = np.array(zmat.lin_indices).astype(np.int)
-        self.linx_indices = np.array(zmat.linx_indices).astype(np.int)
-        self.liny_indices = np.array(zmat.liny_indices).astype(np.int)
+        self.bond_indices = np.array(zmat.bond_indices).astype(int)
+        self.angle_indices = np.array(zmat.angle_indices).astype(int)
+        self.torsion_indices = np.array(zmat.torsion_indices).astype(int)
+        self.oop_indices = np.array(zmat.oop_indices).astype(int)
+        self.lin_indices = np.array(zmat.lin_indices).astype(int)
+        self.linx_indices = np.array(zmat.linx_indices).astype(int)
+        self.liny_indices = np.array(zmat.liny_indices).astype(int)
         self.options = options
         self.variable_dict = variable_dict
         self.zmat = zmat
@@ -661,9 +661,9 @@ class SVectors(object):
         TED_obj = TED(np.eye(len(self.B)), self.zmat)
 
         # Initialize then generate the internal coordinate displacements
-        from concordantmodes.trans_disp import TransDisp
+        from concordantmodes.transf_disp import TransfDisp
 
-        B_disp = TransDisp(
+        B_disp = TransfDisp(
             self,
             self.zmat,
             self.options.disp,
