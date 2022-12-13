@@ -37,6 +37,10 @@ User must have at least:
 Python version 3.5.4
 Numpy version 1.13.1
 
+Developers must have:
+Pytest 7.2.0 (-c condaforge)
+Pytest-xdist 3.0.2 (-c condaforge)
+
 A simple way to ensure this program may be run is by creating a conda environment with the following command:
 
 conda create --name CMA python=3.9 sympy numpy scipy
