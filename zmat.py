@@ -39,27 +39,27 @@ class Zmat(object):
         self.zmat_end_regex = re.compile(r"ZMAT end")
 
         # ZMAT regexes
-        self.first_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s*\n")
-        self.second_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s*\n")
-        self.third_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s*\n")
-        self.full_atom_regex = re.compile("^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        self.first_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s*\n")
+        self.second_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s*\n")
+        self.third_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s*\n")
+        self.full_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
         # Custom int coord regexes
-        self.bond_regex = re.compile("^\s*(\d+)\s+(\d+)\s*\n")
-        self.angle_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
-        self.torsion_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
-        self.oop_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
-        self.lin_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*L\s*\n")
-        self.linx_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Lx\s*\n")
-        self.liny_regex = re.compile("^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Ly\s*\n")
+        self.bond_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s*\n")
+        self.angle_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        self.torsion_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*T\s*\n")
+        self.oop_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*O\s*\n")
+        self.lin_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*L\s*\n")
+        self.linx_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Lx\s*\n")
+        self.liny_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*Ly\s*\n")
 
         # Cartesian regexes
         self.cart_begin_regex = re.compile(r"cart begin")
         self.cart_end_regex = re.compile(r"cart end")
-        s = "[A-Za-z]+[0-9]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n"
+        s = r"[A-Za-z]+[0-9]*\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s*\n"
         self.cartesian_regex = re.compile(s)
-        s = "([A-Za-z]+[0-9]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
+        s = r"([A-Za-z]+[0-9]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
         self.cartesian_atom_regex = re.compile(s)
-        self.divider_regex = re.compile("^\s*\-\-\-\s*\n")
+        self.divider_regex = re.compile(r"^\s*\-\-\-\s*\n")
 
 
         with open(zmat_name, "r") as file:
