@@ -47,7 +47,6 @@ def test_transf_disp():
         [1.941172931083388, -1.5774905865156932, -0.0019238478290682895],
     ]
 
-    # print(disps.p_disp[3][3].tolist())
 
     if np.setdiff1d(np.array(disp_ref), disps.p_disp[3][3].tolist()).size:
         errors.append("Computed Displacement does not match the reference.")

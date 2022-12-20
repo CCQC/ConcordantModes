@@ -12,26 +12,8 @@ from concordantmodes.options import Options
 from concordantmodes.s_vectors import SVectors
 from concordantmodes.zmat import Zmat
 
-# s_vec_test = SVectors()
-
-
 suite = execute_suite("./ref_data/s_vec_test/","Custom",s_vec_bool=True)
 suite.run()
-
-# os.chdir("./ref_data/s_vec_test/")
-# options = Options()
-# options.coords = "Custom"
-# ZMAT = Zmat(options)
-# output_test = ZMAT.zmat_read("zmat")
-# ZMAT.zmat_process(output_test)
-
-# ZMAT.zmat_calc()
-
-# ZMAT.zmat_compile()
-# os.chdir("../../")
-
-# s_vec = SVectors(ZMAT, options, ZMAT.variable_dictionary_init)
-
 
 def test_compute_G():
     errors = []
@@ -54,10 +36,6 @@ def test_compute_G():
              [ 0.00000000e+00, -2.59456007e-05,  2.83001423e-05, -4.34098373e-06, -4.38818656e-06,  1.25695499e-05,  1.56366743e-05, -2.64304905e-05,  1.04052001e-05,  1.94198975e-04,  3.76137316e-04,  7.83768965e-05],
              [ 5.00626441e-05, -3.20145289e-05, -1.09112087e-05, -1.09111166e-05,  0.00000000e+00,  6.80353003e-06, -1.42465168e-04, -1.16816043e-04, -1.16815711e-04, -7.83770679e-05,  7.83768965e-05,  3.78284543e-04]]
     G_ref = np.array(G_ref)
-    # print(np.sum(abs(G_ref - g_mat.G)))
-
-    # if np.setdiff1d(np.array(G_ref), np.array(g_mat.G.tolist())).size:
-        # errors.append("Computed G-matrix does not match the reference.")
 
     assert np.sum(abs(G_ref - g_mat.G)) < 1.0e-8
 

@@ -236,7 +236,6 @@ B_ref_INTDER = [
 B_ref_INTDER = np.array(B_ref_INTDER)
 B_ref_INTDER = B_ref_INTDER.reshape((12,18))
 B_ref_INTDER[5:] *= 0.529177210903
-# print(B_ref_INTDER)
 
 
 def test_compute_B():
@@ -246,10 +245,6 @@ def test_compute_B():
 
 
     B_diff = s_vec.B - B_ref_INTDER
-    # print(np.sum(B_diff))
-
-    # if np.setdiff1d(np.array(B_ref), np.array(s_vec.B.tolist())).size:
-        # errors.append("Computed S-vectors do not match the reference.")
 
     assert abs(np.sum(B_diff)) < 1.0e-8
 
