@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 import os
 import shutil
@@ -8,29 +9,16 @@ from concordantmodes.transf_disp import TransfDisp
 from concordantmodes.options import Options
 from concordantmodes.zmat import Zmat
 
-
-def test_zmat_read():
-    os.chdir("./ref_data/zmat_test/")
-    options = Options()
-
-    options.coords = "ZMAT"
-    ZMAT = Zmat(options)
-
-    output_ref_zmat = ["C\n", "O 1\n", "H 1 2\n", "H 1 2 3\n", "H 1 2 4\n", "H 2 1 3\n"]
-    output_test_zmat = ZMAT.zmat_read("zmat_zmat")
-    zmat_bool = output_ref_zmat == output_test_zmat
-
-    options.coords = "Redundant"
-    ZMAT = Zmat(options)
-
-    output_ref_redundant = ["1 2\n", "1 3\n", "1 4\n", "1 5\n", "2 6\n"]
-    output_test_redundant = ZMAT.zmat_read("zmat_red")
-    red_bool = output_ref_redundant == output_test_redundant
-
-    options.coords = "Custom"
-    ZMAT = Zmat(options)
-
-    output_ref_custom = [
+coord1 = "Redundant"
+coord2 = "ZMAT"
+coord3 = "Custom"
+file1 = "zmat_red"
+file2 = "zmat_zmat"
+file3 = "zmat_custom"
+# ZMAT read data
+ref_Red = ["1 2\n", "1 3\n", "1 4\n", "1 5\n", "2 6\n"]
+ref_ZMAT = ["C\n", "O 1\n", "H 1 2\n", "H 1 2 3\n", "H 1 2 4\n", "H 2 1 3\n"]
+ref_Custom = [
         "1 2\n",
         "1 3\n",
         "1 4\n",
@@ -49,12 +37,118 @@ def test_zmat_read():
         "3 1 2 6 Ly\n",
         "5 1 2 4 L\n",
     ]
-    output_test_custom = ZMAT.zmat_read("zmat_custom")
-    custom_bool = output_ref_custom == output_test_custom
+zmat_read = [(coord1,ref_Red,file1),(coord2,ref_ZMAT,file2),(coord2,ref_Custom,file3)]
+
+# ZMAT ref indices and variables
+# ref_zmat_bond_indices = [["2", "1"], ["3", "1"], ["4", "1"], ["5", "1"], ["6", "2"]]
+# ref_zmat_angle_indices = [
+    # ["3", "1", "2"],
+    # ["4", "1", "2"],
+    # ["5", "1", "2"],
+    # ["6", "2", "1"],
+# ]
+# ref_zmat_torsion_indices = [
+    # ["4", "1", "2", "3"],
+    # ["5", "1", "2", "4"],
+    # ["6", "2", "1", "3"],
+# ]
+# ref_zmat_bond_variables = ["R1", "R2", "R3", "R4", "R5"]
+# ref_zmat_angle_variables = ["A2", "A3", "A4", "A5"]
+# ref_zmat_torsion_variables = ["D3", "D4", "D5"]
+
+# #Redundant ref indices and variables
+# ref_red_bond_indices = np.array(
+    # [["1", "2"], ["1", "3"], ["1", "4"], ["1", "5"], ["2", "6"]]
+# )
+# ref_red_angle_indices = np.array(
+    # [
+        # ["2", "1", "3"],
+        # ["2", "1", "4"],
+        # ["2", "1", "5"],
+        # ["1", "2", "6"],
+        # ["3", "1", "4"],
+        # ["3", "1", "5"],
+        # ["4", "1", "5"],
+    # ]
+# )
+# ref_red_torsion_indices = np.array(
+    # [
+        # ["3", "1", "2", "4"],
+        # ["3", "1", "2", "5"],
+        # ["3", "1", "2", "6"],
+        # ["2", "1", "3", "4"],
+        # ["2", "1", "3", "5"],
+        # ["4", "1", "2", "5"],
+        # ["4", "1", "2", "6"],
+        # ["2", "1", "4", "3"],
+        # ["2", "1", "4", "5"],
+        # ["5", "1", "2", "6"],
+        # ["2", "1", "5", "3"],
+        # ["2", "1", "5", "4"],
+        # ["4", "1", "3", "5"],
+        # ["3", "1", "4", "5"],
+        # ["3", "1", "5", "4"],
+    # ]
+# )
+# ref_red_bond_variables = ["R1", "R2", "R3", "R4", "R5"]
+# ref_red_angle_variables = ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]
+# ref_red_torsion_variables = [
+    # "D1",
+    # "D2",
+    # "D3",
+    # "D4",
+    # "D5",
+    # "D6",
+    # "D7",
+    # "D8",
+    # "D9",
+    # "D10",
+    # "D11",
+    # "D12",
+    # "D13",
+    # "D14",
+    # "D15",
+# ]
+
+# # Custom ref indices and variables
+# ref_custom_bond_indices = [("1", "2"), ("1", "3"), ("1", "4"), ("1", "5"), ("2", "6")]
+# ref_custom_angle_indices = [
+    # ("2", "1", "3"),
+    # ("2", "1", "4"),
+    # ("2", "1", "5"),
+    # ("3", "1", "4"),
+    # ("4", "1", "5"),
+    # ("5", "1", "3"),
+    # ("6", "2", "1"),
+# ]
+# ref_custom_torsion_indices = [("6", "2", "1", "4")]
+# ref_custom_oop_indices = [("4", "1", "3", "5")]
+# ref_custom_lin_indices = [("5", "1", "2", "4")]
+# ref_custom_linx_indices = [("3", "1", "2", "6")]
+# ref_custom_liny_indices = [("3", "1", "2", "6")]
+# ref_custom_bond_variables = ["R1", "R2", "R3", "R4", "R5"]
+# ref_custom_angle_variables = ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]
+# ref_custom_torsion_variables = ["D1"]
+# ref_custom_oop_variables = ["O1"]
+# ref_custom_lin_variables = ["L1"]
+# ref_custom_linx_variables = ["Lx1"]
+# ref_custom_liny_variables = ["Ly1"]
+
+@pytest.mark.parametrize(
+    "option, expected, file_name",zmat_read 
+)
+
+def test_zmat_read(option, expected, file_name):
+    os.chdir("./ref_data/zmat_test/")
+    options = Options()
+
+    options.coords = option
+    ZMAT = Zmat(options)
+
+    output_test = ZMAT.zmat_read(file_name)
 
     os.chdir("../../")
-
-    assert red_bool and zmat_bool and custom_bool
+    assert expected == output_test
 
 
 def test_zmat_process():
@@ -263,7 +357,6 @@ def test_zmat_calc():
         errors.append("Custom variables do not match.")
 
     os.chdir("../../")
-
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
 
@@ -309,5 +402,7 @@ def test_zmat_compile():
         errors.append("Custom indices do not match.")
 
     os.chdir("../../")
-
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
+
+
+# test_zmat_read_ZMAT()

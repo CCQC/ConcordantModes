@@ -5,6 +5,8 @@ from concordantmodes.ted import TED
 from numpy.linalg import inv
 from numpy import linalg as LA
 
+from suite_execute import execute_suite
+
 from concordantmodes.algorithm import Algorithm
 from concordantmodes.f_convert import FcConv
 from concordantmodes.f_read import FcRead
@@ -16,52 +18,23 @@ from concordantmodes.ted import TED
 from concordantmodes.transf_disp import TransfDisp
 from concordantmodes.zmat import Zmat
 
-os.chdir("./ref_data/f_read_test/")
-options = Options()
-options.coords = "Redundant"
-FC = FcRead("fc.dat")
-FC.run()
-ZMAT = Zmat(options)
-output_test = ZMAT.zmat_read("zmat")
-ZMAT.zmat_process(output_test)
-
-ZMAT.zmat_calc()
-
-ZMAT.zmat_compile()
-s_vec = SVectors(ZMAT, options, ZMAT.variable_dictionary_init)
-s_vec.run(ZMAT.cartesians_init, True)
-
-TED_obj = TED(s_vec.proj, ZMAT)
-f_conv = FcConv(FC.fc_mat, s_vec, ZMAT, "internal", False, TED_obj, options.units)
-f_conv.run()
-
-g_mat = GMatrix(ZMAT, s_vec, options)
-g_mat.run()
-
-F = np.dot(TED_obj.proj.T, np.dot(f_conv.F, TED_obj.proj))
-G = np.dot(TED_obj.proj.T, np.dot(g_mat.G, TED_obj.proj))
-GF = GFMethod(G, F, options.tol, options.proj_tol, ZMAT, TED_obj)
-
-GF.run()
-algo = Algorithm(len(GF.L), None, options)
-algo.run()
-
-os.chdir("../../")
-
+print(os.getcwd())
+suite = execute_suite("./ref_data/f_read_test/","Redundant")
+suite.run()
 
 def test_transf_disp():
     errors = []
 
     disps = TransfDisp(
-        s_vec,
-        ZMAT,
-        options.disp,
-        GF.L,
+        suite.s_vec,
+        suite.ZMAT,
+        suite.options.disp,
+        suite.GF.L,
         True,
-        options.disp_tol,
-        TED_obj,
-        options,
-        algo.indices,
+        suite.options.disp_tol,
+        suite.TED_obj,
+        suite.options,
+        suite.algo.indices,
     )
     disps.run()
 

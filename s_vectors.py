@@ -41,6 +41,8 @@ class SVectors(object):
         # Torsions,
         # Out-of-plane bending,
         # Linear Bends
+        # LinX Bends
+        # LinY Bends
         # Toggle this to convert from bohr to angstrom
         # self.carts = 0.5291772085936*self.carts
 

@@ -5,6 +5,8 @@ from concordantmodes.ted import TED
 from numpy.linalg import inv
 from numpy import linalg as LA
 
+from suite_execute import execute_suite
+
 from concordantmodes.f_convert import FcConv
 from concordantmodes.f_read import FcRead
 from concordantmodes.gf_method import GFMethod
@@ -14,37 +16,13 @@ from concordantmodes.s_vectors import SVectors
 from concordantmodes.ted import TED
 from concordantmodes.zmat import Zmat
 
-
-os.chdir("./ref_data/f_read_test/")
-options = Options()
-options.coords = "Redundant"
-FC = FcRead("fc.dat")
-FC.run()
-ZMAT = Zmat(options)
-output_test = ZMAT.zmat_read("zmat")
-ZMAT.zmat_process(output_test)
-
-ZMAT.zmat_calc()
-
-ZMAT.zmat_compile()
-s_vec = SVectors(ZMAT, options, ZMAT.variable_dictionary_init)
-s_vec.run(ZMAT.cartesians_init, True)
-
-TED_obj = TED(s_vec.proj, ZMAT)
-f_conv = FcConv(FC.fc_mat, s_vec, ZMAT, "internal", False, TED_obj, options.units)
-f_conv.run()
-
-g_mat = GMatrix(ZMAT, s_vec, options)
-g_mat.run()
-
-os.chdir("../../")
-
+suite = execute_suite("./ref_data/f_read_test/","Redundant")
+suite.run()
 
 def test_gf_method():
     errors = []
-    F = np.dot(TED_obj.proj.T, np.dot(f_conv.F, TED_obj.proj))
-    G = np.dot(TED_obj.proj.T, np.dot(g_mat.G, TED_obj.proj))
-    GF = GFMethod(G, F, options.tol, options.proj_tol, ZMAT, TED_obj)
+    
+    GF = GFMethod(suite.G, suite.F, suite.options.tol, suite.options.proj_tol, suite.ZMAT, suite.TED_obj)
 
     GF.run()
 
