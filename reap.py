@@ -97,8 +97,8 @@ class Reap(object):
                     direc, success_regex, energy_regex
                 )
                 # print(energy)
-                rel = ref_en - energy
-                print("Relative plus  " + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{:10.9f}".format(rel))
+                rel = energy - ref_en
+                print("Relative plus  " + "{:4d}".format(direc) + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{: 10.9f}".format(rel))
                 rel_en_p[i, j] = rel
                 relative_energies.append([(i, j), "plus", rel, direc])
                 absolute_energies.append([(i, j), "plus", energy, direc])
@@ -115,9 +115,9 @@ class Reap(object):
                     direc + 1, success_regex, energy_regex
                 )
                 # print(energy)
-                rel = ref_en - energy
+                rel = energy - ref_en
                 # print("Relative minus " + str(i) + " " + str(j) + ": " + "{:10.6f}".format(rel))
-                print("Relative minus " + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{:10.9f}".format(rel))
+                print("Relative minus " + "{:4d}".format(direc + 1) + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{: 10.9f}".format(rel))
                 rel_en_m[i, j] = rel
                 relative_energies.append([(i, j), "minus", rel, direc + 1])
                 absolute_energies.append([(i, j), "minus", energy, direc + 1])

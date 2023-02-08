@@ -1,7 +1,7 @@
 class Options(object):
     def __init__(self, **kwargs):
         self.benchmark_full = kwargs.pop("benchmark_full", False)
-        self.bond_tol = kwargs.pop("inter_tol", 3.778)
+        self.bond_threshold = kwargs.pop("bond_threshold", 1.2)
         self.calc = kwargs.pop("calc", True)
         self.cart_coords = kwargs.pop("cart_coords", "Bohr")
         self.calc_init = kwargs.pop("calc_init", True)
@@ -10,6 +10,7 @@ class Options(object):
         self.clean_house = kwargs.pop("clean_house", True)
         self.cluster = kwargs.pop("cluster", "vulcan")
         self.coords = kwargs.pop("coords", "ZMAT")
+        self.covalent_radii = kwargs.pop("covalent_radii", False)
         self.deriv_level = kwargs.pop("deriv_level", 0)
         self.deriv_level_init = kwargs.pop("deriv_level_init", 0)
         self.dir_reap = kwargs.pop("dir_reap", True)
@@ -22,7 +23,6 @@ class Options(object):
         self.gen_disps_init = kwargs.pop("gen_disps_init",True)
         self.geom_check = kwargs.pop("geom_check", False)
         self.gradient_regex = kwargs.pop("gradient_regex", "")
-        self.interatomic_distance = kwargs.pop("interatomic_distance", False)
         self.man_proj = kwargs.pop("man_proj", False)
         self.mode_coupling_check = kwargs.pop("mode_coupling_check", False)
         self.molly_regex_init = kwargs.pop("molly_regex_init", "")
@@ -43,4 +43,6 @@ class Options(object):
         self.success_regex_init = kwargs.pop("success_regex_init", "")
         self.tight_disp = kwargs.pop("tight_disp", False)
         self.tol = kwargs.pop("tol", 1.0e-14)
+        self.topo_analysis = kwargs.pop("topo_analysis", False)
+        self.topo_max_it = kwargs.pop("topo_max_it", 20)
         self.units = kwargs.pop("units", "HartreeBohr")

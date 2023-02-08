@@ -3,6 +3,7 @@ import os
 import shutil
 import re
 from . import masses
+from qcelemental.covalent_radii import CovalentRadii
 from concordantmodes.int2cart import Int2Cart
 from concordantmodes.transf_disp import TransfDisp
 
@@ -15,7 +16,7 @@ class Zmat(object):
         self.Bohr_Ang = 0.529177210903
 
     def run(self, zmat_name="zmat"):
-        
+
         # Read in the ZMAT file
         zmat_output = self.zmat_read(zmat_name)
 
@@ -24,16 +25,14 @@ class Zmat(object):
 
         # Calculate internal coordinate values from reference cartesian coordinates
         self.zmat_calc()
-        
-        # 
+
+        #
         self.zmat_compile()
 
         #
         self.zmat_print()
 
-
-
-    def zmat_read(self,zmat_name):
+    def zmat_read(self, zmat_name):
         # Define some regexes
         self.zmat_begin_regex = re.compile(r"ZMAT begin")
         self.zmat_end_regex = re.compile(r"ZMAT end")
@@ -41,8 +40,12 @@ class Zmat(object):
         # ZMAT regexes
         self.first_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s*\n")
         self.second_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s*\n")
-        self.third_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s*\n")
-        self.full_atom_regex = re.compile(r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n")
+        self.third_atom_regex = re.compile(
+            r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s*\n"
+        )
+        self.full_atom_regex = re.compile(
+            r"^\s*([A-Za-z]+[0-9]*)\s+(\d+)\s+(\d+)\s+(\d+)\s*\n"
+        )
         # Custom int coord regexes
         self.bond_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s*\n")
         self.angle_regex = re.compile(r"^\s*(\d+)\s+(\d+)\s+(\d+)\s*\n")
@@ -60,7 +63,6 @@ class Zmat(object):
         s = r"([A-Za-z]+[0-9]*)\s+-?\d+\.\d+\s+-?\d+\.\d+\s+-?\d+\.\d+\s*\n"
         self.cartesian_atom_regex = re.compile(s)
         self.divider_regex = re.compile(r"^\s*\-\-\-\s*\n")
-
 
         with open(zmat_name, "r") as file:
             output = file.readlines()
@@ -117,28 +119,30 @@ class Zmat(object):
             self.cartesians_init /= self.Bohr_Ang
             self.cartesians_final /= self.Bohr_Ang
 
+        zmat_output = ""
         # Slice out the ZMAT from the input
-        zmat_range = []
+        if not self.options.covalent_radii:
+            zmat_range = []
 
-        for i in range(len(output)):
-            beg_zmat = re.search(self.zmat_begin_regex, output[i])
-            if beg_zmat:
-                zmat_range.append(i)
+            for i in range(len(output)):
+                beg_zmat = re.search(self.zmat_begin_regex, output[i])
+                if beg_zmat:
+                    zmat_range.append(i)
 
-        for i in range(len(output) - zmat_range[0]):
-            end_zmat = re.search(self.zmat_end_regex, output[i + zmat_range[0]])
-            if end_zmat:
-                zmat_range.append(i + zmat_range[0])
-                break
+            for i in range(len(output) - zmat_range[0]):
+                end_zmat = re.search(self.zmat_end_regex, output[i + zmat_range[0]])
+                if end_zmat:
+                    zmat_range.append(i + zmat_range[0])
+                    break
 
-        zmat_output = output[zmat_range[0] + 1 : zmat_range[1]].copy()
-        
+            zmat_output = output[zmat_range[0] + 1 : zmat_range[1]].copy()
+
         # print(output)
         # print(zmat_output)
 
         return zmat_output
 
-    def zmat_process(self,zmat_output):
+    def zmat_process(self, zmat_output):
         # Initialize necessary lists
         self.bond_indices = []
         self.bond_variables = []
@@ -196,7 +200,9 @@ class Zmat(object):
                     self.torsion_variables.append("D" + str(i - first_index))
         elif self.options.coords.upper() == "REDUNDANT":
             count = 0
-            if self.options.interatomic_distance:
+            if self.options.covalent_radii:
+                # This program yields the covalent radius of an atom in bohr.
+                c_r = CovalentRadii()
                 self.bond_indices = np.array([])
                 indices = []
                 transdisp_inter = TransfDisp(
@@ -213,13 +219,21 @@ class Zmat(object):
                 inter_atomic_len = np.zeros(
                     (len(self.cartesians_init), len(self.cartesians_init))
                 )
+                N = len(self.cartesians_init)
+                adj_mat = np.zeros((N,N))
                 for i in range(len(self.cartesians_init)):
                     for j in range(i):
                         inter_atomic_len[j, i] = transdisp_inter.calc_bond(
                             self.cartesians_init[i], self.cartesians_init[j]
                         )
-                        if inter_atomic_len[j, i] < self.options.bond_tol:
+                        if inter_atomic_len[
+                            j, i
+                        ] < self.options.bond_threshold * (
+                            c_r.get(self.atom_list[i]) + c_r.get(self.atom_list[j])
+                        ):
                             count += 1
+                            adj_mat[i,j] = 1
+                            adj_mat[j,i] = 1
                             self.bond_indices = np.append(
                                 self.bond_indices, np.array([str(j + 1), str(i + 1)])
                             )
@@ -227,10 +241,19 @@ class Zmat(object):
                     self.bond_indices = np.reshape(self.bond_indices, (-1, 2))
                 print("Interatomic Distance Matrix:")
                 print(inter_atomic_len)
-                print("Bond tolerance:")
-                print(self.options.bond_tol)
+                print("Adjacency Matrix:")
+                print(adj_mat)
+                for i in range(len(adj_mat)):
+                    print("Degree of vertex " + str(i))
+                    print(np.sum(adj_mat[i]))
+                adj_mat2 = np.dot(adj_mat,adj_mat)
+                for i in range(len(adj_mat2)):
+                    adj_mat2[i,i] = 0
+                print("Covalent Radius Scale Factor:")
+                print(self.options.bond_threshold)
                 print("Resulting bond indices:")
                 print(self.bond_indices)
+                # raise RuntimeError
             else:
                 for i in range(len(zmat_output)):
                     if re.search(self.bond_regex, zmat_output[i]):
@@ -239,7 +262,7 @@ class Zmat(object):
                         self.bond_indices.append(List)
                         self.bond_variables.append("R" + str(count))
                 self.bond_indices = np.array(self.bond_indices)
-            
+
             # Form all possible angles from bonds
             self.angle_indices = np.array([])
             count = 0
@@ -259,24 +282,144 @@ class Zmat(object):
 
             # Form all possible torsions from angles
             self.torsion_indices = np.array([])
-            count = 0
+            self.oop_indices = np.array([])
+            tor_count = 0
+            oop_count = 0
             for i in range(len(self.angle_indices)):
-                for j in range(len(self.angle_indices) - i - 1):
+                for j in range(len(self.bond_indices)):
                     a = np.setdiff1d(
-                        self.angle_indices[i], self.angle_indices[i + j + 1]
+                        self.angle_indices[i], self.bond_indices[j]
                     )
                     b = np.intersect1d(
-                        self.angle_indices[i], self.angle_indices[i + j + 1]
+                        self.angle_indices[i], self.bond_indices[j]
                     )
                     c = np.setdiff1d(
-                        self.angle_indices[i + j + 1], self.angle_indices[i]
+                        self.bond_indices[j], self.angle_indices[i]
                     )
-                    if len(a) and len(b) == 2 and len(c):
-                        d = np.array([a[0], b[0], b[1], c[0]])
-                        self.torsion_indices = np.append(self.torsion_indices, d)
-                        count += 1
-                        self.torsion_variables.append("D" + str(count))
+                    if len(c) == 1:
+                        d = np.where(self.bond_indices[j]==c)[0][0]
+                        f = 1 - d
+                        g = self.bond_indices[j][f]
+                        h = np.where(self.angle_indices[i]==g)[0][0]
+                        if h == 1:
+                            # This is an out of plane bend
+                            oop = np.array([self.bond_indices[j][d],self.bond_indices[j][f],a[0],a[1]])
+                            self.oop_indices = np.append(self.oop_indices, oop, axis=0)
+                        else:
+                            # This is a torsion
+                            if h:
+                                tor = np.append(self.angle_indices[i].copy(),self.bond_indices[j][d])
+                            else:
+                                tor = np.append(self.bond_indices[j][d],self.angle_indices[i].copy())
+                            self.torsion_indices = np.append(self.torsion_indices, tor, axis=0)
+            
             self.torsion_indices = self.torsion_indices.reshape((-1, 4))
+            
+            # Eliminate all redundancies
+            self.torsion_indices = np.unique(self.torsion_indices,axis=0)
+            
+            del_list = np.array([])
+            for i in range(len(self.torsion_indices)):
+                for j in range(len(self.torsion_indices) - i - 1):
+                    a = np.array([self.torsion_indices[i],np.flip(self.torsion_indices[i+j+1])])
+                    a = np.unique(a,axis=0)
+                    if len(a) == 1:
+                        del_list = np.append(del_list,[i+j+1])
+            
+            del_list = del_list.astype(int)
+            self.torsion_indices = np.delete(self.torsion_indices,del_list,axis=0)
+            self.oop_indices = self.oop_indices.reshape((-1, 4))
+            
+            for i in range(len(self.torsion_indices)):
+                self.torsion_variables.append("D" + str(i+1))
+            for i in range(len(self.oop_indices)):
+                self.oop_variables.append("O" + str(i+1))
+
+            if self.options.topo_analysis:
+                X_len_walks_dict = {}
+                X_len_walks_dict["2_length_walks"] = self.bond_indices.copy()
+                X_len_walks_dict["3_length_walks"] = self.angle_indices.copy()
+                X_len_walks_dict["4_length_walks"] = self.torsion_indices.copy()
+
+                count = 4
+                
+                # self.options.topo_max_it = 4
+                
+                prev_walks = self.torsion_indices.copy()
+
+                while True:
+                    new_walks = np.array([])
+                    for i in range(len(prev_walks)):
+                        for j in range(len(self.bond_indices)):
+                            a = np.where(prev_walks[i]==self.bond_indices[j][0])[0]
+                            b = np.where(prev_walks[i]==self.bond_indices[j][1])[0]
+                            if len(a) and not len(b):
+                                if not a[0]:
+                                    new_walk = np.append(self.bond_indices[j][1],prev_walks[i].copy())
+                                    new_walks = np.append(new_walks,new_walk)
+                                elif a[0]==count-1:
+                                    new_walk = np.append(prev_walks[i].copy(),self.bond_indices[j][1])
+                                    new_walks = np.append(new_walks,new_walk)
+                            if len(b) and not len(a):
+                                if not b[0]:
+                                    new_walk = np.append(self.bond_indices[j][0],prev_walks[i].copy())
+                                    new_walks = np.append(new_walks,new_walk)
+                                elif b[0]==count-1:
+                                    new_walk = np.append(prev_walks[i].copy(),self.bond_indices[j][0])
+                                    new_walks = np.append(new_walks,new_walk)
+
+                    count += 1
+                    # print(count)
+                    new_walks = new_walks.reshape((-1,count))
+                    new_walks = np.unique(new_walks,axis=0)
+
+                    del_list = np.array([])
+                    for i in range(len(new_walks)):
+                        for j in range(len(new_walks) - i - 1):
+                            a = np.array([new_walks[i],np.flip(new_walks[i+j+1])])
+                            a = np.unique(a,axis=0)
+                            if len(a) == 1:
+                                del_list = np.append(del_list,[i+j+1])
+                    
+                    del_list = del_list.astype(int)
+                    new_walks = np.delete(new_walks,del_list,axis=0)
+                    prev_walks = new_walks
+                    if count > self.options.topo_max_it or not len(new_walks):
+                        print("Walk generator has terminated at walk lengths of " + str(count))
+                        break
+                    X_len_walks_dict[str(count) + "_length_walks"] = new_walks
+                    print(str(count) + "_length_walks")
+                    print(len(new_walks))
+                    print(new_walks)
+
+                
+                dict_len = len(X_len_walks_dict) - 1
+
+                cycles_dict = {}
+                for i in range(dict_len):
+                    print(str(i+3))
+                    cycles_dict[str(i+3)] = np.array([])
+                    for j in range(len(X_len_walks_dict[str(i+3) + "_length_walks"])):
+                        a = np.array([X_len_walks_dict[str(i+3) + "_length_walks"][j][0],X_len_walks_dict[str(i+3) + "_length_walks"][j][-1]])
+                        for k in range(len(self.bond_indices)):
+                            b = np.intersect1d(a,self.bond_indices[k])
+                            if len(b) == 2:
+                                cycle = X_len_walks_dict[str(i+3) + "_length_walks"][j].copy()
+                                cycles_dict[str(i+3)] = np.append(cycles_dict[str(i+3)],cycle)
+                    cycles_dict[str(i+3)] = cycles_dict[str(i+3)].reshape((-1,i+3))
+                    del_array = np.array([])
+                    if len(cycles_dict[str(i+3)]):
+                        for j in range(len(cycles_dict[str(i+3)])):
+                            for k in range(len(cycles_dict[str(i+3)]) - j - 1):
+                                a = np.intersect1d(cycles_dict[str(i+3)][j],cycles_dict[str(i+3)][k + j + 1])
+                                if len(a) == len(cycles_dict[str(i+3)][0]):
+                                    del_array = np.append(del_array,[k + j + 1])
+                        del_array = del_array.astype(int)
+                        del_array = np.unique(del_array)
+                        cycles_dict[str(i+3)] = np.delete(cycles_dict[str(i+3)],del_array,axis=0)
+                        print(cycles_dict[str(i+3)])
+                
+                # raise RuntimeError
 
         elif self.options.coords.upper() == "CUSTOM":
             # This option will allow the user to specify a custom array of
@@ -473,7 +616,7 @@ class Zmat(object):
                     >= 270.0
                 ):
                     self.variable_dictionary_final[self.torsion_variables[i]] -= 360.0
-    
+
     def zmat_compile(self):
         # The masses are assigned to the respective atom from the masses.py file
         self.masses = [masses.get_mass(label) for label in self.atom_list]
@@ -508,7 +651,7 @@ class Zmat(object):
             self.index_dictionary["Lx" + str(i + 1)] = self.linx_indices[i]
         for i in range(len(self.liny_indices)):
             self.index_dictionary["Ly" + str(i + 1)] = self.liny_indices[i]
-    
+
     def zmat_print(self):
         # Print off the internal coordinate and its value in Bohr/Degree
         print("Initial Geometric Internal Coordinate Values:")

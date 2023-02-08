@@ -430,7 +430,7 @@ class SVectors(object):
                 axis=0,
             )
         # raise RuntimeError
-        tol = 1e-8
+        tol = 1e-4
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
         if not self.options.man_proj:
