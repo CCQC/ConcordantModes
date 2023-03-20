@@ -25,7 +25,7 @@ class DirectoryTree(object):
         self.zmat = zmat
         self.insertion_index = insertion_index
         self.dir_name = dir_name
-        self.disps = disps  # This should be the 'TransDisp' object
+        self.disps = disps  # This should be the 'TransfDisp' object
         # nate
         self.p_disp = p_disp
         self.m_disp = m_disp
@@ -41,7 +41,7 @@ class DirectoryTree(object):
         if index == -1:
             print(
                 "The user needs to specify a different value for the \
-                   cartInsert keyword."
+                   cart_insert keyword."
             )
             raise RuntimeError
         else:
@@ -72,6 +72,7 @@ class DirectoryTree(object):
         if prog_name == "molpro" or prog_name == "psi4" or prog_name == "cfour":
             with open(self.template, "r") as file:
                 data = file.readlines()
+                # print(data)
         else:
             print("Specified program not supported: " + prog_name)
             raise RuntimeError

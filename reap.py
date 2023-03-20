@@ -96,8 +96,9 @@ class Reap(object):
                 p_en_array[i, j] = energy = self.reap_energies(
                     direc, success_regex, energy_regex
                 )
-                print(energy)
-                rel = ref_en - energy
+                # print(energy)
+                rel = energy - ref_en
+                print("Relative plus  " + "{:4d}".format(direc) + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{: 10.9f}".format(rel))
                 rel_en_p[i, j] = rel
                 relative_energies.append([(i, j), "plus", rel, direc])
                 absolute_energies.append([(i, j), "plus", energy, direc])
@@ -113,8 +114,10 @@ class Reap(object):
                 m_en_array[i, j] = energy = self.reap_energies(
                     direc + 1, success_regex, energy_regex
                 )
-                print(energy)
-                rel = ref_en - energy
+                # print(energy)
+                rel = energy - ref_en
+                # print("Relative minus " + str(i) + " " + str(j) + ": " + "{:10.6f}".format(rel))
+                print("Relative minus " + "{:4d}".format(direc + 1) + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{: 10.9f}".format(rel))
                 rel_en_m[i, j] = rel
                 relative_energies.append([(i, j), "minus", rel, direc + 1])
                 absolute_energies.append([(i, j), "minus", energy, direc + 1])
@@ -135,17 +138,17 @@ class Reap(object):
             )
             print(rel_en_m)
             os.chdir("..")
-            if self.options.printout_rel_e:
-                auxiliary = ""
-                header = "Index, relative energy, directory \n"
-                print(json.dumps(energy))
-                with open("auxiliary", "a") as file:
-                    file.seek(0)
-                    file.truncate()
-                    file.writelines(header)
-                for energy in print_en:
-                    with open("auxiliary", "a") as file:
-                        file.writelines(str(energy) + "\n")
+            # if self.options.printout_rel_e:
+                # auxiliary = ""
+                # header = "Index, relative energy, directory \n"
+                # print(json.dumps(energy))
+                # with open("auxiliary", "a") as file:
+                    # file.seek(0)
+                    # file.truncate()
+                    # file.writelines(header)
+                # for energy in print_en:
+                    # with open("auxiliary", "a") as file:
+                        # file.writelines(str(energy) + "\n")
         else:
             indices = self.indices
             p_grad_array = np.array([])
@@ -170,6 +173,7 @@ class Reap(object):
             self.p_grad_array = p_grad_array.reshape((-1, len(grad)))
             self.m_grad_array = m_grad_array.reshape((-1, len(grad)))
             os.chdir("..")
+    
     def reap_molly(self, direc, molly1_regex, molly2_regex):
         os.chdir("./" + str(direc))
         with open("output.dat", "r") as file:
@@ -224,7 +228,8 @@ class Reap(object):
                  
                     rearrange.append(j)
         os.chdir("..")
-        return rearrange, insertion 
+        return rearrange, insertion
+
     def reap_energies(self, direc, success_regex, energy_regex):
         if self.options.dir_reap:
             os.chdir("./" + str(direc))
