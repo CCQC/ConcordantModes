@@ -2,6 +2,7 @@ import numpy as np
 from numpy import linalg as LA
 from . import masses
 
+
 class Int2Cart(object):
     def __init__(self, zmat, var_dict):
         self.zmat = zmat

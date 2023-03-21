@@ -38,17 +38,17 @@ class GFMethod(object):
         self.L_p = L_p
         # make sure the correct "primed" or unprimed version is being saved in each instance
         # if self.cma:
-            # with open("L_full.npy", "wb") as z:
-                # np.save(z, L)
+        # with open("L_full.npy", "wb") as z:
+        # np.save(z, L)
         # # if self.cma == False:
         # #    with open("L_intermediate.npy", "wb") as z:
         # #        np.save(z, L)
         # if self.cma is None:
-            # with open("L_0.npy", "wb") as z:
-                # np.save(z, L)
+        # with open("L_0.npy", "wb") as z:
+        # np.save(z, L)
         # if self.cma == "init":
-            # with open("S_p.npy", "wb") as z:
-                # np.save(z, S_p)
+        # with open("S_p.npy", "wb") as z:
+        # np.save(z, S_p)
         # Construct the normal mode overlap matrix. Will be useful for off-diagonal diagnostics.
         L = np.absolute(np.real(self.L))
         L_inv = LA.inv(L)
@@ -64,8 +64,8 @@ class GFMethod(object):
                 self.freq[i] = np.real(self.freq[i])
             else:
                 self.freq[i] = -np.imag(self.freq[i])
-        
-        # # This seems to fix the constant warning I get about casting out imaginary values from the complex numbers, 
+
+        # # This seems to fix the constant warning I get about casting out imaginary values from the complex numbers,
         # # however I will need to test it on transition states to see if it captures the imaginary frequencies.
         # self.freq = np.real(self.freq)
         # print(self.freq)

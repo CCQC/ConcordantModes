@@ -46,8 +46,8 @@ class Reap(object):
         else:
             grad_regex1 = re.compile(self.gradient_regex[0])
             grad_regex2 = re.compile(self.gradient_regex[1])
-            #molly_regex1  = re.compile(self.molly_regex[0])
-            #molly_regex2  = re.compile(self.molly_regex[1])
+            # molly_regex1  = re.compile(self.molly_regex[0])
+            # molly_regex2  = re.compile(self.molly_regex[1])
         eigs = self.eigs
         if type(eigs) == int:
             size = eigs
@@ -98,7 +98,15 @@ class Reap(object):
                 )
                 # print(energy)
                 rel = energy - ref_en
-                print("Relative plus  " + "{:4d}".format(direc) + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{: 10.9f}".format(rel))
+                print(
+                    "Relative plus  "
+                    + "{:4d}".format(direc)
+                    + "{:4d}".format(i)
+                    + " "
+                    + "{:4d}".format(j)
+                    + ": "
+                    + "{: 10.9f}".format(rel)
+                )
                 rel_en_p[i, j] = rel
                 relative_energies.append([(i, j), "plus", rel, direc])
                 absolute_energies.append([(i, j), "plus", energy, direc])
@@ -117,7 +125,15 @@ class Reap(object):
                 # print(energy)
                 rel = energy - ref_en
                 # print("Relative minus " + str(i) + " " + str(j) + ": " + "{:10.6f}".format(rel))
-                print("Relative minus " + "{:4d}".format(direc + 1) + "{:4d}".format(i) + " " + "{:4d}".format(j) + ": " + "{: 10.9f}".format(rel))
+                print(
+                    "Relative minus "
+                    + "{:4d}".format(direc + 1)
+                    + "{:4d}".format(i)
+                    + " "
+                    + "{:4d}".format(j)
+                    + ": "
+                    + "{: 10.9f}".format(rel)
+                )
                 rel_en_m[i, j] = rel
                 relative_energies.append([(i, j), "minus", rel, direc + 1])
                 absolute_energies.append([(i, j), "minus", energy, direc + 1])
@@ -139,22 +155,22 @@ class Reap(object):
             print(rel_en_m)
             os.chdir("..")
             # if self.options.printout_rel_e:
-                # auxiliary = ""
-                # header = "Index, relative energy, directory \n"
-                # print(json.dumps(energy))
-                # with open("auxiliary", "a") as file:
-                    # file.seek(0)
-                    # file.truncate()
-                    # file.writelines(header)
-                # for energy in print_en:
-                    # with open("auxiliary", "a") as file:
-                        # file.writelines(str(energy) + "\n")
+            # auxiliary = ""
+            # header = "Index, relative energy, directory \n"
+            # print(json.dumps(energy))
+            # with open("auxiliary", "a") as file:
+            # file.seek(0)
+            # file.truncate()
+            # file.writelines(header)
+            # for energy in print_en:
+            # with open("auxiliary", "a") as file:
+            # file.writelines(str(energy) + "\n")
         else:
             indices = self.indices
             p_grad_array = np.array([])
             m_grad_array = np.array([])
             Sum = 0
-            #print(indices)
+            # print(indices)
             for index in indices:
                 grad = self.reap_gradients(
                     2 * index + 1 - Sum, grad_regex1, grad_regex2
@@ -173,33 +189,33 @@ class Reap(object):
             self.p_grad_array = p_grad_array.reshape((-1, len(grad)))
             self.m_grad_array = m_grad_array.reshape((-1, len(grad)))
             os.chdir("..")
-    
+
     def reap_molly(self, direc, molly1_regex, molly2_regex):
         os.chdir("./" + str(direc))
         with open("output.dat", "r") as file:
             datta = file.read()
-        #try to grab init geom
+        # try to grab init geom
         initmolreg = r"\s*\{([^}]+)\}"
         reggie = re.compile(initmolreg)
         initmol = re.findall(initmolreg, datta)
-        initmol = initmol[0].split('\n')
+        initmol = initmol[0].split("\n")
         label_xyz = r"(\s*.*(\s*-?\d+\.\d+){3})+"
         molly_init = np.array([])
-        insertion = [] 
-        c = 0 
+        insertion = []
+        c = 0
         for x, line in enumerate(initmol):
             if re.search(label_xyz, line):
                 if re.search(r"\s*[xX]", line):
                     insertion.append(succ)
-                else: 
+                else:
                     re.search(label_xyz, line)
                     temp = line.split()[-3:]
                     molly_init = np.append(molly_init, np.array(temp))
                 c += 1
-        
+
         molly_init = molly_init.astype("float64")
-        molly_init = np.split(molly_init, len(molly_init)/3)
- 
+        molly_init = np.split(molly_init, len(molly_init) / 3)
+
         with open("output.dat", "r") as file:
             data = file.readlines()
         for i in range(len(data)):
@@ -218,14 +234,14 @@ class Reap(object):
             if re.search(label_xyz, line):
                 temp = line.split()[-3:]
                 molly_array = np.append(molly_array, np.array(temp))
- 
+
         molly_array = molly_array.astype("float64")
-        molly_array = np.split(molly_array, len(molly_array)/3)
+        molly_array = np.split(molly_array, len(molly_array) / 3)
         rearrange = []
         for i, initial in enumerate(molly_init):
             for j, final in enumerate(molly_array):
                 if sum(np.abs(initial - final)) < 1e-6:
-                 
+
                     rearrange.append(j)
         os.chdir("..")
         return rearrange, insertion
@@ -251,7 +267,7 @@ class Reap(object):
 
         return energy
 
-    #def reap_gradients(self, direc, grad_regex1, grad_regex2, shuffle,insertion):
+    # def reap_gradients(self, direc, grad_regex1, grad_regex2, shuffle,insertion):
     def reap_gradients(self, direc, grad_regex1, grad_regex2):
         os.chdir("./" + str(direc))
         grad_array = []
@@ -274,14 +290,14 @@ class Reap(object):
                 grad_array.append(temp)
         grad_array = np.array(grad_array)
         grad_array = grad_array.astype("float64")
-        #grad_array = grad_array[shuffle]
-        #if len(insertion) > 0:
+        # grad_array = grad_array[shuffle]
+        # if len(insertion) > 0:
         #    counter = 0
         #    for x in insertion:
         #        grad_array = np.insert(grad_array, x, [0.0, 0.0, 0.0], axis = 0)
         #        counter += 1
         #        grad_array = np.reshape(grad_array, (-1, 3))
-        grad_array = grad_array.flatten() 
+        grad_array = grad_array.flatten()
         if not grad1:
             print("Gradient failed at " + os.getcwd())
             raise RuntimeError

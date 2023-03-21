@@ -65,9 +65,9 @@ class ForceConstant(object):
 
     # Functions for computing the diagonal and off-diagonal force constants
     def diag_fc(self, e_p, e_m, e_r, disp):
-        fc = (e_p - 2 * e_r + e_m) / (disp ** 2)
+        fc = (e_p - 2 * e_r + e_m) / (disp**2)
         return fc
 
     def off_diag_fc(self, e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp):
-        fc = (e_pp - e_pi - e_pj + 2 * e_r - e_mi - e_mj + e_mm) / (2 * (disp ** 2))
+        fc = (e_pp - e_pi - e_pj + 2 * e_r - e_mi - e_mj + e_mm) / (2 * (disp**2))
         return fc

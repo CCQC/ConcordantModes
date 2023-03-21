@@ -434,9 +434,9 @@ class SVectors(object):
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
         if not self.options.man_proj:
-        #if self.options.man_proj:
-        #if True:
-            #print("just this once bb")
+            # if self.options.man_proj:
+            # if True:
+            # print("just this once bb")
             if self.options.coords.upper() != "ZMAT":
                 proj, eigs, _ = LA.svd(self.B)
                 proj[np.abs(proj) < tol] = 0

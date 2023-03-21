@@ -16,13 +16,21 @@ from concordantmodes.s_vectors import SVectors
 from concordantmodes.ted import TED
 from concordantmodes.zmat import Zmat
 
-suite = execute_suite("./ref_data/f_read_test/","Redundant")
+suite = execute_suite("./ref_data/f_read_test/", "Redundant")
 suite.run()
+
 
 def test_gf_method():
     errors = []
-    
-    GF = GFMethod(suite.G, suite.F, suite.options.tol, suite.options.proj_tol, suite.ZMAT, suite.TED_obj)
+
+    GF = GFMethod(
+        suite.G,
+        suite.F,
+        suite.options.tol,
+        suite.options.proj_tol,
+        suite.ZMAT,
+        suite.TED_obj,
+    )
 
     GF.run()
 

@@ -19,30 +19,32 @@ file3 = "zmat_custom"
 ref_Red = ["1 2\n", "1 3\n", "1 4\n", "1 5\n", "2 6\n"]
 ref_ZMAT = ["C\n", "O 1\n", "H 1 2\n", "H 1 2 3\n", "H 1 2 4\n", "H 2 1 3\n"]
 ref_Custom = [
-        "1 2\n",
-        "1 3\n",
-        "1 4\n",
-        "1 5\n",
-        "2 6\n",
-        "2 1 3\n",
-        "2 1 4\n",
-        "2 1 5\n",
-        "3 1 4\n",
-        "4 1 5\n",
-        "5 1 3\n",
-        "6 2 1\n",
-        "6 2 1 4 T\n",
-        "4 1 3 5 O\n",
-        "3 1 2 6 Lx\n",
-        "3 1 2 6 Ly\n",
-        "5 1 2 4 L\n",
-    ]
-zmat_read = [(coord1,ref_Red,file1),(coord2,ref_ZMAT,file2),(coord2,ref_Custom,file3)]
+    "1 2\n",
+    "1 3\n",
+    "1 4\n",
+    "1 5\n",
+    "2 6\n",
+    "2 1 3\n",
+    "2 1 4\n",
+    "2 1 5\n",
+    "3 1 4\n",
+    "4 1 5\n",
+    "5 1 3\n",
+    "6 2 1\n",
+    "6 2 1 4 T\n",
+    "4 1 3 5 O\n",
+    "3 1 2 6 Lx\n",
+    "3 1 2 6 Ly\n",
+    "5 1 2 4 L\n",
+]
+zmat_read = [
+    (coord1, ref_Red, file1),
+    (coord2, ref_ZMAT, file2),
+    (coord2, ref_Custom, file3),
+]
 
-@pytest.mark.parametrize(
-    "option, expected, file_name",zmat_read 
-)
 
+@pytest.mark.parametrize("option, expected, file_name", zmat_read)
 def test_zmat_read(option, expected, file_name):
     os.chdir("./ref_data/zmat_test/")
     options = Options()

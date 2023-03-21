@@ -15,13 +15,22 @@ from concordantmodes.zmat import Zmat
 
 np.set_printoptions(precision=9)
 
-suite = execute_suite("./ref_data/f_conv_test/","Redundant")
+suite = execute_suite("./ref_data/f_conv_test/", "Redundant")
 suite.run()
+
 
 def test_f_convert2int():
     errors = []
 
-    FCint = FcConv(suite.FC.fc_mat, suite.s_vec, suite.ZMAT, "internal", False, suite.TED_obj, suite.options.units)
+    FCint = FcConv(
+        suite.FC.fc_mat,
+        suite.s_vec,
+        suite.ZMAT,
+        "internal",
+        False,
+        suite.TED_obj,
+        suite.options.units,
+    )
     FCint.run()
 
     FCintR = FcRead(suite.path + "/fc_int.dat")
@@ -38,9 +47,25 @@ def test_f_convert2int():
 def test_f_convert2cart():
     errors = []
 
-    FCint = FcConv(suite.FC.fc_mat, suite.s_vec, suite.ZMAT, "internal", False, suite.TED_obj, suite.options.units)
+    FCint = FcConv(
+        suite.FC.fc_mat,
+        suite.s_vec,
+        suite.ZMAT,
+        "internal",
+        False,
+        suite.TED_obj,
+        suite.options.units,
+    )
     FCint.run()
-    FCcart = FcConv(FCint.F, suite.s_vec, suite.ZMAT, "cartesian", False, suite.TED_obj, suite.options.units)
+    FCcart = FcConv(
+        FCint.F,
+        suite.s_vec,
+        suite.ZMAT,
+        "cartesian",
+        False,
+        suite.TED_obj,
+        suite.options.units,
+    )
     FCcart.run()
 
     FCintC = FcRead(suite.path + "/fc_cart.dat")

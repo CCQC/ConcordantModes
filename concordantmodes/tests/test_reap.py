@@ -20,37 +20,39 @@ from concordantmodes.ted import TED
 from concordantmodes.transf_disp import TransfDisp
 from concordantmodes.zmat import Zmat
 
-suite = execute_suite("./ref_data/reap_test/","Redundant")
+suite = execute_suite("./ref_data/reap_test/", "Redundant")
 suite.run()
+
 
 def test_reap():
     suite.options.program = "psi4@master"
     prog = suite.options.program
     prog_name = prog.split("@")[0]
-    
+
     suite.options.energy_regex = r"Giraffe The Energy is\s+(\-\d+\.\d+)"
     suite.options.success_regex = r"beer"
     # print(os.getcwd())
     os.chdir(suite.path + "/Disps")
     reap_obj = Reap(
-            prog_name,
-            suite.ZMAT,
-            suite.disps.disp_cart,
-            suite.options,
-            suite.disps.n_coord,
-            suite.GF.L,
-            suite.algo.indices,
-            suite.options.energy_regex,
-            suite.options.gradient_regex,
-            suite.options.molly_regex_init,
-            suite.options.success_regex
-            )
+        prog_name,
+        suite.ZMAT,
+        suite.disps.disp_cart,
+        suite.options,
+        suite.disps.n_coord,
+        suite.GF.L,
+        suite.algo.indices,
+        suite.options.energy_regex,
+        suite.options.gradient_regex,
+        suite.options.molly_regex_init,
+        suite.options.success_regex,
+    )
     reap_obj.run()
-    
-    ref_en = -76.332189646734 
-    
+
+    ref_en = -76.332189646734
+
     os.chdir("../..")
 
     assert ref_en == reap_obj.m_en_array[1][1]
+
 
 # test_reap()
