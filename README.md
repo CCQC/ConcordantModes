@@ -1,6 +1,5 @@
 # ConcordantModes
 
-
 <p align="center">
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
@@ -31,6 +30,8 @@ To use CMA-0B, the following files must be present in the working directory: tem
 3) Set the "gen_disps" keyword to False and run the CMA program one more time.
 An example is available at the following directory concordantmodes/Example/1_H2O/psi4/CMA_0B/Redundants/manual_submission
 
+=======
+>>>>>>> master
 ## Installation
 
 User must have at least:
