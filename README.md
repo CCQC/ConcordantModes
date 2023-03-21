@@ -30,13 +30,12 @@ To use CMA-0B, the following files must be present in the working directory: tem
 3) Set the "gen_disps" keyword to False and run the CMA program one more time.
 An example is available at the following directory concordantmodes/Example/1_H2O/psi4/CMA_0B/Redundants/manual_submission
 
-=======
->>>>>>> master
 ## Installation
 
 User must have at least:
-Python version 3.5.4
-Numpy version 1.13.1
+Python version 3.7
+Numpy version 1.13.3
+qcelemental
 
 Developers must have:
 Pytest 7.2.0 (-c condaforge)
@@ -44,10 +43,12 @@ Pytest-xdist 3.0.2 (-c condaforge)
 
 A simple way to ensure this program may be run is by creating a conda environment with the following command:
 
-conda create --name CMA python=3.9 sympy numpy scipy
+`conda create --name CMA python=3.9 sympy numpy scipy qcelemental`
 
-If you need to install anaconda, consult the official website:
-https://www.anaconda.com/products/individual
+If you need to install anaconda, consult the [official website](https://www.anaconda.com/products/individual)
+
+Alternatively, after installing the source code, ensure `pip` is installed and run `pip install -e .` from `ConcordantModes/`. All
+dependencies will be installed and `concordantmodes` will be made available as a python module.
 
 ## Quickstart Guide
 
