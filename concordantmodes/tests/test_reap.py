@@ -1,4 +1,5 @@
 import fileinput
+import math
 import os
 import re
 import shutil
@@ -52,7 +53,4 @@ def test_reap():
 
     os.chdir("../..")
 
-    assert ref_en == reap_obj.m_en_array[1][1]
-
-
-# test_reap()
+    assert math.isclose(ref_en, reap_obj.m_en_array[1][1], rel_tol=0.0, abs_tol=1e-10)

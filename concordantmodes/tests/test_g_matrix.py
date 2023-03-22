@@ -195,7 +195,4 @@ def test_compute_G():
     ]
     G_ref = np.array(G_ref)
 
-    assert np.sum(abs(G_ref - g_mat.G)) < 1.0e-8
-
-
-test_compute_G()
+    assert np.allclose(g_mat.G, G_ref, rtol=0.0, atol=1e-8)

@@ -36,12 +36,8 @@ def test_f_convert2int():
     FCintR = FcRead(suite.path + "/fc_int.dat")
     FCintR.run()
 
-    if np.setdiff1d(FCint.F.round(decimals=10), FCintR.fc_mat).size:
-        errors.append(
-            "Transformed internal force constants do not match the reference."
-        )
-
-    assert not errors, "errors occured:\n{}".format("\n".join(errors))
+    print("Transformed internal force constants do not match the reference.")
+    assert np.allclose(FCint.F, FCintR.fc_mat, rtol=0, atol=1e-10)
 
 
 def test_f_convert2cart():
@@ -71,13 +67,5 @@ def test_f_convert2cart():
     FCintC = FcRead(suite.path + "/fc_cart.dat")
     FCintC.run()
 
-    if np.setdiff1d(FCcart.F.round(decimals=10), FCintC.fc_mat).size:
-        errors.append(
-            "Transformed internal force constants do not match the reference."
-        )
-
-    assert not errors, "errors occured:\n{}".format("\n".join(errors))
-
-
-# test_f_convert2int()
-# test_f_convert2cart()
+    print("Transformed internal force constants do not match the reference.")
+    assert np.allclose(FCcart.F, FCintC.fc_mat, rtol=0.0, atol=1e-10)

@@ -18,12 +18,12 @@ from concordantmodes.ted import TED
 from concordantmodes.transf_disp import TransfDisp
 from concordantmodes.zmat import Zmat
 
-print(os.getcwd())
-suite = execute_suite("./ref_data/f_read_test/", "Redundant")
-suite.run()
-
 
 def test_transf_disp():
+    print(os.getcwd())
+    suite = execute_suite("./ref_data/f_read_test/", "Redundant")
+    suite.run()
+
     errors = []
 
     disps = TransfDisp(
@@ -48,10 +48,4 @@ def test_transf_disp():
         [1.941172931083388, -1.5774905865156932, -0.0019238478290682895],
     ]
 
-    if np.setdiff1d(np.array(disp_ref), disps.p_disp[3][3].tolist()).size:
-        errors.append("Computed Displacement does not match the reference.")
-
-    assert not errors, "errors occured:\n{}".format("\n".join(errors))
-
-
-test_transf_disp()
+    assert np.allclose(np.asarray(disp_ref), disps.p_disp[3][3], rtol=0.0, atol=1e-8)

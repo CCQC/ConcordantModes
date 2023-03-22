@@ -16,12 +16,12 @@ from concordantmodes.s_vectors import SVectors
 from concordantmodes.ted import TED
 from concordantmodes.zmat import Zmat
 
-suite = execute_suite("./ref_data/f_read_test/", "Redundant")
-suite.run()
-
 
 def test_gf_method():
     errors = []
+
+    suite = execute_suite("./ref_data/f_read_test/", "Redundant")
+    suite.run()
 
     GF = GFMethod(
         suite.G,
@@ -49,14 +49,4 @@ def test_gf_method():
         3837.8500878962245,
     ]
 
-    if np.setdiff1d(
-        GF.freq.round(decimals=10), np.array(ref_freq).round(decimals=10)
-    ).size:
-        errors.append(
-            "Frequencies computed via the GF method do not match the reference."
-        )
-
-    assert not errors, "errors occured:\n{}".format("\n".join(errors))
-
-
-test_gf_method()
+    assert np.allclose(GF.freq, np.asarray(ref_freq), rtol=0.0, atol=1e-10)

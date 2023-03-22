@@ -1,3 +1,4 @@
+from functools import reduce
 import pytest
 import numpy as np
 import os
@@ -44,65 +45,38 @@ zmat_read = [
 ]
 
 
-@pytest.mark.parametrize("option, expected, file_name", zmat_read)
-def test_zmat_read(option, expected, file_name):
+def make_zmat(type: str, option: str):
     os.chdir("./ref_data/zmat_test/")
     options = Options()
 
     options.coords = option
     ZMAT = Zmat(options)
-
-    output_test = ZMAT.zmat_read(file_name)
-
-    os.chdir("../../")
-    assert expected == output_test
-
-
-def test_zmat_process():
-    os.chdir("./ref_data/zmat_test/")
-    options = Options()
-    errors = []
-
-    options.coords = "ZMAT"
-    ZMAT = Zmat(options)
-    output_test_zmat = ZMAT.zmat_read("zmat_zmat")
-    ZMAT.zmat_process(output_test_zmat)
-    ref_bond_indices = [["2", "1"], ["3", "1"], ["4", "1"], ["5", "1"], ["6", "2"]]
-    ref_angle_indices = [
-        ["3", "1", "2"],
-        ["4", "1", "2"],
-        ["5", "1", "2"],
-        ["6", "2", "1"],
-    ]
-    ref_torsion_indices = [
-        ["4", "1", "2", "3"],
-        ["5", "1", "2", "4"],
-        ["6", "2", "1", "3"],
-    ]
-    ref_bond_variables = ["R1", "R2", "R3", "R4", "R5"]
-    ref_angle_variables = ["A2", "A3", "A4", "A5"]
-    ref_torsion_variables = ["D3", "D4", "D5"]
-    if not ref_bond_indices == ZMAT.bond_indices:
-        errors.append("ZMAT bond indices")
-    if not ref_angle_indices == ZMAT.angle_indices:
-        errors.append("ZMAT angle indices")
-    if not ref_torsion_indices == ZMAT.torsion_indices:
-        errors.append("ZMAT torsion indices")
-    if not ref_bond_variables == ZMAT.bond_variables:
-        errors.append("ZMAT bond variables")
-    if not ref_angle_variables == ZMAT.angle_variables:
-        errors.append("ZMAT angle variables")
-    if not ref_torsion_variables == ZMAT.torsion_variables:
-        errors.append("ZMAT torsion variables")
-
-    options.coords = "Redundant"
-    ZMAT = Zmat(options)
-    output_test_red = ZMAT.zmat_read("zmat_red")
+    output_test_red = ZMAT.zmat_read(type)
     ZMAT.zmat_process(output_test_red)
-    ref_bond_indices = np.array(
-        [["1", "2"], ["1", "3"], ["1", "4"], ["1", "5"], ["2", "6"]]
-    )
-    ref_angle_indices = np.array(
+    os.chdir("../../")
+    return ZMAT
+
+
+zmat = make_zmat("zmat_zmat", "ZMAT")
+redundant_zmat = make_zmat("zmat_red", "Redundant")
+custom_zmat = make_zmat("zmat_custom", "Custom")
+
+ref_bond_indices = [
+    (zmat, [["2", "1"], ["3", "1"], ["4", "1"], ["5", "1"], ["6", "2"]]),
+    (redundant_zmat, [["1", "2"], ["1", "3"], ["1", "4"], ["1", "5"], ["2", "6"]]),
+    (custom_zmat, [("1", "2"), ("1", "3"), ("1", "4"), ("1", "5"), ("2", "6")]),
+]
+
+ref_bond_variables = [
+    (zmat, ["R1", "R2", "R3", "R4", "R5"]),
+    (redundant_zmat, ["R1", "R2", "R3", "R4", "R5"]),
+    (custom_zmat, ["R1", "R2", "R3", "R4", "R5"]),
+]
+
+ref_angle_indices = [
+    (zmat, [["3", "1", "2"], ["4", "1", "2"], ["5", "1", "2"], ["6", "2", "1"]]),
+    (
+        redundant_zmat,
         [
             ["2", "1", "3"],
             ["2", "1", "4"],
@@ -111,9 +85,32 @@ def test_zmat_process():
             ["3", "1", "4"],
             ["3", "1", "5"],
             ["4", "1", "5"],
-        ]
-    )
-    ref_torsion_indices = np.array(
+        ],
+    ),
+    (
+        custom_zmat,
+        [
+            ("2", "1", "3"),
+            ("2", "1", "4"),
+            ("2", "1", "5"),
+            ("3", "1", "4"),
+            ("4", "1", "5"),
+            ("5", "1", "3"),
+            ("6", "2", "1"),
+        ],
+    ),
+]
+
+ref_angle_variables = [
+    (zmat, ["A2", "A3", "A4", "A5"]),
+    (redundant_zmat, ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]),
+    (custom_zmat, ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]),
+]
+
+ref_tors_indices = [
+    (zmat, [["4", "1", "2", "3"], ["5", "1", "2", "4"], ["6", "2", "1", "3"]]),
+    (
+        redundant_zmat,
         [
             ["3", "1", "2", "4"],
             ["3", "1", "2", "5"],
@@ -130,103 +127,151 @@ def test_zmat_process():
             ["4", "1", "3", "5"],
             ["3", "1", "4", "5"],
             ["3", "1", "5", "4"],
-        ]
-    )
-    ref_bond_variables = ["R1", "R2", "R3", "R4", "R5"]
-    ref_angle_variables = ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]
-    ref_torsion_variables = [
-        "D1",
-        "D2",
-        "D3",
-        "D4",
-        "D5",
-        "D6",
-        "D7",
-        "D8",
-        "D9",
-        "D10",
-        "D11",
-        "D12",
-        "D13",
-        "D14",
-        "D15",
-    ]
-    # print(np.setdiff1d(ref_bond_indices,ZMAT.bond_indices))
-    if np.setdiff1d(ref_bond_indices, ZMAT.bond_indices).size:
-        errors.append("Redundant bond indices")
-    if np.setdiff1d(ref_angle_indices, ZMAT.angle_indices).size:
-        errors.append("Redundant angle indices")
-    if np.setdiff1d(ref_torsion_indices, ZMAT.torsion_indices).size:
-        errors.append("Redundant torsion indices")
-    if np.setdiff1d(ref_bond_variables, ZMAT.bond_variables).size:
-        errors.append("Redundant bond variables")
-    if np.setdiff1d(ref_angle_variables, ZMAT.angle_variables).size:
-        errors.append("Redundant angle variables")
-    if np.setdiff1d(ref_torsion_variables, ZMAT.torsion_variables).size:
-        errors.append("Redundant torsion variables")
+        ],
+    ),
+    (custom_zmat, [("6", "2", "1", "4")]),
+]
 
-    options.coords = "Custom"
+ref_tors_variables = [
+    (zmat, ["D3", "D4", "D5"]),
+    (
+        redundant_zmat,
+        [
+            "D1",
+            "D2",
+            "D3",
+            "D4",
+            "D5",
+            "D6",
+            "D7",
+            "D8",
+            "D9",
+            "D10",
+            "D11",
+            "D12",
+            "D13",
+            "D14",
+            "D15",
+        ],
+    ),
+    (custom_zmat, ["D1"]),
+]
+
+ref_oop_indices = (custom_zmat.oop_indices, [("4", "1", "3", "5")])
+ref_lin_indices = (custom_zmat.lin_indices, [("5", "1", "2", "4")])
+ref_linx_indices = (custom_zmat.linx_indices, [("3", "1", "2", "6")])
+ref_liny_indices = (custom_zmat.liny_indices, [("3", "1", "2", "6")])
+ref_oop_variables = (custom_zmat.oop_variables, ["O1"])
+ref_lin_variables = (custom_zmat.lin_variables, ["L1"])
+ref_linx_variables = (custom_zmat.linx_variables, ["Lx1"])
+ref_liny_variables = (custom_zmat.liny_variables, ["Ly1"])
+
+
+@pytest.mark.parametrize("option, expected, file_name", zmat_read)
+def test_zmat_read(option, expected, file_name):
+    os.chdir("./ref_data/zmat_test/")
+    options = Options()
+
+    options.coords = option
     ZMAT = Zmat(options)
-    output_test_red = ZMAT.zmat_read("zmat_custom")
-    ZMAT.zmat_process(output_test_red)
-    ref_bond_indices = [("1", "2"), ("1", "3"), ("1", "4"), ("1", "5"), ("2", "6")]
-    ref_angle_indices = [
-        ("2", "1", "3"),
-        ("2", "1", "4"),
-        ("2", "1", "5"),
-        ("3", "1", "4"),
-        ("4", "1", "5"),
-        ("5", "1", "3"),
-        ("6", "2", "1"),
-    ]
-    ref_torsion_indices = [("6", "2", "1", "4")]
-    ref_oop_indices = [("4", "1", "3", "5")]
-    ref_lin_indices = [("5", "1", "2", "4")]
-    ref_linx_indices = [("3", "1", "2", "6")]
-    ref_liny_indices = [("3", "1", "2", "6")]
-    ref_bond_variables = ["R1", "R2", "R3", "R4", "R5"]
-    ref_angle_variables = ["A1", "A2", "A3", "A4", "A5", "A6", "A7"]
-    ref_torsion_variables = ["D1"]
-    ref_oop_variables = ["O1"]
-    ref_lin_variables = ["L1"]
-    ref_linx_variables = ["Lx1"]
-    ref_liny_variables = ["Ly1"]
 
-    if np.setdiff1d(ref_bond_indices, ZMAT.bond_indices).size:
-        errors.append("Redundant bond indices")
-    if np.setdiff1d(ref_angle_indices, ZMAT.angle_indices).size:
-        errors.append("Redundant angle indices")
-    if np.setdiff1d(ref_torsion_indices, ZMAT.torsion_indices).size:
-        errors.append("Redundant torsion indices")
-    if np.setdiff1d(ref_oop_indices, ZMAT.oop_indices).size:
-        errors.append("Redundant out-of-plane indices")
-    if np.setdiff1d(ref_lin_indices, ZMAT.lin_indices).size:
-        errors.append("Redundant lin indices")
-    if np.setdiff1d(ref_linx_indices, ZMAT.linx_indices).size:
-        errors.append("Redundant linx indices")
-    if np.setdiff1d(ref_liny_indices, ZMAT.liny_indices).size:
-        errors.append("Redundant liny indices")
-    if not ref_bond_variables == ZMAT.bond_variables:
-        errors.append("Redundant bond variables")
-    if not ref_angle_variables == ZMAT.angle_variables:
-        errors.append("Redundant angle variables")
-    if not ref_torsion_variables == ZMAT.torsion_variables:
-        errors.append("Redundant torsion variables")
-    if not ref_oop_variables == ZMAT.oop_variables:
-        errors.append("Redundant out-of-plane variables")
-    if not ref_lin_variables == ZMAT.lin_variables:
-        errors.append("Redundant lin variables")
-    if not ref_linx_variables == ZMAT.linx_variables:
-        errors.append("Redundant linx variables")
-    if not ref_linx_variables == ZMAT.linx_variables:
-        errors.append("Redundant linx variables")
+    output_test = ZMAT.zmat_read(file_name)
 
     os.chdir("../../")
+    assert expected == output_test
 
-    assert not errors, "errors occured:\n{}".format("\n".join(errors))
+
+@pytest.mark.parametrize(
+    "ZMAT, ref_bond_indices",
+    ref_bond_indices,
+    ids=["standard zmat", "automatic redundant", "custom"],
+)
+def test_zmat_bond_indices(ZMAT, ref_bond_indices):
+    if isinstance(ZMAT.bond_indices, np.ndarray):
+        ZMAT.bond_indices = ZMAT.bond_indices.tolist()
+    assert ZMAT.bond_indices == ref_bond_indices
+
+
+@pytest.mark.parametrize(
+    "ZMAT, ref_bond_variables",
+    ref_bond_variables,
+    ids=["standard zmat", "automatic redundant", "custom"],
+)
+def test_zmat_bond_variables(ZMAT, ref_bond_variables):
+    assert list(ZMAT.bond_variables) == ref_bond_variables
+
+
+@pytest.mark.parametrize(
+    "ZMAT, ref_angle_indices",
+    ref_angle_indices,
+    ids=["standard zmat", "automatic redundant", "custom"],
+)
+def test_zmat_angle_indices(ZMAT, ref_angle_indices):
+    if isinstance(ZMAT.angle_indices, np.ndarray):
+        ZMAT.angle_indices = ZMAT.angle_indices.tolist()
+    assert list(ZMAT.angle_indices) == ref_angle_indices
+
+
+@pytest.mark.parametrize(
+    "ZMAT, ref_angle_variables",
+    ref_angle_variables,
+    ids=["standard zmat", "automatic redundant", "custom"],
+)
+def test_zmat_angle_variables(ZMAT, ref_angle_variables):
+    assert list(ZMAT.angle_variables) == ref_angle_variables
+
+
+@pytest.mark.parametrize(
+    "ZMAT, ref_tors_indices",
+    ref_tors_indices,
+    ids=["standard zmat", "automatic redundant", "custom"],
+)
+def test_zmat_torsion_indices(ZMAT, ref_tors_indices):
+    if isinstance(ZMAT.torsion_indices, np.ndarray):
+        ZMAT.torsion_indices = ZMAT.torsion_indices.tolist()
+    print(ZMAT.torsion_indices)
+    print(ref_tors_indices)
+    assert list(ZMAT.torsion_indices) == ref_tors_indices
+
+
+@pytest.mark.parametrize(
+    "ZMAT, ref_tors_variables",
+    ref_tors_variables,
+    ids=["standard zmat", "automatic redundant", "custom"],
+)
+def test_zmat_torsion_variables(ZMAT, ref_tors_variables):
+    assert list(ZMAT.torsion_variables) == ref_tors_variables
+
+
+@pytest.mark.parametrize(
+    "custom_zmat_coords, reference_coords",
+    [
+        ref_oop_indices,
+        ref_oop_variables,
+        ref_lin_indices,
+        ref_lin_variables,
+        ref_linx_indices,
+        ref_linx_variables,
+        ref_liny_indices,
+        ref_liny_variables,
+    ],
+    ids=[
+        "redundant out of plane indices",
+        "redundant out of place variables",
+        "redundant lin indices",
+        "redundant lin variables",
+        "redundant linx indices",
+        "redundant linx variables",
+        "redundant_liny indices",
+        "redundant_liny variables",
+    ],
+)
+def test_custom_zmat(custom_zmat_coords, reference_coords):
+    assert custom_zmat_coords == reference_coords
 
 
 # Only need to test the Custom internal coordinates
+# TODO pythonize
 def test_zmat_calc():
     os.chdir("./ref_data/zmat_test/")
     options = Options()
@@ -311,5 +356,3 @@ def test_zmat_compile():
     os.chdir("../../")
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
-
-# test_zmat_read_ZMAT()
