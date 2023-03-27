@@ -1,6 +1,5 @@
 # ConcordantModes
 
-
 <p align="center">
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
@@ -34,8 +33,9 @@ An example is available at the following directory concordantmodes/Example/1_H2O
 ## Installation
 
 User must have at least:
-Python version 3.5.4
-Numpy version 1.13.1
+Python version 3.7
+Numpy version 1.13.3
+qcelemental
 
 Developers must have:
 Pytest 7.2.0 (-c condaforge)
@@ -43,10 +43,12 @@ Pytest-xdist 3.0.2 (-c condaforge)
 
 A simple way to ensure this program may be run is by creating a conda environment with the following command:
 
-conda create --name CMA python=3.9 sympy numpy scipy
+`conda create --name CMA python=3.9 sympy numpy scipy qcelemental`
 
-If you need to install anaconda, consult the official website:
-https://www.anaconda.com/products/individual
+If you need to install anaconda, consult the [official website](https://www.anaconda.com/products/individual)
+
+Alternatively, after installing the source code, ensure `pip` is installed and run `pip install -e .` from `ConcordantModes/`. All
+dependencies will be installed and `concordantmodes` will be made available as a python module.
 
 ## Quickstart Guide
 
