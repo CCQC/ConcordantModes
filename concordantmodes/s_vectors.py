@@ -340,8 +340,6 @@ class SVectors(object):
                         self.s_4center_dict["L" + str(i + 1)][int(j) - 1] += l_3 / len(
                             indies[2]
                         )
-                    # for j in indies[3]:
-                    # self.s_4center_dict["L" + str(i + 1)][int(j)-1] += l_4 / len(indies[3])
                 else:
                     self.s_4center_dict["L" + str(i + 1)][int(indies[0]) - 1] = l_1
                     self.s_4center_dict["L" + str(i + 1)][int(indies[1]) - 1] = l_2
