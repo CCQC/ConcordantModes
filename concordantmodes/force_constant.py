@@ -44,17 +44,29 @@ class ForceConstant(object):
                 e_pp, e_mm = p_en_array[i, j], m_en_array[i, j]
                 if i == j:
                     self.FC[i, i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i])
+                    # print("DIAG DISP:")
+                    # print(disp.disp[i])
                 elif i != j:
                     self.FC[i, j] = self.off_diag_fc(
-                        e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp.disp[i]
+                        e_pp,
+                        e_pi,
+                        e_pj,
+                        e_mi,
+                        e_mj,
+                        e_mm,
+                        e_r,
+                        disp.disp[i],
+                        disp.disp[j],
                     )
+                    # print("OFF-DIAG DISPS:")
+                    # print(disp.disp[i])
+                    # print(disp.disp[j])
             # Take advantage of FC[i,j] = FC[j,i]
             cf = np.triu_indices(a, 1)
             il = (cf[1], cf[0])
             self.FC[il] = self.FC[cf]
         elif self.deriv_level == 1:
             self.FC = (self.p_array - self.m_array) / (2 * self.disp.disp[0])
-            # raise RuntimeError
         else:
             print("Higher order deriv_level computations aren't yet supported")
             raise RuntimeError
@@ -65,9 +77,9 @@ class ForceConstant(object):
 
     # Functions for computing the diagonal and off-diagonal force constants
     def diag_fc(self, e_p, e_m, e_r, disp):
-        fc = (e_p - 2 * e_r + e_m) / (disp**2)
+        fc = (e_p - 2 * e_r + e_m) / (disp ** 2)
         return fc
 
-    def off_diag_fc(self, e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp):
-        fc = (e_pp - e_pi - e_pj + 2 * e_r - e_mi - e_mj + e_mm) / (2 * (disp**2))
+    def off_diag_fc(self, e_pp, e_pi, e_pj, e_mi, e_mj, e_mm, e_r, disp1, disp2):
+        fc = (e_pp - e_pi - e_pj + 2 * e_r - e_mi - e_mj + e_mm) / (2 * disp1 * disp2)
         return fc

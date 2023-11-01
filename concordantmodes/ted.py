@@ -73,23 +73,10 @@ class TED(object):
                 for j in range(len(freq)):
                     if i < len(self.zmat.bond_indices) and j == 0:
                         table_output += (
-                            "{:10s}".format(" ")
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.bond_indices[i][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.bond_indices[i][0])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.bond_indices[i][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.bond_indices[i][1])
+                                "B"
+                                + str(i+1)
                             )
                             + " STRE: "
                         )
@@ -97,42 +84,18 @@ class TED(object):
                         i < len(self.zmat.bond_indices) + len(self.zmat.angle_indices)
                         and j == 0
                     ):
-                        k = i - len(self.zmat.bond_indices)
+                        k = i - len(self.zmat.bond_indices) 
                         table_output += (
-                            "{:5s}".format(" ")
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.angle_indices[k][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.angle_indices[k][0])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.angle_indices[k][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.angle_indices[k][1])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.angle_indices[k][2]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.angle_indices[k][2])
+                                "A"
+                                + str(k+1)
                             )
                             + " BEND: "
                         )
                     elif (
                         i
-                        < len(self.zmat.bond_indices)
-                        + len(self.zmat.angle_indices)
-                        + len(self.zmat.torsion_indices)
+                        < len(self.zmat.bond_indices) + len(self.zmat.angle_indices) + len(self.zmat.torsion_indices)
                         and j == 0
                     ):
                         k = (
@@ -141,40 +104,10 @@ class TED(object):
                             - len(self.zmat.angle_indices)
                         )
                         table_output += (
-                            "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.torsion_indices[k][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.torsion_indices[k][0])
-                            )
-                            + " "
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.torsion_indices[k][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.torsion_indices[k][1])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.torsion_indices[k][2]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.torsion_indices[k][2])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.torsion_indices[k][3]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.torsion_indices[k][3])
+                                "D"
+                                + str(k+1)
                             )
                             + " TORS: "
                         )
@@ -193,40 +126,10 @@ class TED(object):
                             - len(self.zmat.torsion_indices)
                         )
                         table_output += (
-                            "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.oop_indices[k][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.oop_indices[k][0])
-                            )
-                            + " "
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.oop_indices[k][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.oop_indices[k][1])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.oop_indices[k][2]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.oop_indices[k][2])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.oop_indices[k][3]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.oop_indices[k][3])
+                                "O"
+                                + str(k+1)
                             )
                             + "  OOP: "
                         )
@@ -247,40 +150,10 @@ class TED(object):
                             - len(self.zmat.oop_indices)
                         )
                         table_output += (
-                            "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.lin_indices[k][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.lin_indices[k][0])
-                            )
-                            + " "
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.lin_indices[k][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.lin_indices[k][1])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.lin_indices[k][2]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.lin_indices[k][2])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.lin_indices[k][3]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.lin_indices[k][3])
+                                "L"
+                                + str(k+1)
                             )
                             + "  LIN: "
                         )
@@ -303,40 +176,10 @@ class TED(object):
                             - len(self.zmat.lin_indices)
                         )
                         table_output += (
-                            "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.linx_indices[k][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.linx_indices[k][0])
-                            )
-                            + " "
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.linx_indices[k][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.linx_indices[k][1])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.linx_indices[k][2]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.linx_indices[k][2])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.linx_indices[k][3]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.linx_indices[k][3])
+                                "Lx"
+                                + str(k+1)
                             )
                             + " LINX: "
                         )
@@ -361,40 +204,10 @@ class TED(object):
                             - len(self.zmat.linx_indices)
                         )
                         table_output += (
-                            "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.liny_indices[k][0]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.liny_indices[k][0])
-                            )
-                            + " "
+                            "{:15s}".format(" ")
                             + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.liny_indices[k][1]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.liny_indices[k][1])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.liny_indices[k][2]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.liny_indices[k][2])
-                            )
-                            + " "
-                            + "{:4s}".format(
-                                str(
-                                    self.zmat.atom_list[
-                                        int(self.zmat.liny_indices[k][3]) - 1
-                                    ]
-                                )
-                                + str(self.zmat.liny_indices[k][3])
+                                "Ly"
+                                + str(k+1)
                             )
                             + " LINY: "
                         )
