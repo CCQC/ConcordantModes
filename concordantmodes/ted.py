@@ -74,28 +74,24 @@ class TED(object):
                     if i < len(self.zmat.bond_indices) and j == 0:
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "B"
-                                + str(i+1)
-                            )
+                            + "{:4s}".format("B" + str(i + 1))
                             + " STRE: "
                         )
                     elif (
                         i < len(self.zmat.bond_indices) + len(self.zmat.angle_indices)
                         and j == 0
                     ):
-                        k = i - len(self.zmat.bond_indices) 
+                        k = i - len(self.zmat.bond_indices)
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "A"
-                                + str(k+1)
-                            )
+                            + "{:4s}".format("A" + str(k + 1))
                             + " BEND: "
                         )
                     elif (
                         i
-                        < len(self.zmat.bond_indices) + len(self.zmat.angle_indices) + len(self.zmat.torsion_indices)
+                        < len(self.zmat.bond_indices)
+                        + len(self.zmat.angle_indices)
+                        + len(self.zmat.torsion_indices)
                         and j == 0
                     ):
                         k = (
@@ -105,10 +101,7 @@ class TED(object):
                         )
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "D"
-                                + str(k+1)
-                            )
+                            + "{:4s}".format("D" + str(k + 1))
                             + " TORS: "
                         )
                     elif (
@@ -127,10 +120,7 @@ class TED(object):
                         )
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "O"
-                                + str(k+1)
-                            )
+                            + "{:4s}".format("O" + str(k + 1))
                             + "  OOP: "
                         )
                     elif (
@@ -151,10 +141,7 @@ class TED(object):
                         )
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "L"
-                                + str(k+1)
-                            )
+                            + "{:4s}".format("L" + str(k + 1))
                             + "  LIN: "
                         )
                     elif (
@@ -177,10 +164,7 @@ class TED(object):
                         )
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "Lx"
-                                + str(k+1)
-                            )
+                            + "{:4s}".format("Lx" + str(k + 1))
                             + " LINX: "
                         )
                     elif (
@@ -205,10 +189,7 @@ class TED(object):
                         )
                         table_output += (
                             "{:15s}".format(" ")
-                            + "{:4s}".format(
-                                "Ly"
-                                + str(k+1)
-                            )
+                            + "{:4s}".format("Ly" + str(k + 1))
                             + " LINY: "
                         )
                     table_output += "{:8.1f}".format(TED[i][j + div * int_div])

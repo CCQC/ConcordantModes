@@ -66,13 +66,27 @@ class Zmat(object):
         # Centroid regexes
         self.centroid_regex1 = re.compile(r";")
         self.centroid_regex2 = re.compile(r"\s*(\d+)")
-        self.bond_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)\n")
-        self.angle_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)\n")
-        self.torsion_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)T\s*\n")
-        self.oop_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)O\s*\n")
-        self.lin_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)L\s*\n")
-        self.linx_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)Lx\s*\n")
-        self.liny_centroid_regex = re.compile(r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)Ly\s*\n")
+        self.bond_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)\n"
+        )
+        self.angle_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)\n"
+        )
+        self.torsion_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)T\s*\n"
+        )
+        self.oop_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)O\s*\n"
+        )
+        self.lin_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)L\s*\n"
+        )
+        self.linx_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)Lx\s*\n"
+        )
+        self.liny_centroid_regex = re.compile(
+            r"^\s*(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)(;\s*(\d+\s+)*\d+\s*)Ly\s*\n"
+        )
 
         # Cartesian regexes
         self.cart_begin_regex = re.compile(r"cart begin")
@@ -508,7 +522,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
 
@@ -527,7 +541,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
                     self.angle_indices.append(List)
@@ -545,7 +559,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
                     self.torsion_indices.append(List)
@@ -563,7 +577,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
                     self.oop_indices.append(List)
@@ -581,7 +595,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
                     self.lin_indices.append(List)
@@ -599,7 +613,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
                     self.linx_indices.append(List)
@@ -617,7 +631,7 @@ class Zmat(object):
                     ListBuff = []
                     for j in List:
                         if re.search(self.centroid_regex1, j):
-                            SubList = re.findall(self.centroid_regex2,j)
+                            SubList = re.findall(self.centroid_regex2, j)
                             ListBuff.append(SubList)
                     List = ListBuff
                     self.liny_indices.append(List)
@@ -636,59 +650,59 @@ class Zmat(object):
                         "Rc" + str(i + 1 - Sum + len(self.rcom_variables))
                     )
                 # elif re.search(self.int1_regex, zmat_output[i]):
-                    # List = re.findall(self.int1_regex, zmat_output[i])[0][0]
-                    # List = List.split(" ")[1:]
-                    # print("INT1 List:")
-                    # print(List)
-                    # self.int1_indices.append(List)
-                    # self.int1_variables.append(
-                        # "I1_" + str(i + 1 - Sum + len(self.int1_variables))
-                    # )
+                # List = re.findall(self.int1_regex, zmat_output[i])[0][0]
+                # List = List.split(" ")[1:]
+                # print("INT1 List:")
+                # print(List)
+                # self.int1_indices.append(List)
+                # self.int1_variables.append(
+                # "I1_" + str(i + 1 - Sum + len(self.int1_variables))
+                # )
                 # elif re.search(self.int2_regex, zmat_output[i]):
-                    # List = re.findall(self.int2_regex, zmat_output[i])[0][0]
-                    # List = List.split(" ")[1:]
-                    # print("INT2 List:")
-                    # print(List)
-                    # self.int2_indices.append(List)
-                    # self.int2_variables.append(
-                        # "I2_" + str(i + 1 - Sum + len(self.int2_variables))
-                    # )
+                # List = re.findall(self.int2_regex, zmat_output[i])[0][0]
+                # List = List.split(" ")[1:]
+                # print("INT2 List:")
+                # print(List)
+                # self.int2_indices.append(List)
+                # self.int2_variables.append(
+                # "I2_" + str(i + 1 - Sum + len(self.int2_variables))
+                # )
                 # elif re.search(self.int3_regex, zmat_output[i]):
-                    # List = re.findall(self.int3_regex, zmat_output[i])[0][0]
-                    # List = List.split(" ")[1:]
-                    # print("INT3 List:")
-                    # print(List)
-                    # self.int3_indices.append(List)
-                    # self.int3_variables.append(
-                        # "I3_" + str(i + 1 - Sum + len(self.int3_variables))
-                    # )
+                # List = re.findall(self.int3_regex, zmat_output[i])[0][0]
+                # List = List.split(" ")[1:]
+                # print("INT3 List:")
+                # print(List)
+                # self.int3_indices.append(List)
+                # self.int3_variables.append(
+                # "I3_" + str(i + 1 - Sum + len(self.int3_variables))
+                # )
                 # elif re.search(self.int4_regex, zmat_output[i]):
-                    # List = re.findall(self.int4_regex, zmat_output[i])[0][0]
-                    # List = List.split(" ")[1:]
-                    # print("INT4 List:")
-                    # print(List)
-                    # self.int4_indices.append(List)
-                    # self.int4_variables.append(
-                        # "I4_" + str(i + 1 - Sum + len(self.int4_variables))
-                    # )
+                # List = re.findall(self.int4_regex, zmat_output[i])[0][0]
+                # List = List.split(" ")[1:]
+                # print("INT4 List:")
+                # print(List)
+                # self.int4_indices.append(List)
+                # self.int4_variables.append(
+                # "I4_" + str(i + 1 - Sum + len(self.int4_variables))
+                # )
                 # elif re.search(self.int5_regex, zmat_output[i]):
-                    # List = re.findall(self.int5_regex, zmat_output[i])[0][0]
-                    # List = List.split(" ")[1:]
-                    # print("INT5 List:")
-                    # print(List)
-                    # self.int5_indices.append(List)
-                    # self.int5_variables.append(
-                        # "I5_" + str(i + 1 - Sum + len(self.int5_variables))
-                    # )
+                # List = re.findall(self.int5_regex, zmat_output[i])[0][0]
+                # List = List.split(" ")[1:]
+                # print("INT5 List:")
+                # print(List)
+                # self.int5_indices.append(List)
+                # self.int5_variables.append(
+                # "I5_" + str(i + 1 - Sum + len(self.int5_variables))
+                # )
                 # elif re.search(self.int6_regex, zmat_output[i]):
-                    # List = re.findall(self.int6_regex, zmat_output[i])[0][0]
-                    # List = List.split(" ")[1:]
-                    # print("INT6 List:")
-                    # print(List)
-                    # self.int6_indices.append(List)
-                    # self.int6_variables.append(
-                        # "I6_" + str(i + 1 - Sum + len(self.int6_variables))
-                    # )
+                # List = re.findall(self.int6_regex, zmat_output[i])[0][0]
+                # List = List.split(" ")[1:]
+                # print("INT6 List:")
+                # print(List)
+                # self.int6_indices.append(List)
+                # self.int6_variables.append(
+                # "I6_" + str(i + 1 - Sum + len(self.int6_variables))
+                # )
                 else:
                     blank += 1
                 Sum = (
@@ -739,7 +753,7 @@ class Zmat(object):
         self.variables2 = transdisp.int_c(self.cartesians_final, I, I)
 
         # if len(self.int1_indices):
-            # self.int_frag_points = transdisp.int_frag_points
+        # self.int_frag_points = transdisp.int_frag_points
         # print(self.int_frag_points)
         # raise RuntimeError
 
@@ -749,7 +763,7 @@ class Zmat(object):
             # + len(self.int4_indices)
             # + len(self.int5_indices)
             # + len(self.int6_indices)
-            + len(self.angle_indices)
+            +len(self.angle_indices)
             + len(self.torsion_indices)
             + len(self.oop_indices)
             + len(self.lin_indices)
@@ -773,17 +787,17 @@ class Zmat(object):
         if len(self.rcom_variables):
             self.variables = np.append(self.variables, self.rcom_variables)
         # if len(self.int1_variables):
-            # self.variables = np.append(self.variables, self.int1_variables)
+        # self.variables = np.append(self.variables, self.int1_variables)
         # if len(self.int2_variables):
-            # self.variables = np.append(self.variables, self.int2_variables)
+        # self.variables = np.append(self.variables, self.int2_variables)
         # if len(self.int3_variables):
-            # self.variables = np.append(self.variables, self.int3_variables)
+        # self.variables = np.append(self.variables, self.int3_variables)
         # if len(self.int4_variables):
-            # self.variables = np.append(self.variables, self.int4_variables)
+        # self.variables = np.append(self.variables, self.int4_variables)
         # if len(self.int5_variables):
-            # self.variables = np.append(self.variables, self.int5_variables)
+        # self.variables = np.append(self.variables, self.int5_variables)
         # if len(self.int6_variables):
-            # self.variables = np.append(self.variables, self.int6_variables)
+        # self.variables = np.append(self.variables, self.int6_variables)
         if len(self.angle_variables):
             self.variables = np.append(self.variables, self.angle_variables)
         if len(self.torsion_variables):
@@ -903,57 +917,57 @@ class Zmat(object):
         for i in range(len(self.bond_indices)):
             self.index_dictionary["R" + str(i + 1)] = self.bond_indices[i]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.bond_indices[i])
+            # self.reduced_masses, self.red_mass(self.bond_indices[i])
             # )
         for i in range(len(self.angle_indices)):
             self.index_dictionary["A" + str(i + zmat_shift_a + 1)] = self.angle_indices[
                 i
             ]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.angle_indices[i])
+            # self.reduced_masses, self.red_mass(self.angle_indices[i])
             # )
         for i in range(len(self.torsion_indices)):
             self.index_dictionary[
                 "D" + str(i + zmat_shift_d + 1)
             ] = self.torsion_indices[i]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.torsion_indices[i])
+            # self.reduced_masses, self.red_mass(self.torsion_indices[i])
             # )
         for i in range(len(self.oop_indices)):
             self.index_dictionary["O" + str(i + 1)] = self.oop_indices[i]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.oop_indices[i])
+            # self.reduced_masses, self.red_mass(self.oop_indices[i])
             # )
         for i in range(len(self.lin_indices)):
             self.index_dictionary["L" + str(i + 1)] = self.lin_indices[i]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.lin_indices[i])
+            # self.reduced_masses, self.red_mass(self.lin_indices[i])
             # )
         for i in range(len(self.linx_indices)):
             self.index_dictionary["Lx" + str(i + 1)] = self.linx_indices[i]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.linx_indices[i])
+            # self.reduced_masses, self.red_mass(self.linx_indices[i])
             # )
         for i in range(len(self.liny_indices)):
             self.index_dictionary["Ly" + str(i + 1)] = self.liny_indices[i]
             # self.reduced_masses = np.append(
-                # self.reduced_masses, self.red_mass(self.liny_indices[i])
+            # self.reduced_masses, self.red_mass(self.liny_indices[i])
             # )
         for i in range(len(self.rcom_indices)):
             self.index_dictionary["Rc" + str(i + 1)] = self.rcom_indices[i]
 
         # for i in range(len(self.int1_indices)):
-            # self.index_dictionary["I1_" + str(i + 1)] = self.int1_indices[i]
+        # self.index_dictionary["I1_" + str(i + 1)] = self.int1_indices[i]
         # for i in range(len(self.int2_indices)):
-            # self.index_dictionary["I2_" + str(i + 1)] = self.int2_indices[i]
+        # self.index_dictionary["I2_" + str(i + 1)] = self.int2_indices[i]
         # for i in range(len(self.int3_indices)):
-            # self.index_dictionary["I3_" + str(i + 1)] = self.int3_indices[i]
+        # self.index_dictionary["I3_" + str(i + 1)] = self.int3_indices[i]
         # for i in range(len(self.int4_indices)):
-            # self.index_dictionary["I4_" + str(i + 1)] = self.int4_indices[i]
+        # self.index_dictionary["I4_" + str(i + 1)] = self.int4_indices[i]
         # for i in range(len(self.int5_indices)):
-            # self.index_dictionary["I5_" + str(i + 1)] = self.int5_indices[i]
+        # self.index_dictionary["I5_" + str(i + 1)] = self.int5_indices[i]
         # for i in range(len(self.int6_indices)):
-            # self.index_dictionary["I6_" + str(i + 1)] = self.int6_indices[i]
+        # self.index_dictionary["I6_" + str(i + 1)] = self.int6_indices[i]
 
     def zmat_print(self):
         # Print off the internal coordinate and its value in Bohr/Degree

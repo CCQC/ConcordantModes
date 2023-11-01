@@ -53,11 +53,11 @@ class SVectors(object):
                 indies = self.bond_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= len(indies[0])
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= len(indies[1])
@@ -69,13 +69,17 @@ class SVectors(object):
                 self.s_2center_dict["B" + str(i + 1)] = (
                     0 * self.s_2center_dict["B" + str(i + 1)]
                 )
-                b_1 = self.compute_e(x1,x2)
+                b_1 = self.compute_e(x1, x2)
                 b_2 = -b_1
                 if Len:
                     for j in indies[0]:
-                        self.s_2center_dict["B" + str(i + 1)][int(j)-1] += b_1 / len(indies[0])
+                        self.s_2center_dict["B" + str(i + 1)][int(j) - 1] += b_1 / len(
+                            indies[0]
+                        )
                     for j in indies[1]:
-                        self.s_2center_dict["B" + str(i + 1)][int(j)-1] += b_2 / len(indies[1])
+                        self.s_2center_dict["B" + str(i + 1)][int(j) - 1] += b_2 / len(
+                            indies[1]
+                        )
                 else:
                     self.s_2center_dict["B" + str(i + 1)][int(indies[0]) - 1] = b_1
                     self.s_2center_dict["B" + str(i + 1)][int(indies[1]) - 1] = b_2
@@ -86,17 +90,17 @@ class SVectors(object):
                 indies = self.angle_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     L = len(indies[0])
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= L
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     L = len(indies[1])
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= L
-                    x3 = [0.0,0.0,0.0]
+                    x3 = [0.0, 0.0, 0.0]
                     L = len(indies[2])
                     for j in indies[2]:
                         x3 += self.carts[int(j) - 1]
@@ -110,27 +114,32 @@ class SVectors(object):
                 self.s_3center_dict["A" + str(i + 1)] = (
                     0 * self.s_3center_dict["A" + str(i + 1)]
                 )
-                r_1 = self.compute_r(x1,x2)
-                r_2 = self.compute_r(x2,x3)
-                e_1 = self.compute_e(x1,x2)
-                e_2 = self.compute_e(x3,x2)
-                phi = self.compute_phi(e_1,e_2)
+                r_1 = self.compute_r(x1, x2)
+                r_2 = self.compute_r(x2, x3)
+                e_1 = self.compute_e(x1, x2)
+                e_2 = self.compute_e(x3, x2)
+                phi = self.compute_phi(e_1, e_2)
                 a_1 = self.compute_BEND(e_1, e_2, phi, r_1)
                 a_3 = self.compute_BEND(e_2, e_1, phi, r_2)
                 a_2 = -a_1 - a_3
-                
+
                 if Len:
                     for j in indies[0]:
-                        self.s_3center_dict["A" + str(i + 1)][int(j)-1] += a_1 / len(indies[0])
+                        self.s_3center_dict["A" + str(i + 1)][int(j) - 1] += a_1 / len(
+                            indies[0]
+                        )
                     for j in indies[1]:
-                        self.s_3center_dict["A" + str(i + 1)][int(j)-1] += a_2 / len(indies[1])
+                        self.s_3center_dict["A" + str(i + 1)][int(j) - 1] += a_2 / len(
+                            indies[1]
+                        )
                     for j in indies[2]:
-                        self.s_3center_dict["A" + str(i + 1)][int(j)-1] += a_3 / len(indies[2])
+                        self.s_3center_dict["A" + str(i + 1)][int(j) - 1] += a_3 / len(
+                            indies[2]
+                        )
                 else:
                     self.s_3center_dict["A" + str(i + 1)][int(indies[0]) - 1] = a_1
                     self.s_3center_dict["A" + str(i + 1)][int(indies[1]) - 1] = a_2
                     self.s_3center_dict["A" + str(i + 1)][int(indies[2]) - 1] = a_3
-
 
         # Next, torsions.
         if len(self.torsion_indices) > 0:
@@ -138,19 +147,19 @@ class SVectors(object):
                 indies = self.torsion_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= len(indies[0])
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= len(indies[1])
-                    x3 = [0.0,0.0,0.0]
+                    x3 = [0.0, 0.0, 0.0]
                     for j in indies[2]:
                         x3 += self.carts[int(j) - 1]
                     x3 /= len(indies[2])
-                    x4 = [0.0,0.0,0.0]
+                    x4 = [0.0, 0.0, 0.0]
                     for j in indies[3]:
                         x4 += self.carts[int(j) - 1]
                     x4 /= len(indies[3])
@@ -160,42 +169,47 @@ class SVectors(object):
                     x3 = self.carts[int(indies[2]) - 1]
                     x4 = self.carts[int(indies[3]) - 1]
 
-
                 self.s_4center_dict["D" + str(i + 1)] = self.carts.copy()
                 self.s_4center_dict["D" + str(i + 1)] = (
                     0 * self.s_4center_dict["D" + str(i + 1)]
                 )
-                
-                r_1 = self.compute_r(x1,x2)
-                r_2 = self.compute_r(x2,x3)
-                r_3 = self.compute_r(x3,x4)
-                e_1 = self.compute_e(x1,x2)
-                e_2 = self.compute_e(x2,x3)
-                e_3 = self.compute_e(x3,x4)
-                phi_1 = self.compute_phi(e_1,-e_2)
-                phi_2 = self.compute_phi(e_2,-e_3)
+
+                r_1 = self.compute_r(x1, x2)
+                r_2 = self.compute_r(x2, x3)
+                r_3 = self.compute_r(x3, x4)
+                e_1 = self.compute_e(x1, x2)
+                e_2 = self.compute_e(x2, x3)
+                e_3 = self.compute_e(x3, x4)
+                phi_1 = self.compute_phi(e_1, -e_2)
+                phi_2 = self.compute_phi(e_2, -e_3)
 
                 t_1 = self.compute_TORS1(e_1, -e_2, phi_1, r_1)
                 t_4 = self.compute_TORS1(-e_3, e_2, phi_2, r_3)
                 t_2 = self.compute_TORS2(e_1, -e_2, -e_3, phi_1, phi_2, r_1, r_2)
                 t_3 = -t_1 - t_2 - t_4
-               
+
                 if Len:
                     for j in indies[0]:
-                        self.s_4center_dict["D" + str(i + 1)][int(j)-1] += t_1 / len(indies[0])
+                        self.s_4center_dict["D" + str(i + 1)][int(j) - 1] += t_1 / len(
+                            indies[0]
+                        )
                     for j in indies[1]:
-                        self.s_4center_dict["D" + str(i + 1)][int(j)-1] += t_2 / len(indies[1])
+                        self.s_4center_dict["D" + str(i + 1)][int(j) - 1] += t_2 / len(
+                            indies[1]
+                        )
                     for j in indies[2]:
-                        self.s_4center_dict["D" + str(i + 1)][int(j)-1] += t_3 / len(indies[2])
+                        self.s_4center_dict["D" + str(i + 1)][int(j) - 1] += t_3 / len(
+                            indies[2]
+                        )
                     for j in indies[3]:
-                        self.s_4center_dict["D" + str(i + 1)][int(j)-1] += t_4 / len(indies[3])
+                        self.s_4center_dict["D" + str(i + 1)][int(j) - 1] += t_4 / len(
+                            indies[3]
+                        )
                 else:
                     self.s_4center_dict["D" + str(i + 1)][int(indies[0]) - 1] = t_1
                     self.s_4center_dict["D" + str(i + 1)][int(indies[1]) - 1] = t_2
                     self.s_4center_dict["D" + str(i + 1)][int(indies[2]) - 1] = t_3
                     self.s_4center_dict["D" + str(i + 1)][int(indies[3]) - 1] = t_4
-
-
 
         # Now, out of plane bending.
         if len(self.oop_indices) > 0:
@@ -203,19 +217,19 @@ class SVectors(object):
                 indies = self.oop_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= len(indies[0])
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= len(indies[1])
-                    x3 = [0.0,0.0,0.0]
+                    x3 = [0.0, 0.0, 0.0]
                     for j in indies[2]:
                         x3 += self.carts[int(j) - 1]
                     x3 /= len(indies[2])
-                    x4 = [0.0,0.0,0.0]
+                    x4 = [0.0, 0.0, 0.0]
                     for j in indies[3]:
                         x4 += self.carts[int(j) - 1]
                     x4 /= len(indies[3])
@@ -225,19 +239,18 @@ class SVectors(object):
                     x3 = self.carts[int(indies[2]) - 1]
                     x4 = self.carts[int(indies[3]) - 1]
 
-
                 self.s_4center_dict["O" + str(i + 1)] = self.carts.copy()
                 self.s_4center_dict["O" + str(i + 1)] = (
                     0 * self.s_4center_dict["O" + str(i + 1)]
                 )
-                
-                r_1 = self.compute_r(x1,x2)
-                r_2 = self.compute_r(x3,x2)
-                r_3 = self.compute_r(x4,x2)
-                e_1 = self.compute_e(x1,x2)
-                e_2 = self.compute_e(x3,x2)
-                e_3 = self.compute_e(x4,x2)
-                phi = self.compute_phi(e_2,e_3)
+
+                r_1 = self.compute_r(x1, x2)
+                r_2 = self.compute_r(x3, x2)
+                r_3 = self.compute_r(x4, x2)
+                e_1 = self.compute_e(x1, x2)
+                e_2 = self.compute_e(x3, x2)
+                e_3 = self.compute_e(x4, x2)
+                phi = self.compute_phi(e_2, e_3)
                 theta = self.calc_OOP(x1, x2, x3, x4)
 
                 o_1 = self.compute_OOP1(e_1, e_2, e_3, r_1, theta, phi)
@@ -245,16 +258,23 @@ class SVectors(object):
                 o_4 = self.compute_OOP2(-e_1, e_3, e_2, r_3, theta, phi)
                 o_2 = -o_1 - o_3 - o_4
 
-
                 if Len:
                     for j in indies[0]:
-                        self.s_4center_dict["O" + str(i + 1)][int(j)-1] += o_1 / len(indies[0])
+                        self.s_4center_dict["O" + str(i + 1)][int(j) - 1] += o_1 / len(
+                            indies[0]
+                        )
                     for j in indies[1]:
-                        self.s_4center_dict["O" + str(i + 1)][int(j)-1] += o_2 / len(indies[1])
+                        self.s_4center_dict["O" + str(i + 1)][int(j) - 1] += o_2 / len(
+                            indies[1]
+                        )
                     for j in indies[2]:
-                        self.s_4center_dict["O" + str(i + 1)][int(j)-1] += o_3 / len(indies[2])
+                        self.s_4center_dict["O" + str(i + 1)][int(j) - 1] += o_3 / len(
+                            indies[2]
+                        )
                     for j in indies[3]:
-                        self.s_4center_dict["O" + str(i + 1)][int(j)-1] += o_4 / len(indies[3])
+                        self.s_4center_dict["O" + str(i + 1)][int(j) - 1] += o_4 / len(
+                            indies[3]
+                        )
                 else:
                     self.s_4center_dict["O" + str(i + 1)][int(indies[0]) - 1] = o_1
                     self.s_4center_dict["O" + str(i + 1)][int(indies[1]) - 1] = o_2
@@ -267,19 +287,19 @@ class SVectors(object):
                 indies = self.lin_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= len(indies[0])
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= len(indies[1])
-                    x3 = [0.0,0.0,0.0]
+                    x3 = [0.0, 0.0, 0.0]
                     for j in indies[2]:
                         x3 += self.carts[int(j) - 1]
                     x3 /= len(indies[2])
-                    x4 = [0.0,0.0,0.0]
+                    x4 = [0.0, 0.0, 0.0]
                     for j in indies[3]:
                         x4 += self.carts[int(j) - 1]
                     x4 /= len(indies[3])
@@ -293,29 +313,35 @@ class SVectors(object):
                 self.s_4center_dict["L" + str(i + 1)] = (
                     0 * self.s_4center_dict["L" + str(i + 1)]
                 )
-                r_1 = self.compute_r(x1,x2)
-                r_2 = self.compute_r(x3,x2)
-                r_3 = self.compute_r(x4,x2)
-                e_1 = self.compute_e(x1,x2)
-                e_2 = self.compute_e(x3,x2)
-                e_3 = self.compute_e(x4,x2)
-                theta = self.calc_Lin(x1,x2,x3,x4)
+                r_1 = self.compute_r(x1, x2)
+                r_2 = self.compute_r(x3, x2)
+                r_3 = self.compute_r(x4, x2)
+                e_1 = self.compute_e(x1, x2)
+                e_2 = self.compute_e(x3, x2)
+                e_3 = self.compute_e(x4, x2)
+                theta = self.calc_Lin(x1, x2, x3, x4)
 
                 l_1 = self.compute_LIN(e_1, e_2, e_3, r_1, theta)
                 l_3 = self.compute_LIN(e_2, e_3, e_1, r_2, theta)
                 # l_4 = self.compute_LIN(e_3, e_1, e_2, r_3, theta)
                 l_2 = -l_1 - l_3
-                # l_2 = -l_1 - l_3 - l_4 
-                
+                # l_2 = -l_1 - l_3 - l_4
+
                 if Len:
                     for j in indies[0]:
-                        self.s_4center_dict["L" + str(i + 1)][int(j)-1] += l_1 / len(indies[0])
+                        self.s_4center_dict["L" + str(i + 1)][int(j) - 1] += l_1 / len(
+                            indies[0]
+                        )
                     for j in indies[1]:
-                        self.s_4center_dict["L" + str(i + 1)][int(j)-1] += l_2 / len(indies[1])
+                        self.s_4center_dict["L" + str(i + 1)][int(j) - 1] += l_2 / len(
+                            indies[1]
+                        )
                     for j in indies[2]:
-                        self.s_4center_dict["L" + str(i + 1)][int(j)-1] += l_3 / len(indies[2])
+                        self.s_4center_dict["L" + str(i + 1)][int(j) - 1] += l_3 / len(
+                            indies[2]
+                        )
                     # for j in indies[3]:
-                        # self.s_4center_dict["L" + str(i + 1)][int(j)-1] += l_4 / len(indies[3])
+                    # self.s_4center_dict["L" + str(i + 1)][int(j)-1] += l_4 / len(indies[3])
                 else:
                     self.s_4center_dict["L" + str(i + 1)][int(indies[0]) - 1] = l_1
                     self.s_4center_dict["L" + str(i + 1)][int(indies[1]) - 1] = l_2
@@ -328,19 +354,19 @@ class SVectors(object):
                 indies = self.linx_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= len(indies[0])
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= len(indies[1])
-                    x3 = [0.0,0.0,0.0]
+                    x3 = [0.0, 0.0, 0.0]
                     for j in indies[2]:
                         x3 += self.carts[int(j) - 1]
                     x3 /= len(indies[2])
-                    x4 = [0.0,0.0,0.0]
+                    x4 = [0.0, 0.0, 0.0]
                     for j in indies[3]:
                         x4 += self.carts[int(j) - 1]
                     x4 /= len(indies[3])
@@ -354,30 +380,38 @@ class SVectors(object):
                 self.s_4center_dict["Lx" + str(i + 1)] = (
                     0 * self.s_4center_dict["Lx" + str(i + 1)]
                 )
-                r_1 = self.compute_r(x2,x1)
-                r_2 = self.compute_r(x3,x2)
-                r_3 = self.compute_r(x4,x3)
-                e_1 = self.compute_e(x1,x2)
-                e_2 = self.compute_e(x2,x3)
-                e_3 = self.compute_e(x3,x4)
-                ax = self.calc_alpha_x(e_1,e_2,e_3)
-                phi_1 = self.compute_phi(-e_1,e_2)
-                phi_2 = self.compute_phi(-e_2,e_3)
-                
+                r_1 = self.compute_r(x2, x1)
+                r_2 = self.compute_r(x3, x2)
+                r_3 = self.compute_r(x4, x3)
+                e_1 = self.compute_e(x1, x2)
+                e_2 = self.compute_e(x2, x3)
+                e_3 = self.compute_e(x3, x4)
+                ax = self.calc_alpha_x(e_1, e_2, e_3)
+                phi_1 = self.compute_phi(-e_1, e_2)
+                phi_2 = self.compute_phi(-e_2, e_3)
+
                 lx_1 = self.compute_LINX1(e_1, e_2, e_3, r_1, phi_1, phi_2, ax)
                 lx_2 = self.compute_LINX2(e_1, e_2, e_3, r_1, r_2, phi_1, phi_2, ax)
                 lx_4 = self.compute_LINX4(e_1, e_2, e_3, r_3, phi_1, ax)
                 lx_3 = -lx_1 - lx_2 - lx_4
-                
+
                 if Len:
                     for j in indies[0]:
-                        self.s_4center_dict["Lx" + str(i + 1)][int(j)-1] += lx_1 / len(indies[0])
+                        self.s_4center_dict["Lx" + str(i + 1)][
+                            int(j) - 1
+                        ] += lx_1 / len(indies[0])
                     for j in indies[1]:
-                        self.s_4center_dict["Lx" + str(i + 1)][int(j)-1] += lx_2 / len(indies[1])
+                        self.s_4center_dict["Lx" + str(i + 1)][
+                            int(j) - 1
+                        ] += lx_2 / len(indies[1])
                     for j in indies[2]:
-                        self.s_4center_dict["Lx" + str(i + 1)][int(j)-1] += lx_3 / len(indies[2])
+                        self.s_4center_dict["Lx" + str(i + 1)][
+                            int(j) - 1
+                        ] += lx_3 / len(indies[2])
                     for j in indies[3]:
-                        self.s_4center_dict["Lx" + str(i + 1)][int(j)-1] += lx_4 / len(indies[3])
+                        self.s_4center_dict["Lx" + str(i + 1)][
+                            int(j) - 1
+                        ] += lx_4 / len(indies[3])
                 else:
                     self.s_4center_dict["Lx" + str(i + 1)][int(indies[0]) - 1] = lx_1
                     self.s_4center_dict["Lx" + str(i + 1)][int(indies[1]) - 1] = lx_2
@@ -390,19 +424,19 @@ class SVectors(object):
                 indies = self.liny_indices[i]
                 Len = len(np.array(indies[0]).shape)
                 if Len:
-                    x1 = [0.0,0.0,0.0]
+                    x1 = [0.0, 0.0, 0.0]
                     for j in indies[0]:
                         x1 += self.carts[int(j) - 1]
                     x1 /= len(indies[0])
-                    x2 = [0.0,0.0,0.0]
+                    x2 = [0.0, 0.0, 0.0]
                     for j in indies[1]:
                         x2 += self.carts[int(j) - 1]
                     x2 /= len(indies[1])
-                    x3 = [0.0,0.0,0.0]
+                    x3 = [0.0, 0.0, 0.0]
                     for j in indies[2]:
                         x3 += self.carts[int(j) - 1]
                     x3 /= len(indies[2])
-                    x4 = [0.0,0.0,0.0]
+                    x4 = [0.0, 0.0, 0.0]
                     for j in indies[3]:
                         x4 += self.carts[int(j) - 1]
                     x4 /= len(indies[3])
@@ -411,21 +445,21 @@ class SVectors(object):
                     x2 = self.carts[int(indies[1]) - 1]
                     x3 = self.carts[int(indies[2]) - 1]
                     x4 = self.carts[int(indies[3]) - 1]
-                
+
                 self.s_4center_dict["Ly" + str(i + 1)] = self.carts.copy()
                 self.s_4center_dict["Ly" + str(i + 1)] = (
                     0 * self.s_4center_dict["Ly" + str(i + 1)]
                 )
-                r_1 = self.compute_r(x2,x1)
-                r_2 = self.compute_r(x3,x2)
-                r_3 = self.compute_r(x4,x3)
-                e_1 = self.compute_e(x1,x2)
-                e_2 = self.compute_e(x2,x3)
-                e_3 = self.compute_e(x3,x4)
+                r_1 = self.compute_r(x2, x1)
+                r_2 = self.compute_r(x3, x2)
+                r_3 = self.compute_r(x4, x3)
+                e_1 = self.compute_e(x1, x2)
+                e_2 = self.compute_e(x2, x3)
+                e_3 = self.compute_e(x3, x4)
                 ay = self.calc_alpha_y(e_1, e_2, e_3)
-                phi_1 = self.compute_phi(-e_1,e_2)
-                phi_2 = self.compute_phi(-e_2,e_3)
-                
+                phi_1 = self.compute_phi(-e_1, e_2)
+                phi_2 = self.compute_phi(-e_2, e_3)
+
                 ly_1 = self.compute_LINY1(e_1, e_2, e_3, r_1, phi_1, ay)
                 ly_2 = self.compute_LINY2(e_1, e_2, e_3, r_1, r_2, phi_1, ay)
                 ly_4 = self.compute_LINY4(e_1, e_2, e_3, r_2, r_3, phi_1, ay)
@@ -433,13 +467,21 @@ class SVectors(object):
 
                 if Len:
                     for j in indies[0]:
-                        self.s_4center_dict["Ly" + str(i + 1)][int(j)-1] += ly_1 / len(indies[0])
+                        self.s_4center_dict["Ly" + str(i + 1)][
+                            int(j) - 1
+                        ] += ly_1 / len(indies[0])
                     for j in indies[1]:
-                        self.s_4center_dict["Ly" + str(i + 1)][int(j)-1] += ly_2 / len(indies[1])
+                        self.s_4center_dict["Ly" + str(i + 1)][
+                            int(j) - 1
+                        ] += ly_2 / len(indies[1])
                     for j in indies[2]:
-                        self.s_4center_dict["Ly" + str(i + 1)][int(j)-1] += ly_3 / len(indies[2])
+                        self.s_4center_dict["Ly" + str(i + 1)][
+                            int(j) - 1
+                        ] += ly_3 / len(indies[2])
                     for j in indies[3]:
-                        self.s_4center_dict["Ly" + str(i + 1)][int(j)-1] += ly_4 / len(indies[3])
+                        self.s_4center_dict["Ly" + str(i + 1)][
+                            int(j) - 1
+                        ] += ly_4 / len(indies[3])
                 else:
                     self.s_4center_dict["Ly" + str(i + 1)][int(indies[0]) - 1] = ly_1
                     self.s_4center_dict["Ly" + str(i + 1)][int(indies[1]) - 1] = ly_2
@@ -449,7 +491,7 @@ class SVectors(object):
         # The last step will be to concatenate all of the s-vectors into a singular B-tensor, in order of stretches, then bends, then torsions.
         # Note: I am going to modify this to hold all 2-center, 3-center, and 4-center internal coordinates.
         self.B = np.array([self.s_2center_dict["B1"].flatten()])
-        
+
         # Append stretches
         for i in range(len(self.bond_indices) - 1):
             self.B = np.append(
@@ -545,9 +587,8 @@ class SVectors(object):
         # the A-matrix. You lose information.
 
     def compute_STRE(self, x1, x2):
-        s = (x1 - x2) / self.compute_r(x1,x2)
+        s = (x1 - x2) / self.compute_r(x1, x2)
         return s
-
 
     def compute_BEND(self, e_1, e_2, phi, r):
         s = (e_1 * np.cos(phi) - e_2) / (r * np.sin(phi))
@@ -562,7 +603,6 @@ class SVectors(object):
             e_2, e_1
         ) + (np.cos(phi_2) / (r_2 * np.sin(phi_2) ** 2)) * np.cross(-e_2, e_3)
         return s
-    
 
     # See Wilson, Decius, and Cross' "Molecular Vibrations" page 60 for the
     # OOP1 and OOP2 formulae.
@@ -624,7 +664,7 @@ class SVectors(object):
         c = ax * e_3 / r
         s = a + b + c
         return s
-    
+
     def compute_LINY1(self, e_1, e_2, e_3, r, phi, ay):
         a = -ay * (np.tan(phi) ** -1) * (e_1 * np.cos(phi) + e_2) / (r * np.sin(phi))
         b = np.cross(e_2, -e_3) / (r * np.sin(phi))
@@ -674,18 +714,18 @@ class SVectors(object):
         e4 = (x4 - x2) / LA.norm(x4 - x2)
         theta = np.arcsin(np.dot(e4, np.cross(e3, e1)))
         return theta
-    
+
     def compute_e(self, x1, x2):
-        r = self.compute_r(x1,x2)
+        r = self.compute_r(x1, x2)
         e = (x1 - x2) / r
         return e
-    
+
     def compute_r(self, x1, x2):
         r = LA.norm(x1 - x2)
         return r
 
     def compute_phi(self, e_1, e_2):
-        
+
         p = np.dot(e_1, e_2)
         if p > 1:
             p = 1
@@ -705,7 +745,7 @@ class SVectors(object):
         s = np.dot(e_1, np.cross(-e_2, e_3))
         ay = s / np.sin(theta)
         return ay
-    
+
     def calc_r_com(self, cart1, cart2, mass1, mass2):
         rc1 = self.int2cart.COM(cart1, mass1)
         rc2 = self.int2cart.COM(cart2, mass2)

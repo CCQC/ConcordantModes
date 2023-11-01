@@ -236,18 +236,26 @@ class TransfDisp(object):
                     indies = self.zmat.bond_indices[i]
                     bond_carts = []
                     for k in indies[0]:
-                        bond_carts = np.append(bond_carts,np.array(carts[int(k) - 1]).astype(float))
+                        bond_carts = np.append(
+                            bond_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     bond_carts = np.reshape(bond_carts, (-1, 3))
                     x1 = self.calc_Centroid(bond_carts)
-                    
+
                     bond_carts = []
                     for k in indies[1]:
-                        bond_carts = np.append(bond_carts,np.array(carts[int(k) - 1]).astype(float))
+                        bond_carts = np.append(
+                            bond_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     bond_carts = np.reshape(bond_carts, (-1, 3))
                     x2 = self.calc_Centroid(bond_carts)
                 else:
-                    x1 = np.array(carts[int(self.zmat.bond_indices[i][0]) - 1]).astype(float)
-                    x2 = np.array(carts[int(self.zmat.bond_indices[i][1]) - 1]).astype(float)
+                    x1 = np.array(carts[int(self.zmat.bond_indices[i][0]) - 1]).astype(
+                        float
+                    )
+                    x2 = np.array(carts[int(self.zmat.bond_indices[i][1]) - 1]).astype(
+                        float
+                    )
 
             int_coord = np.append(int_coord, self.calc_bond(x1, x2))
 
@@ -260,148 +268,148 @@ class TransfDisp(object):
 
         # Prep interfragment coords here
         # for i in range(len(self.zmat.int1_indices)):
-            # p1_points = np.array([])
-            # for j in np.array(self.zmat.int1_indices[i]).astype(int):
-                # p1_points = np.append(p1_points, carts[j - 1])
-            # p1_points = np.reshape(p1_points, (-1, 3))
-            # p1 = self.calc_Centroid(p1_points)
-            # p2 = np.array([])
-            # p3 = np.array([])
-            # p4 = np.array([])
-            # p5 = np.array([])
-            # p6 = np.array([])
-            # if len(self.zmat.int2_indices):
-                # p2_points = np.array([])
-                # for j in np.array(self.zmat.int2_indices[i]).astype(int):
-                    # p2_points = np.append(p2_points, carts[j - 1])
-                # p2_points = np.reshape(p2_points, (-1, 3))
-                # p2 = self.calc_Centroid(p2_points)
-            # if len(self.zmat.int3_indices):
-                # p3_points = np.array([])
-                # for j in np.array(self.zmat.int3_indices[i]).astype(int):
-                    # p3_points = np.append(p3_points, carts[j - 1])
-                # p3_points = np.reshape(p3_points, (-1, 3))
-                # p3 = self.calc_Centroid(p3_points)
-            # if len(self.zmat.int4_indices):
-                # p4_points = np.array([])
-                # for j in np.array(self.zmat.int4_indices[i]).astype(int):
-                    # p4_points = np.append(p4_points, carts[j - 1])
-                # p4_points = np.reshape(p4_points, (-1, 3))
-                # p4 = self.calc_Centroid(p4_points)
-            # if len(self.zmat.int5_indices):
-                # p5_points = np.array([])
-                # for j in np.array(self.zmat.int5_indices[i]).astype(int):
-                    # p5_points = np.append(p5_points, carts[j - 1])
-                # p5_points = np.reshape(p5_points, (-1, 3))
-                # p5 = self.calc_Centroid(p5_points)
-            # if len(self.zmat.int6_indices):
-                # p6_points = np.array([])
-                # for j in np.array(self.zmat.int6_indices[i]).astype(int):
-                    # p6_points = np.append(p6_points, carts[j - 1])
-                # p6_points = np.reshape(p6_points, (-1, 3))
-                # p6 = self.calc_Centroid(p6_points)
+        # p1_points = np.array([])
+        # for j in np.array(self.zmat.int1_indices[i]).astype(int):
+        # p1_points = np.append(p1_points, carts[j - 1])
+        # p1_points = np.reshape(p1_points, (-1, 3))
+        # p1 = self.calc_Centroid(p1_points)
+        # p2 = np.array([])
+        # p3 = np.array([])
+        # p4 = np.array([])
+        # p5 = np.array([])
+        # p6 = np.array([])
+        # if len(self.zmat.int2_indices):
+        # p2_points = np.array([])
+        # for j in np.array(self.zmat.int2_indices[i]).astype(int):
+        # p2_points = np.append(p2_points, carts[j - 1])
+        # p2_points = np.reshape(p2_points, (-1, 3))
+        # p2 = self.calc_Centroid(p2_points)
+        # if len(self.zmat.int3_indices):
+        # p3_points = np.array([])
+        # for j in np.array(self.zmat.int3_indices[i]).astype(int):
+        # p3_points = np.append(p3_points, carts[j - 1])
+        # p3_points = np.reshape(p3_points, (-1, 3))
+        # p3 = self.calc_Centroid(p3_points)
+        # if len(self.zmat.int4_indices):
+        # p4_points = np.array([])
+        # for j in np.array(self.zmat.int4_indices[i]).astype(int):
+        # p4_points = np.append(p4_points, carts[j - 1])
+        # p4_points = np.reshape(p4_points, (-1, 3))
+        # p4 = self.calc_Centroid(p4_points)
+        # if len(self.zmat.int5_indices):
+        # p5_points = np.array([])
+        # for j in np.array(self.zmat.int5_indices[i]).astype(int):
+        # p5_points = np.append(p5_points, carts[j - 1])
+        # p5_points = np.reshape(p5_points, (-1, 3))
+        # p5 = self.calc_Centroid(p5_points)
+        # if len(self.zmat.int6_indices):
+        # p6_points = np.array([])
+        # for j in np.array(self.zmat.int6_indices[i]).astype(int):
+        # p6_points = np.append(p6_points, carts[j - 1])
+        # p6_points = np.reshape(p6_points, (-1, 3))
+        # p6 = self.calc_Centroid(p6_points)
 
-            # self.int_frag_points = np.array([p1, p2, p3, p4, p5, p6])
+        # self.int_frag_points = np.array([p1, p2, p3, p4, p5, p6])
 
-            # inter_distance = self.calc_bond(p1, p4)
-            # int_coord = np.append(int_coord, inter_distance)
-            # if len(self.zmat.int2_indices):
-                # polar_angle1 = self.calc_angle(p2, p1, p4)
-                # if self.conv:
-                    # condition_1 = (
-                        # float(
-                            # self.zmat.variable_dictionary_final[
-                                # self.zmat.int2_variables[i]
-                            # ]
-                        # )
-                        # > 180.0
-                    # )
-                    # condition_2 = (
-                        # float(
-                            # self.zmat.variable_dictionary_final[
-                                # self.zmat.int2_variables[i]
-                            # ]
-                        # )
-                        # < 0.0
-                    # )
-                    # if condition_1 or condition_2:
-                        # polar_angle1 = 2 * np.pi - polar_angle1
-                # int_coord = np.append(int_coord, polar_angle1)
-            # if len(self.zmat.int5_indices):
-                # polar_angle2 = self.calc_angle(p5, p4, p1)
-                # if self.conv:
-                    # condition_1 = (
-                        # float(
-                            # self.zmat.variable_dictionary_final[
-                                # self.zmat.int3_variables[i]
-                            # ]
-                        # )
-                        # > 180.0
-                    # )
-                    # condition_2 = (
-                        # float(
-                            # self.zmat.variable_dictionary_final[
-                                # self.zmat.int3_variables[i]
-                            # ]
-                        # )
-                        # < 0.0
-                    # )
-                    # if condition_1 or condition_2:
-                        # polar_angle2 = 2 * np.pi - polar_angle2
-                # int_coord = np.append(int_coord, polar_angle2)
-            # if len(self.zmat.int5_indices):
-                # torsion_angle = self.calc_tors(p2, p1, p4, p5)
-                # if self.conv:
-                    # condition_1 = float(
-                        # self.zmat.variable_dictionary_final[self.zmat.int4_variables[i]]
-                    # ) > 135.0 and (torsion_angle * 180.0 / np.pi < -135.0)
-                    # condition_2 = float(
-                        # self.zmat.variable_dictionary_final[self.zmat.int4_variables[i]]
-                    # ) < -135.0 and (torsion_angle * 180.0 / np.pi > 135.0)
-                    # if condition_1:
-                        # torsion_angle += 2 * np.pi
-                    # if condition_2:
-                        # torsion_angle -= 2 * np.pi
-                # int_coord = np.append(int_coord, torsion_angle)
-            # if len(self.zmat.int3_indices):
-                # int_rot_angle1 = self.calc_tors(p3, p2, p1, p4)
-                # # int_rot_angle1 = self.calc_tors(p4, p1, p2, p3)
-                # if self.conv:
-                    # condition_1 = float(
-                        # self.zmat.variable_dictionary_final[self.zmat.int5_variables[i]]
-                    # ) > 135.0 and (int_rot_angle1 * 180.0 / np.pi < -135.0)
-                    # condition_2 = float(
-                        # self.zmat.variable_dictionary_final[self.zmat.int5_variables[i]]
-                    # ) < -135.0 and (int_rot_angle1 * 180.0 / np.pi > 135.0)
-                    # if condition_1:
-                        # int_rot_angle1 += 2 * np.pi
-                    # if condition_2:
-                        # int_rot_angle1 -= 2 * np.pi
-                # int_coord = np.append(int_coord, int_rot_angle1)
-            # if len(self.zmat.int6_indices):
-                # int_rot_angle2 = self.calc_tors(p6, p5, p4, p1)
-                # # int_rot_angle2 = self.calc_tors(p1, p4, p5, p6)
-                # if self.conv:
-                    # condition_1 = float(
-                        # self.zmat.variable_dictionary_final[self.zmat.int6_variables[i]]
-                    # ) > 135.0 and (int_rot_angle2 * 180.0 / np.pi < -135.0)
-                    # condition_2 = float(
-                        # self.zmat.variable_dictionary_final[self.zmat.int6_variables[i]]
-                    # ) < -135.0 and (int_rot_angle2 * 180.0 / np.pi > 135.0)
-                    # if condition_1:
-                        # int_rot_angle2 += 2 * np.pi
-                    # if condition_2:
-                        # int_rot_angle2 -= 2 * np.pi
-                # int_coord = np.append(int_coord, int_rot_angle2)
+        # inter_distance = self.calc_bond(p1, p4)
+        # int_coord = np.append(int_coord, inter_distance)
+        # if len(self.zmat.int2_indices):
+        # polar_angle1 = self.calc_angle(p2, p1, p4)
+        # if self.conv:
+        # condition_1 = (
+        # float(
+        # self.zmat.variable_dictionary_final[
+        # self.zmat.int2_variables[i]
+        # ]
+        # )
+        # > 180.0
+        # )
+        # condition_2 = (
+        # float(
+        # self.zmat.variable_dictionary_final[
+        # self.zmat.int2_variables[i]
+        # ]
+        # )
+        # < 0.0
+        # )
+        # if condition_1 or condition_2:
+        # polar_angle1 = 2 * np.pi - polar_angle1
+        # int_coord = np.append(int_coord, polar_angle1)
+        # if len(self.zmat.int5_indices):
+        # polar_angle2 = self.calc_angle(p5, p4, p1)
+        # if self.conv:
+        # condition_1 = (
+        # float(
+        # self.zmat.variable_dictionary_final[
+        # self.zmat.int3_variables[i]
+        # ]
+        # )
+        # > 180.0
+        # )
+        # condition_2 = (
+        # float(
+        # self.zmat.variable_dictionary_final[
+        # self.zmat.int3_variables[i]
+        # ]
+        # )
+        # < 0.0
+        # )
+        # if condition_1 or condition_2:
+        # polar_angle2 = 2 * np.pi - polar_angle2
+        # int_coord = np.append(int_coord, polar_angle2)
+        # if len(self.zmat.int5_indices):
+        # torsion_angle = self.calc_tors(p2, p1, p4, p5)
+        # if self.conv:
+        # condition_1 = float(
+        # self.zmat.variable_dictionary_final[self.zmat.int4_variables[i]]
+        # ) > 135.0 and (torsion_angle * 180.0 / np.pi < -135.0)
+        # condition_2 = float(
+        # self.zmat.variable_dictionary_final[self.zmat.int4_variables[i]]
+        # ) < -135.0 and (torsion_angle * 180.0 / np.pi > 135.0)
+        # if condition_1:
+        # torsion_angle += 2 * np.pi
+        # if condition_2:
+        # torsion_angle -= 2 * np.pi
+        # int_coord = np.append(int_coord, torsion_angle)
+        # if len(self.zmat.int3_indices):
+        # int_rot_angle1 = self.calc_tors(p3, p2, p1, p4)
+        # # int_rot_angle1 = self.calc_tors(p4, p1, p2, p3)
+        # if self.conv:
+        # condition_1 = float(
+        # self.zmat.variable_dictionary_final[self.zmat.int5_variables[i]]
+        # ) > 135.0 and (int_rot_angle1 * 180.0 / np.pi < -135.0)
+        # condition_2 = float(
+        # self.zmat.variable_dictionary_final[self.zmat.int5_variables[i]]
+        # ) < -135.0 and (int_rot_angle1 * 180.0 / np.pi > 135.0)
+        # if condition_1:
+        # int_rot_angle1 += 2 * np.pi
+        # if condition_2:
+        # int_rot_angle1 -= 2 * np.pi
+        # int_coord = np.append(int_coord, int_rot_angle1)
+        # if len(self.zmat.int6_indices):
+        # int_rot_angle2 = self.calc_tors(p6, p5, p4, p1)
+        # # int_rot_angle2 = self.calc_tors(p1, p4, p5, p6)
+        # if self.conv:
+        # condition_1 = float(
+        # self.zmat.variable_dictionary_final[self.zmat.int6_variables[i]]
+        # ) > 135.0 and (int_rot_angle2 * 180.0 / np.pi < -135.0)
+        # condition_2 = float(
+        # self.zmat.variable_dictionary_final[self.zmat.int6_variables[i]]
+        # ) < -135.0 and (int_rot_angle2 * 180.0 / np.pi > 135.0)
+        # if condition_1:
+        # int_rot_angle2 += 2 * np.pi
+        # if condition_2:
+        # int_rot_angle2 -= 2 * np.pi
+        # int_coord = np.append(int_coord, int_rot_angle2)
 
-            # print(inter_distance)
-            # print(polar_angle1*180/np.pi)
-            # print(polar_angle2*180/np.pi)
-            # print(torsion_angle*180/np.pi)
-            # print(int_rot_angle1*180/np.pi)
-            # print(int_rot_angle2*180/np.pi)
+        # print(inter_distance)
+        # print(polar_angle1*180/np.pi)
+        # print(polar_angle2*180/np.pi)
+        # print(torsion_angle*180/np.pi)
+        # print(int_rot_angle1*180/np.pi)
+        # print(int_rot_angle2*180/np.pi)
 
-            # raise RuntimeError
+        # raise RuntimeError
 
         for i in range(len(self.zmat.angle_indices)):
             for j in self.zmat.angle_indices[i]:
@@ -410,27 +418,32 @@ class TransfDisp(object):
                 if Len:
                     angle_carts = []
                     for k in indies[0]:
-                        angle_carts = np.append(angle_carts,np.array(carts[int(k) - 1]).astype(float))
+                        angle_carts = np.append(
+                            angle_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     angle_carts = np.reshape(angle_carts, (-1, 3))
                     x1 = self.calc_Centroid(angle_carts)
-                    
+
                     angle_carts = []
                     for k in indies[1]:
-                        angle_carts = np.append(angle_carts,np.array(carts[int(k) - 1]).astype(float))
+                        angle_carts = np.append(
+                            angle_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     angle_carts = np.reshape(angle_carts, (-1, 3))
                     x2 = self.calc_Centroid(angle_carts)
-                    
+
                     angle_carts = []
                     for k in indies[2]:
-                        angle_carts = np.append(angle_carts,np.array(carts[int(k) - 1]).astype(float))
+                        angle_carts = np.append(
+                            angle_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     angle_carts = np.reshape(angle_carts, (-1, 3))
                     x3 = self.calc_Centroid(angle_carts)
                 else:
                     x1 = np.array(carts[int(indies[0]) - 1]).astype(float)
                     x2 = np.array(carts[int(indies[1]) - 1]).astype(float)
                     x3 = np.array(carts[int(indies[2]) - 1]).astype(float)
-            
-            
+
             a = self.calc_angle(x1, x2, x3)
             if self.conv:
                 condition_1 = (
@@ -452,7 +465,7 @@ class TransfDisp(object):
                 if condition_1 or condition_2:
                     a = 2 * np.pi - a
             int_coord = np.append(int_coord, a)
-        
+
         for i in range(len(self.zmat.torsion_indices)):
             for j in self.zmat.torsion_indices[i]:
                 Len = len(np.array(j).shape)
@@ -460,32 +473,48 @@ class TransfDisp(object):
                     indies = self.zmat.torsion_indices[i]
                     torsion_carts = []
                     for k in indies[0]:
-                        torsion_carts = np.append(torsion_carts,np.array(carts[int(k) - 1]).astype(float))
+                        torsion_carts = np.append(
+                            torsion_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     torsion_carts = np.reshape(torsion_carts, (-1, 3))
                     x1 = self.calc_Centroid(torsion_carts)
-                    
+
                     torsion_carts = []
                     for k in indies[1]:
-                        torsion_carts = np.append(torsion_carts,np.array(carts[int(k) - 1]).astype(float))
+                        torsion_carts = np.append(
+                            torsion_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     torsion_carts = np.reshape(torsion_carts, (-1, 3))
                     x2 = self.calc_Centroid(torsion_carts)
-                    
+
                     torsion_carts = []
                     for k in indies[2]:
-                        torsion_carts = np.append(torsion_carts,np.array(carts[int(k) - 1]).astype(float))
+                        torsion_carts = np.append(
+                            torsion_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     torsion_carts = np.reshape(torsion_carts, (-1, 3))
                     x3 = self.calc_Centroid(torsion_carts)
-                    
+
                     torsion_carts = []
                     for k in indies[3]:
-                        torsion_carts = np.append(torsion_carts,np.array(carts[int(k) - 1]).astype(float))
+                        torsion_carts = np.append(
+                            torsion_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     torsion_carts = np.reshape(torsion_carts, (-1, 3))
                     x4 = self.calc_Centroid(torsion_carts)
                 else:
-                    x1 = np.array(carts[int(self.zmat.torsion_indices[i][0]) - 1]).astype(float)
-                    x2 = np.array(carts[int(self.zmat.torsion_indices[i][1]) - 1]).astype(float)
-                    x3 = np.array(carts[int(self.zmat.torsion_indices[i][2]) - 1]).astype(float)
-                    x4 = np.array(carts[int(self.zmat.torsion_indices[i][3]) - 1]).astype(float)
+                    x1 = np.array(
+                        carts[int(self.zmat.torsion_indices[i][0]) - 1]
+                    ).astype(float)
+                    x2 = np.array(
+                        carts[int(self.zmat.torsion_indices[i][1]) - 1]
+                    ).astype(float)
+                    x3 = np.array(
+                        carts[int(self.zmat.torsion_indices[i][2]) - 1]
+                    ).astype(float)
+                    x4 = np.array(
+                        carts[int(self.zmat.torsion_indices[i][3]) - 1]
+                    ).astype(float)
 
             t = self.calc_tors(x1, x2, x3, x4)
             if self.conv:
@@ -500,7 +529,7 @@ class TransfDisp(object):
                 if condition_2:
                     t -= 2 * np.pi
             int_coord = np.append(int_coord, t)
-        
+
         for i in range(len(self.zmat.oop_indices)):
             for j in self.zmat.oop_indices[i]:
                 Len = len(np.array(j).shape)
@@ -508,33 +537,49 @@ class TransfDisp(object):
                     indies = self.zmat.oop_indices[i]
                     oop_carts = []
                     for k in indies[0]:
-                        oop_carts = np.append(oop_carts,np.array(carts[int(k) - 1]).astype(float))
+                        oop_carts = np.append(
+                            oop_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     oop_carts = np.reshape(oop_carts, (-1, 3))
                     x1 = self.calc_Centroid(oop_carts)
-                    
+
                     oop_carts = []
                     for k in indies[1]:
-                        oop_carts = np.append(oop_carts,np.array(carts[int(k) - 1]).astype(float))
+                        oop_carts = np.append(
+                            oop_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     oop_carts = np.reshape(oop_carts, (-1, 3))
                     x2 = self.calc_Centroid(oop_carts)
-                    
+
                     oop_carts = []
                     for k in indies[2]:
-                        oop_carts = np.append(oop_carts,np.array(carts[int(k) - 1]).astype(float))
+                        oop_carts = np.append(
+                            oop_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     oop_carts = np.reshape(oop_carts, (-1, 3))
                     x3 = self.calc_Centroid(oop_carts)
-                    
+
                     oop_carts = []
                     for k in indies[3]:
-                        oop_carts = np.append(oop_carts,np.array(carts[int(k) - 1]).astype(float))
+                        oop_carts = np.append(
+                            oop_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     oop_carts = np.reshape(oop_carts, (-1, 3))
                     x4 = self.calc_Centroid(oop_carts)
                 else:
-                    x1 = np.array(carts[int(self.zmat.oop_indices[i][0]) - 1]).astype(float)
-                    x2 = np.array(carts[int(self.zmat.oop_indices[i][1]) - 1]).astype(float)
-                    x3 = np.array(carts[int(self.zmat.oop_indices[i][2]) - 1]).astype(float)
-                    x4 = np.array(carts[int(self.zmat.oop_indices[i][3]) - 1]).astype(float)
-            
+                    x1 = np.array(carts[int(self.zmat.oop_indices[i][0]) - 1]).astype(
+                        float
+                    )
+                    x2 = np.array(carts[int(self.zmat.oop_indices[i][1]) - 1]).astype(
+                        float
+                    )
+                    x3 = np.array(carts[int(self.zmat.oop_indices[i][2]) - 1]).astype(
+                        float
+                    )
+                    x4 = np.array(carts[int(self.zmat.oop_indices[i][3]) - 1]).astype(
+                        float
+                    )
+
             o = self.calc_OOP(x1, x2, x3, x4)
             if self.conv:
                 condition_1 = (
@@ -563,32 +608,48 @@ class TransfDisp(object):
                     indies = self.zmat.lin_indices[i]
                     lin_carts = []
                     for k in indies[0]:
-                        lin_carts = np.append(lin_carts,np.array(carts[int(k) - 1]).astype(float))
+                        lin_carts = np.append(
+                            lin_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     lin_carts = np.reshape(lin_carts, (-1, 3))
                     x1 = self.calc_Centroid(lin_carts)
-                    
+
                     lin_carts = []
                     for k in indies[1]:
-                        lin_carts = np.append(lin_carts,np.array(carts[int(k) - 1]).astype(float))
+                        lin_carts = np.append(
+                            lin_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     lin_carts = np.reshape(lin_carts, (-1, 3))
                     x2 = self.calc_Centroid(lin_carts)
-                    
+
                     lin_carts = []
                     for k in indies[2]:
-                        lin_carts = np.append(lin_carts,np.array(carts[int(k) - 1]).astype(float))
+                        lin_carts = np.append(
+                            lin_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     lin_carts = np.reshape(lin_carts, (-1, 3))
                     x3 = self.calc_Centroid(lin_carts)
-                    
+
                     lin_carts = []
                     for k in indies[3]:
-                        lin_carts = np.append(lin_carts,np.array(carts[int(k) - 1]).astype(float))
+                        lin_carts = np.append(
+                            lin_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     lin_carts = np.reshape(lin_carts, (-1, 3))
                     x4 = self.calc_Centroid(lin_carts)
                 else:
-                    x1 = np.array(carts[int(self.zmat.lin_indices[i][0]) - 1]).astype(float)
-                    x2 = np.array(carts[int(self.zmat.lin_indices[i][1]) - 1]).astype(float)
-                    x3 = np.array(carts[int(self.zmat.lin_indices[i][2]) - 1]).astype(float)
-                    x4 = np.array(carts[int(self.zmat.lin_indices[i][3]) - 1]).astype(float)
+                    x1 = np.array(carts[int(self.zmat.lin_indices[i][0]) - 1]).astype(
+                        float
+                    )
+                    x2 = np.array(carts[int(self.zmat.lin_indices[i][1]) - 1]).astype(
+                        float
+                    )
+                    x3 = np.array(carts[int(self.zmat.lin_indices[i][2]) - 1]).astype(
+                        float
+                    )
+                    x4 = np.array(carts[int(self.zmat.lin_indices[i][3]) - 1]).astype(
+                        float
+                    )
             l = self.calc_Lin(x1, x2, x3, x4)
             int_coord = np.append(int_coord, l)
 
@@ -599,32 +660,48 @@ class TransfDisp(object):
                     indies = self.zmat.linx_indices[i]
                     linx_carts = []
                     for k in indies[0]:
-                        linx_carts = np.append(linx_carts,np.array(carts[int(k) - 1]).astype(float))
+                        linx_carts = np.append(
+                            linx_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     linx_carts = np.reshape(linx_carts, (-1, 3))
                     x1 = self.calc_Centroid(linx_carts)
-                    
+
                     linx_carts = []
                     for k in indies[1]:
-                        linx_carts = np.append(linx_carts,np.array(carts[int(k) - 1]).astype(float))
+                        linx_carts = np.append(
+                            linx_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     linx_carts = np.reshape(linx_carts, (-1, 3))
                     x2 = self.calc_Centroid(linx_carts)
-                    
+
                     linx_carts = []
                     for k in indies[2]:
-                        linx_carts = np.append(linx_carts,np.array(carts[int(k) - 1]).astype(float))
+                        linx_carts = np.append(
+                            linx_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     linx_carts = np.reshape(linx_carts, (-1, 3))
                     x3 = self.calc_Centroid(linx_carts)
-                    
+
                     linx_carts = []
                     for k in indies[3]:
-                        linx_carts = np.append(linx_carts,np.array(carts[int(k) - 1]).astype(float))
+                        linx_carts = np.append(
+                            linx_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     linx_carts = np.reshape(linx_carts, (-1, 3))
                     x4 = self.calc_Centroid(linx_carts)
                 else:
-                    x1 = np.array(carts[int(self.zmat.linx_indices[i][0]) - 1]).astype(float)
-                    x2 = np.array(carts[int(self.zmat.linx_indices[i][1]) - 1]).astype(float)
-                    x3 = np.array(carts[int(self.zmat.linx_indices[i][2]) - 1]).astype(float)
-                    x4 = np.array(carts[int(self.zmat.linx_indices[i][3]) - 1]).astype(float)
+                    x1 = np.array(carts[int(self.zmat.linx_indices[i][0]) - 1]).astype(
+                        float
+                    )
+                    x2 = np.array(carts[int(self.zmat.linx_indices[i][1]) - 1]).astype(
+                        float
+                    )
+                    x3 = np.array(carts[int(self.zmat.linx_indices[i][2]) - 1]).astype(
+                        float
+                    )
+                    x4 = np.array(carts[int(self.zmat.linx_indices[i][3]) - 1]).astype(
+                        float
+                    )
             lx = self.calc_Linx(x1, x2, x3, x4)
             int_coord = np.append(int_coord, lx)
 
@@ -635,38 +712,54 @@ class TransfDisp(object):
                     indies = self.zmat.liny_indices[i]
                     liny_carts = []
                     for k in indies[0]:
-                        liny_carts = np.append(liny_carts,np.array(carts[int(k) - 1]).astype(float))
+                        liny_carts = np.append(
+                            liny_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     liny_carts = np.reshape(liny_carts, (-1, 3))
                     x1 = self.calc_Centroid(liny_carts)
-                    
+
                     liny_carts = []
                     for k in indies[1]:
-                        liny_carts = np.append(liny_carts,np.array(carts[int(k) - 1]).astype(float))
+                        liny_carts = np.append(
+                            liny_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     liny_carts = np.reshape(liny_carts, (-1, 3))
                     x2 = self.calc_Centroid(liny_carts)
-                    
+
                     liny_carts = []
                     for k in indies[2]:
-                        liny_carts = np.append(liny_carts,np.array(carts[int(k) - 1]).astype(float))
+                        liny_carts = np.append(
+                            liny_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     liny_carts = np.reshape(liny_carts, (-1, 3))
                     x3 = self.calc_Centroid(liny_carts)
-                    
+
                     liny_carts = []
                     for k in indies[3]:
-                        liny_carts = np.append(liny_carts,np.array(carts[int(k) - 1]).astype(float))
+                        liny_carts = np.append(
+                            liny_carts, np.array(carts[int(k) - 1]).astype(float)
+                        )
                     liny_carts = np.reshape(liny_carts, (-1, 3))
                     x4 = self.calc_Centroid(liny_carts)
                 else:
-                    x1 = np.array(carts[int(self.zmat.liny_indices[i][0]) - 1]).astype(float)
-                    x2 = np.array(carts[int(self.zmat.liny_indices[i][1]) - 1]).astype(float)
-                    x3 = np.array(carts[int(self.zmat.liny_indices[i][2]) - 1]).astype(float)
-                    x4 = np.array(carts[int(self.zmat.liny_indices[i][3]) - 1]).astype(float)
+                    x1 = np.array(carts[int(self.zmat.liny_indices[i][0]) - 1]).astype(
+                        float
+                    )
+                    x2 = np.array(carts[int(self.zmat.liny_indices[i][1]) - 1]).astype(
+                        float
+                    )
+                    x3 = np.array(carts[int(self.zmat.liny_indices[i][2]) - 1]).astype(
+                        float
+                    )
+                    x4 = np.array(carts[int(self.zmat.liny_indices[i][3]) - 1]).astype(
+                        float
+                    )
             ly = self.calc_Liny(x1, x2, x3, x4)
             int_coord = np.append(int_coord, ly)
 
         int_coord = np.dot(proj.T, int_coord)
         int_coord = np.dot(eig_inv, int_coord)
-        
+
         return int_coord
 
     def calc_bond(self, x1, x2):
