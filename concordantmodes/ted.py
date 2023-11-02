@@ -16,7 +16,6 @@ class TED(object):
         self.zmat = zmat
 
     def run(self, eigs, freq, rect_print=True):
-
         proj_eigs = eigs
         if len(np.shape(self.proj)) > 2 and np.shape(self.proj)[0] > 1:
             proj_buff = self.proj[0]

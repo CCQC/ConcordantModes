@@ -13,7 +13,6 @@ class Algorithm(object):
     """
 
     def __init__(self, eigs, initial_fc, options):
-
         self.eigs = eigs
         self.options = options
         self.initial_fc = initial_fc
@@ -42,7 +41,6 @@ class Algorithm(object):
             self.indices = self.loop(a, off_diag, lim)
 
     def loop(self, a, off_diag, lim):
-
         a = self.eigs
         indices = []
         Sum = 2

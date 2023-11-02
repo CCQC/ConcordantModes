@@ -16,7 +16,6 @@ class Zmat(object):
         self.Bohr_Ang = 0.529177210903
 
     def run(self, zmat_name="zmat"):
-
         # Read in the ZMAT file
         zmat_output = self.zmat_read(zmat_name)
 
@@ -668,7 +667,6 @@ class Zmat(object):
         self.variables1 = transdisp.int_c(self.cartesians_init, I, I)
         self.variables2 = transdisp.int_c(self.cartesians_final, I, I)
 
-
         for i in range(
             +len(self.angle_indices)
             + len(self.torsion_indices)
@@ -677,16 +675,12 @@ class Zmat(object):
             + len(self.linx_indices)
             + len(self.liny_indices)
         ):
-            self.variables1[
-                len(self.bond_indices)
-                + len(self.rcom_indices)
-                + i
-            ] *= (180.0 / np.pi)
-            self.variables2[
-                len(self.bond_indices)
-                + len(self.rcom_indices)
-                + i
-            ] *= (180.0 / np.pi)
+            self.variables1[len(self.bond_indices) + len(self.rcom_indices) + i] *= (
+                180.0 / np.pi
+            )
+            self.variables2[len(self.bond_indices) + len(self.rcom_indices) + i] *= (
+                180.0 / np.pi
+            )
         self.variables = np.array(self.bond_variables)
         if len(self.rcom_variables):
             self.variables = np.append(self.variables, self.rcom_variables)

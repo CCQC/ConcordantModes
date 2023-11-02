@@ -63,7 +63,6 @@ class TransfDisp(object):
         self.coord_type = coord_type
 
     def run(self):
-
         self.B = self.s_vectors.B.copy()  # (redundant internals (s) x cartesians (3N))
         # Invert the L-matrix and then normalize the rows.
         proj_tol = 1.0e-3

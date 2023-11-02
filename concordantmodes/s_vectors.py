@@ -723,7 +723,6 @@ class SVectors(object):
         return r
 
     def compute_phi(self, e_1, e_2):
-
         p = np.dot(e_1, e_2)
         if p > 1:
             p = 1

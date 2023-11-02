@@ -273,7 +273,6 @@ class Reap(object):
         for i, initial in enumerate(molly_init):
             for j, final in enumerate(molly_array):
                 if sum(np.abs(initial - final)) < 1e-6:
-
                     rearrange.append(j)
         os.chdir("..")
         return rearrange, insertion
