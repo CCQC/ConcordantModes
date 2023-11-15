@@ -16,18 +16,21 @@ class FcConv(object):
     BOHR_ANG: Standard uncertainty of 0.00000000080
     """
 
-    def __init__(self, F, s_vec, zmat, coord, print_f, ted, units):
+    def __init__(self, fc_mat, s_vec, zmat, coord, print_f, ted, units, second_order):
         self.coord = coord
-        self.F = F
+        # self.F_read = F_read
+        self.F = fc_mat
+        self.second_order = second_order
         self.print_f = print_f
         self.s_vec = s_vec
         self.ted = ted
         self.units = units
         self.zmat = zmat
+
         self.MDYNE_HART = 4.3597447222071
         self.BOHR_ANG = 0.529177210903
 
-    def run(self):
+    def run(self, grad=np.array([])):
         # First construct the transpose of the A matrix.
         if self.coord.lower() == "internal":
             # The cartesian force constants must be in units of Hartree/bohr^2.
@@ -39,12 +42,42 @@ class FcConv(object):
             if self.units == "MdyneAng":
                 self.F /= self.BOHR_ANG
                 self.F *= self.MDYNE_HART
-            self.F = np.einsum("ia,jb,ab->ij", self.A_T, self.A_T, self.F)
+            print(self.A_T.shape)
+            print(self.F.shape)
+            self.F = np.einsum("pi,rj,ij->pr", self.A_T, self.A_T, self.F)
+
+            # Non-stationary, gradient correction to internal coordinate force constants
+            V2 = self.F.copy() * 0
+            if len(grad) and self.second_order:
+                # Note: I may want to use projected A_T to reduce the size of the
+                # internal coordinate basis, thus speeding up the computation.
+                # The basis will eventually need to be projected anyways.
+                print("grad:")
+                print(grad.shape)
+                print(grad)
+                print("AT:")
+                print(self.A_T.shape)
+                print(self.A_T)
+                v_q = np.dot(self.A_T, grad)
+                print("v_q:")
+                print(v_q.shape)
+                print(v_q)
+                print("B2:")
+                print(self.s_vec.B2.shape)
+                print(self.s_vec.B2)
+                C2 = np.einsum("rij,pi,qj->rpq", self.s_vec.B2, self.A_T, self.A_T)
+                print("C2:")
+                print(C2.shape)
+                print(C2)
+                V2 = np.einsum("q,qpr->pr", v_q, C2)
+
+            self.F = self.F - V2
+
             if self.print_f:
                 self.N = len(G)
                 self.print_const()
         elif self.coord.lower() == "cartesian":
-            self.F = np.einsum("ai,bj,ab->ij", self.s_vec.B, self.s_vec.B, self.F)
+            self.F = np.einsum("pi,rj,pr->ij", self.s_vec.B, self.s_vec.B, self.F)
             if self.print_f:
                 self.N = len(self.zmat.atom_list) * 3
                 self.print_const()
