@@ -323,9 +323,7 @@ class SVectors(object):
 
                 l_1 = self.compute_LIN(e_1, e_2, e_3, r_1, theta)
                 l_3 = self.compute_LIN(e_2, e_3, e_1, r_2, theta)
-                # l_4 = self.compute_LIN(e_3, e_1, e_2, r_3, theta)
                 l_2 = -l_1 - l_3
-                # l_2 = -l_1 - l_3 - l_4
 
                 if Len:
                     for j in indies[0]:
@@ -344,7 +342,6 @@ class SVectors(object):
                     self.s_4center_dict["L" + str(i + 1)][int(indies[0]) - 1] = l_1
                     self.s_4center_dict["L" + str(i + 1)][int(indies[1]) - 1] = l_2
                     self.s_4center_dict["L" + str(i + 1)][int(indies[2]) - 1] = l_3
-                    # self.s_4center_dict["L" + str(i + 1)][int(indies[3]) - 1] = l_4
 
         # LinX bending.
         if len(self.linx_indices) > 0:
@@ -540,26 +537,6 @@ class SVectors(object):
                 np.array([self.s_4center_dict["Ly" + str(i + 1)].flatten()]),
                 axis=0,
             )
-        # print("B-tensor:")
-        # print(self.B.shape)
-        # print(self.B)
-        # Option to run numerical second order B-tensor here.
-        if second_order:
-            self.B2 = self.second_order_B()
-            self.B2[np.abs(self.B2) < 1e-14] = 0
-            np.set_printoptions(precision=2, linewidth=2000)
-
-            # Average the off-diagonal elements to mitigate the numerical errors
-            for i in range(len(self.B2)):
-                for j in range(len(self.B2[0]) - 1):
-                    for k in range(j):
-                        self.B2[i, j + 1, k] = (
-                            self.B2[i, j + 1, k] + self.B2[i, k, j + 1]
-                        ) / 2
-                        self.B2[i, k, j + 1] = self.B2[i, j + 1, k]
-            self.B2 = self.B2.astype(float)
-            print(self.B2.shape)
-            print(self.B2)
 
         tol = 1e-4
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
@@ -576,6 +553,7 @@ class SVectors(object):
                     self.proj = self.proj.T
             else:
                 self.proj = np.eye(len(self.B))
+
         # self.proj may be used to transfrom from full set of internal
         # coords to symmetrized internal coords. self.proj.T may be used
         # to transform from the symmetrized set to the full set of internal
@@ -583,6 +561,26 @@ class SVectors(object):
 
         # Beware! The projected B matrix cannot be psuedo inverted to form
         # the A-matrix. You lose information.
+
+        # Option to run numerical second order B-tensor here.
+        if second_order:
+            Proj = self.proj.copy()
+            self.B2 = self.second_order_B()
+            self.B2[np.abs(self.B2) < 1e-14] = 0
+            np.set_printoptions(precision=2, linewidth=2000)
+
+            # Average the off-diagonal elements to mitigate the numerical errors
+            for i in range(len(self.B2)):
+                for j in range(len(self.B2[0]) - 1):
+                    for k in range(j):
+                        self.B2[i, j + 1, k] = (
+                            self.B2[i, j + 1, k] + self.B2[i, k, j + 1]
+                        ) / 2
+                        self.B2[i, k, j + 1] = self.B2[i, j + 1, k]
+            self.B2 = self.B2.astype(float)
+            print(self.B2.shape)
+            print(self.B2)
+            self.proj = Proj
 
     def compute_STRE(self, x1, x2):
         s = (x1 - x2) / self.compute_r(x1, x2)
@@ -779,7 +777,6 @@ class SVectors(object):
             TED_obj,
             self.options,
             np.arange(len(self.B)),
-            # deriv_level=1,
             coord_type="cartesian",
         )
 
