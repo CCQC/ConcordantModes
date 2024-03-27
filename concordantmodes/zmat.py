@@ -648,7 +648,6 @@ class Zmat(object):
         # This code utilizes the INTC function from the TransfDisp module to
         # calculate the initial variable values from the cartesian
         # coordinates.
-        # raise RuntimeError
         indices = []
         transdisp = TransfDisp(
             1, self, 1, 1, False, self.disp_tol, np.array([]), self.options, indices
@@ -662,7 +661,6 @@ class Zmat(object):
             + len(self.lin_indices)
             + len(self.linx_indices)
             + len(self.liny_indices)
-            # - 1
         )
         self.variables1 = transdisp.int_c(self.cartesians_init, I, I)
         self.variables2 = transdisp.int_c(self.cartesians_final, I, I)
@@ -802,43 +800,22 @@ class Zmat(object):
         # Append all indices to index_dictionary
         for i in range(len(self.bond_indices)):
             self.index_dictionary["R" + str(i + 1)] = self.bond_indices[i]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.bond_indices[i])
-            # )
         for i in range(len(self.angle_indices)):
             self.index_dictionary["A" + str(i + zmat_shift_a + 1)] = self.angle_indices[
                 i
             ]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.angle_indices[i])
-            # )
         for i in range(len(self.torsion_indices)):
             self.index_dictionary[
                 "D" + str(i + zmat_shift_d + 1)
             ] = self.torsion_indices[i]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.torsion_indices[i])
-            # )
         for i in range(len(self.oop_indices)):
             self.index_dictionary["O" + str(i + 1)] = self.oop_indices[i]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.oop_indices[i])
-            # )
         for i in range(len(self.lin_indices)):
             self.index_dictionary["L" + str(i + 1)] = self.lin_indices[i]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.lin_indices[i])
-            # )
         for i in range(len(self.linx_indices)):
             self.index_dictionary["Lx" + str(i + 1)] = self.linx_indices[i]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.linx_indices[i])
-            # )
         for i in range(len(self.liny_indices)):
             self.index_dictionary["Ly" + str(i + 1)] = self.liny_indices[i]
-            # self.reduced_masses = np.append(
-            # self.reduced_masses, self.red_mass(self.liny_indices[i])
-            # )
         for i in range(len(self.rcom_indices)):
             self.index_dictionary["Rc" + str(i + 1)] = self.rcom_indices[i]
 

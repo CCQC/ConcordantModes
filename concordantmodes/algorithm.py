@@ -21,10 +21,7 @@ class Algorithm(object):
         initial_fc = self.initial_fc
 
         tolerance = 5e-32
-        # print(self.eigs)
         a = self.eigs
-        # print(self.options.off_diag)
-        # print(self.options.off_diag_limit)
         self.options.mode_coupling_check = False
         if self.options.mode_coupling_check:
             self.indices = self.coupling_diagnostic(a, initial_fc, tolerance)

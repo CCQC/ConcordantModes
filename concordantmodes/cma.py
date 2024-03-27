@@ -72,6 +72,7 @@ class ConcordantModes(object):
                 proj=proj,
                 second_order=self.options.second_order,
             )
+            s_vec.proj = proj
         else:
             s_vec.run(
                 self.zmat_obj.cartesians_init,
@@ -79,6 +80,10 @@ class ConcordantModes(object):
                 second_order=self.options.second_order,
             )
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
+        print(s_vec.proj.shape)
+        print(s_vec.proj)
+        print(self.TED_obj.proj.shape)
+        print(self.TED_obj.proj)
 
         # Print out the percentage composition of the projected coordinates
         if self.options.coords != "ZMAT":
@@ -202,11 +207,11 @@ class ConcordantModes(object):
                     sub.run()
 
             reap_obj_init = Reap(
-                prog_name_init,
-                self.zmat_obj,
-                init_disp.disp_cart,
+                # prog_name_init,
+                # self.zmat_obj,
+                # init_disp.disp_cart,
                 self.options,
-                init_disp.n_coord,
+                # init_disp.n_coord,
                 eigs_init,
                 indices,
                 self.options.energy_regex_init,
@@ -282,12 +287,23 @@ class ConcordantModes(object):
         else:
             F = fc_init.FC
 
+        # f_conv_obj.N = len(g_mat.G)
+        # f_conv_obj.print_const(fc_name="fc_int.dat")
+        # print("F and then G:")
+        # print(F)
+        # print(g_mat.G)
+
         if self.options.coords != "ZMAT" and not self.options.init_bool:
             F = np.dot(self.TED_obj.proj.T, np.dot(F, self.TED_obj.proj))
         if self.options.coords != "ZMAT":
             g_mat.G = np.dot(self.TED_obj.proj.T, np.dot(g_mat.G, self.TED_obj.proj))
 
         self.options.init_bool = False
+        print("F and then G:")
+        F[np.abs(F) < self.options.tol] = 0
+        g_mat.G[np.abs(g_mat.G) < self.options.tol] = 0
+        print(F)
+        print(g_mat.G / (5.48579909065 * (10 ** (-4))))
 
         # Run the GF matrix method with the internal F-Matrix and computed G-Matrix!
         print("Initial Frequencies:")
@@ -333,6 +349,9 @@ class ConcordantModes(object):
             algo.indices = np.append(algo.indices, self.extra_indices, axis=0)
         print(algo.indices)
 
+        # Generate higher order indices here. Migrate to algorithm.py when properly prototyped.
+        # Cubics first
+
         # This is hacky code, will need to be updated
         if self.options.pert_off_diag:
             offdiag_indices = np.triu_indices(len(algo.indices))
@@ -366,11 +385,12 @@ class ConcordantModes(object):
             self.TED_obj,
             self.options,
             algo.indices,
-            GF=TED_GF,
+            # GF=TED_GF,
+            # cubic_indices=cubic_indices,
+            # quartic_indices=quartic_indices,
             # offdiag_indices=offdiag_indices
         )
-
-        transf_disp.run()
+        transf_disp.run(fc=self.F)
         p_disp = transf_disp.p_disp
         m_disp = transf_disp.m_disp
         if self.options.disp_check:
@@ -453,11 +473,11 @@ class ConcordantModes(object):
         # to reap the energies as well as checking for sucesses
         print(eigs)
         reap_obj = Reap(
-            progname,
-            self.zmat_obj,
-            transf_disp.disp_cart,
+            # progname,
+            # self.zmat_obj,
+            # transf_disp.disp_cart,
             self.options,
-            transf_disp.n_coord,
+            # transf_disp.n_coord,
             eigs,
             algo.indices,
             self.options.energy_regex,
@@ -502,7 +522,7 @@ class ConcordantModes(object):
             cma = False
 
         # Final GF Matrix run
-        print("Final Frequencies:")
+        print("Final Harmonic Frequencies:")
         final_GF = GFMethod(
             self.G,
             self.F,
@@ -525,7 +545,7 @@ class ConcordantModes(object):
         # This code prints out the frequencies in order of energy as well
         # as the ZPVE in several different units.
         print(
-            "Final ZPVE in: "
+            "Final Harmonic ZPVE in: "
             + "{:6.2f}".format(np.sum(final_GF.freq) / 2)
             + " (cm^-1) "
             + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 349.7550881133)
@@ -673,7 +693,7 @@ class ConcordantModes(object):
             il = (cf[1], cf[0])
             self.F[il] = self.F[cf]
             # Final GF Matrix run
-            print("Final Frequencies:")
+            print("Final Harmonic Frequencies:")
             cma = False
             final_GF = GFMethod(
                 self.G,
@@ -697,7 +717,7 @@ class ConcordantModes(object):
             # This code prints out the frequencies in order of energy as well
             # as the ZPVE in several different units.
             print(
-                "Final ZPVE in: "
+                "Final Harmonic ZPVE in: "
                 + "{:6.2f}".format(np.sum(final_GF.freq) / 2)
                 + " (cm^-1) "
                 + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 349.7550881133)
@@ -705,3 +725,223 @@ class ConcordantModes(object):
                 + "{:6.2f}".format(0.5 * np.sum(final_GF.freq) / 219474.6313708)
                 + " (hartrees) "
             )
+
+        if self.options.anharm:
+            cubic_indices = []
+            temp_indices = []
+            # diagonals first
+            if self.options.anharm_class[0]:
+                for i in range(len(final_GF.freq)):
+                    temp_indices.append([i, i, i])
+            cubic_indices.append(temp_indices)
+            temp_indices = []
+            if self.options.anharm_class[1]:
+                for i in range(len(final_GF.freq)):
+                    for j in range(len(final_GF.freq) - i - 1):
+                        if i != j + i + 1:
+                            temp_indices.append([i, i, j + i + 1])
+                            temp_indices.append([j + i + 1, j + i + 1, i])
+            cubic_indices.append(temp_indices)
+            temp_indices = []
+            if self.options.anharm_class[2]:
+                for i in range(len(final_GF.freq)):
+                    for j in range(len(final_GF.freq) - i - 1):
+                        for k in range(len(final_GF.freq) - i - j - 2):
+                            if i != j + i + 1 and j != k + j + i + 2:
+                                temp_indices.append([i, j + i + 1, k + j + i + 2])
+            cubic_indices.append(temp_indices)
+            quartic_indices = []
+            temp_indices = []
+            # diagonals first
+            if self.options.anharm_class[3]:
+                for i in range(len(final_GF.freq)):
+                    temp_indices.append([i, i, i, i])
+            quartic_indices.append(temp_indices)
+            temp_indices = []
+            if self.options.anharm_class[4]:
+                for i in range(len(final_GF.freq)):
+                    for j in range(len(final_GF.freq) - i - 1):
+                        if i != j + i + 1:
+                            temp_indices.append([i, i, i, j + i + 1])
+                            temp_indices.append([j + i + 1, j + i + 1, j + i + 1, i])
+            quartic_indices.append(temp_indices)
+            temp_indices = []
+            if self.options.anharm_class[5]:
+                for i in range(len(final_GF.freq)):
+                    for j in range(len(final_GF.freq) - i - 1):
+                        if i != j + i + 1:
+                            temp_indices.append([i, i, j + i + 1, j + i + 1])
+            quartic_indices.append(temp_indices)
+            temp_indices = []
+            if self.options.anharm_class[6]:
+                for i in range(len(final_GF.freq)):
+                    for j in range(len(final_GF.freq) - i - 1):
+                        for k in range(len(final_GF.freq) - i - j - 2):
+                            if i != j + i + 1 and j != k + j + i + 2:
+                                temp_indices.append([i, i, j + i + 1, k + j + i + 2])
+                                temp_indices.append(
+                                    [j + i + 1, j + i + 1, i, k + j + i + 2]
+                                )
+                                temp_indices.append(
+                                    [k + j + i + 2, k + j + i + 2, j + i + 1, i]
+                                )
+            quartic_indices.append(temp_indices)
+            temp_indices = []
+            if self.options.anharm_class[7]:
+                for i in range(len(final_GF.freq)):
+                    for j in range(len(final_GF.freq) - i - 1):
+                        for k in range(len(final_GF.freq) - i - j - 2):
+                            for l in range(len(final_GF.freq) - i - j - k - 3):
+                                if (
+                                    i != j + i + 1
+                                    and j != k + j + i + 2
+                                    and k != l + k + j + i + 3
+                                ):
+                                    temp_indices.append(
+                                        [i, j + i + 1, k + j + i + 2, l + k + j + i + 3]
+                                    )
+            quartic_indices.append(temp_indices)
+
+            anharm_transf_disp = TransfDisp(
+                s_vec,
+                self.zmat_obj,
+                self.options.disp,
+                np.dot(init_GF.L, final_GF.L),
+                True,
+                self.options.disp_tol,
+                self.TED_obj,
+                self.options,
+                algo.indices,
+                cubic_indices=cubic_indices,
+                quartic_indices=quartic_indices,
+                anharm=True,
+            )
+            anharm_transf_disp.run(fc=final_GF.F)
+            if self.options.gen_disps_anharm_init:
+                p_disp = [
+                    *anharm_transf_disp.p_disp_xxx,
+                    *anharm_transf_disp.p_disp_xxy,
+                    *anharm_transf_disp.p_disp_xyz,
+                    *anharm_transf_disp.p_disp_xxxy,
+                    *anharm_transf_disp.p_disp_xxyy,
+                    *anharm_transf_disp.p_disp_xxyz,
+                    *anharm_transf_disp.p_disp_wxyz,
+                ]
+                m_disp = [
+                    *anharm_transf_disp.m_disp_xxx,
+                    *anharm_transf_disp.m_disp_xxy,
+                    *anharm_transf_disp.m_disp_xyz,
+                    *anharm_transf_disp.m_disp_xxxy,
+                    *anharm_transf_disp.m_disp_xxyy,
+                    *anharm_transf_disp.m_disp_xxyz,
+                    *anharm_transf_disp.m_disp_wxyz,
+                ]
+                dir_obj = DirectoryTree(
+                    progname,
+                    self.zmat_obj,
+                    anharm_transf_disp,
+                    self.options.cart_insert,
+                    p_disp,
+                    m_disp,
+                    self.options,
+                    algo.indices,
+                    "templateAnharmInit.dat",
+                    "anharmDispsInit",
+                    anharm=True,
+                )
+                dir_obj.run()
+            else:
+                os.chdir(rootdir + "/anharmDispsInit")
+            if self.options.calc_anharm_init:
+                disp_list = []
+                for i in os.listdir(rootdir + "/anharmDispsInit"):
+                    disp_list.append(i)
+                if self.options.cluster != "sapelo":
+                    v_template = VulcanTemplate(
+                        self.options, len(disp_list), progname, prog
+                    )
+                    out = v_template.run()
+                    with open("displacements.sh", "w") as file:
+                        file.write(out)
+
+                    # Submits an array, then checks if all jobs have finished every
+                    # 10 seconds.
+                    sub = Submit(disp_list, self.options)
+                    sub.run()
+                else:
+                    s_template = SapeloTemplate(
+                        self.options, len(disp_list), progname, prog
+                    )
+                    out = s_template.run()
+                    with open("optstep.sh", "w") as file:
+                        file.write(out)
+                    for z in range(0, len(disp_list)):
+                        source = os.getcwd() + "/optstep.sh"
+                        os.chdir("./" + str(z + 1))
+                        destination = os.getcwd()
+                        shutil.copy2(source, destination)
+                        os.chdir("../")
+                    sub = Submit(disp_list, self.options)
+                    sub.run()
+            anharm_indices = [*cubic_indices, *quartic_indices]
+            # print(len(cubic_indices))
+            # print(cubic_indices)
+            # print(len(quartic_indices))
+            # print(quartic_indices)
+            # print(len(anharm_indices))
+            # print(anharm_indices)
+            os.chdir(rootdir + "/anharmDispsInit")
+
+            reap_obj_anharm = Reap(
+                self.options,
+                eigs,
+                anharm_indices,  # Need cubic + quartic indices
+                self.options.energy_regex_init_anharm,
+                self.options.gradient_regex,
+                self.options.success_regex_init_anharm,
+                deriv_level=self.options.deriv_level_init,
+                anharm=True,
+            )
+            reap_obj_anharm.run()
+
+            p_en_anharm = [
+                *reap_obj_anharm.p_e_xxx,
+                *reap_obj_anharm.p_e_xxy,
+                *reap_obj_anharm.p_e_xyz,
+                *reap_obj_anharm.p_e_xxx,
+                *reap_obj_anharm.p_e_xxxy,
+                *reap_obj_anharm.p_e_xxyy,
+                *reap_obj_anharm.p_e_xxyz,
+                *reap_obj_anharm.p_e_wxyz,
+            ]
+            m_en_anharm = [
+                *reap_obj_anharm.m_e_xxx,
+                *reap_obj_anharm.m_e_xxy,
+                *reap_obj_anharm.m_e_xyz,
+                *reap_obj_anharm.m_e_xxx,
+                *reap_obj_anharm.m_e_xxxy,
+                *reap_obj_anharm.m_e_xxyy,
+                *reap_obj_anharm.m_e_xxyz,
+                *reap_obj_anharm.m_e_wxyz,
+            ]
+            p_en_array = reap_obj_init.p_en_array
+            m_en_array = reap_obj_init.m_en_array
+            ref_en = reap_obj_init.ref_en
+
+            anharm_fc = ForceConstant(
+                transf_disp,
+                p_en_array,
+                m_en_array,
+                ref_en,
+                self.options,
+                indices,
+                anharm=True,
+                anharm_indices=anharm_indices,
+                p_anharm=p_en_anharm,
+                m_anharm=m_en_anharm,
+            )
+            anharm_fc.run()
+            # print(anharm_fc.f_cube.shape)
+            # print(anharm_fc.f_cube)
+            # print(anharm_fc.f_quart.shape)
+            # print(anharm_fc.f_quart)
