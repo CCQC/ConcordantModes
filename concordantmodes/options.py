@@ -1,5 +1,6 @@
 class Options(object):
     def __init__(self, **kwargs):
+        self.autosalcs = kwargs.pop("autosalcs", True) 
         self.anharm = kwargs.pop("anharm", False)
         self.anharm_class = kwargs.pop("anharm_class", [0, 0, 0, 0, 0, 0, 0, 0])
         self.benchmark_full = kwargs.pop("benchmark_full", False)
@@ -25,6 +26,7 @@ class Options(object):
         self.energy_regex_add = kwargs.pop("energy_regex_add", [])
         self.energy_regex_init = kwargs.pop("energy_regex_init", "")
         self.energy_regex_init_anharm = kwargs.pop("energy_regex_init_anharm", "")
+        self.exploit_degen = kwargs.pop("exploit_degen", True)
         self.gen_disps = kwargs.pop("gen_disps", True)
         self.gen_disps_init = kwargs.pop("gen_disps_init", True)
         self.gen_disps_anharm_init = kwargs.pop("gen_disps_anharm_init", True)
@@ -45,16 +47,19 @@ class Options(object):
         self.program_init_anharm = kwargs.pop(
             "program_init_anharm", "molpro@2010.1.67+mpi"
         )
+        self.qr_project = kwargs.pop("qr_project", False)
         self.proj_tol = kwargs.pop("proj_tol", 1.0e-14)
         self.queue = kwargs.pop("queue", "gen4.q")
         self.reduced_disp = kwargs.pop("reduced_disp", False)
         self.reduced_disp_size = kwargs.pop("reduced_disp_size", 0.001)
         self.second_order = kwargs.pop("second_order", False)
+        self.subgroup = kwargs.pop("subgroup", False)
         self.rmsd = kwargs.pop("rmsd", False)
         self.spin = kwargs.pop("spin", 1)
         self.success_regex = kwargs.pop("success_regex", "")
         self.success_regex_init = kwargs.pop("success_regex_init", "")
         self.success_regex_init_anharm = kwargs.pop("success_regex_init_anharm", "")
+        self.symmetry = kwargs.pop("symmetry", True)
         self.tight_disp = kwargs.pop("tight_disp", False)
         self.tol = kwargs.pop("tol", 1.0e-14)
         self.topo_analysis = kwargs.pop("topo_analysis", False)

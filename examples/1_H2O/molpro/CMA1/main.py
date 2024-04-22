@@ -8,9 +8,13 @@ options_kwargs = {
     "energy_regex_init": r"\(T\) total energy\s+(\-\d+\.\d+)",
     "cart_insert_init": 9,
     "cart_insert": 9,
+    #"subgroup" : "C1",
+    #"disps_init": False,
+    #"calc_init": False,
     "coords": "Redundant",
     "success_regex": r"Variable memory released",
     "success_regex_init": r"Variable memory released",
+    "symmetry": True,
 }
 options_obj = Options(**options_kwargs)
 

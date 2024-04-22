@@ -1,0 +1,369 @@
+Initial Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.911182420695098
+['1' '3'] R2 = 1.911182420695098
+['1' '4'] R3 = 1.911182418447676
+['2' '1' '3'] A1 = 105.99894818456323
+['2' '1' '4'] A2 = 105.99894849510264
+['3' '1' '4'] A3 = 105.99894849510264
+['4' '1' '2' '3'] O1 = 62.74347197232497
+['3' '1' '2' '4'] O2 = -62.743472145157604
+['2' '1' '3' '4'] O3 = 62.743472145157604
+Final Geometric Internal Coordinate Values:
+['1' '2'] R1 = 1.911182420695098
+['1' '3'] R2 = 1.911182420695098
+['1' '4'] R3 = 1.911182418447676
+['2' '1' '3'] A1 = 105.99894818456323
+['2' '1' '4'] A2 = 105.99894849510264
+['3' '1' '4'] A3 = 105.99894849510264
+['4' '1' '2' '3'] O1 = 62.74347197232497
+['3' '1' '2' '4'] O2 = -62.743472145157604
+['2' '1' '3' '4'] O3 = 62.743472145157604
+Final - Initial Geometric Internal Coordinate Values:
+R1 = 0.0
+R2 = 0.0
+R3 = 0.0
+A1 = 0.0
+A2 = 0.0
+A3 = 0.0
+O1 = 0.0
+O2 = 0.0
+O3 = 0.0
+The Molecular Point Group is self.symtext.pg
+If this was not expected, adjust the tolerances in the MolSym program or symmetrize your molecule.
+proj singular values:
+[2.664 1.74  1.74  1.032 0.953 0.953 0.    0.    0.   ]
+Symmetrize B-Matrix
+The salc
+[[ 0.577  0.577  0.577  0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.577  0.577  0.577  0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.     0.577 -0.577  0.577]]
+The salc
+[]
+The salc
+[[ 0.408  0.408 -0.816  0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.816 -0.408 -0.408  0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.     0.816  0.408 -0.408]
+ [ 0.707 -0.707  0.     0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.707 -0.707  0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.     0.    -0.707 -0.707]]
+Project Out Redundancies
+Non degen
+[[ 0.    -0.    -0.   ]
+ [ 0.     0.    -0.   ]
+ [ 0.67  -0.93   1.989]
+ [-0.266 -0.065  0.139]
+ [-0.461 -0.113  0.241]
+ [-0.223  0.31  -0.663]
+ [-0.266 -0.065  0.139]
+ [ 0.461  0.113 -0.241]
+ [-0.223  0.31  -0.663]
+ [ 0.532  0.13  -0.278]
+ [ 0.     0.     0.   ]
+ [-0.223  0.31  -0.663]]
+r val [[-1.204  0.518 -1.107]
+ [ 0.    -0.968  2.07 ]
+ [ 0.     0.    -0.   ]]
+These are the rejects to project out of the SALCs
+[2]
+projected salcs
+[[0.577 0.577 0.577 0.    0.    0.    0.    0.    0.   ]
+ [0.    0.    0.    0.577 0.577 0.577 0.    0.    0.   ]]
+do nothing bub
+[[ 1.129 -0.784 -0.436 -0.     0.     0.   ]
+ [ 0.    -0.    -0.     1.129 -0.784 -0.436]
+ [-0.     0.    -0.     0.    -0.     0.   ]
+ [-0.188  0.438  0.244 -0.326 -0.306 -0.17 ]
+ [-0.326 -0.306 -0.17  -0.565  0.085  0.047]
+ [-0.158  0.11   0.061 -0.273  0.19   0.106]
+ [-0.188  0.438  0.244  0.326  0.306  0.17 ]
+ [ 0.326  0.306  0.17  -0.565  0.085  0.047]
+ [-0.158  0.11   0.061  0.273 -0.19  -0.106]
+ [-0.753 -0.092 -0.051  0.     0.    -0.   ]
+ [ 0.     0.     0.     0.     0.615  0.342]
+ [ 0.316 -0.219 -0.122 -0.     0.    -0.   ]]
+[3, 0, 3]
+r val [[-1.509  0.587  0.327]
+ [ 0.     0.96   0.534]
+ [ 0.     0.     0.   ]]
+Final product: self.bloc
+[[ 0.577  0.     0.408  0.     0.707  0.   ]
+ [ 0.577  0.     0.408  0.    -0.707  0.   ]
+ [ 0.577  0.    -0.816  0.     0.     0.   ]
+ [ 0.     0.577  0.     0.816  0.     0.   ]
+ [ 0.     0.577  0.    -0.408  0.     0.707]
+ [ 0.     0.577  0.    -0.408  0.    -0.707]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]]
+(9, 6)
+proj irreps
+[2, 0, 2]
+irreps
+s vec proj
+[[ 0.577  0.     0.408  0.     0.707  0.   ]
+ [ 0.577  0.     0.408  0.    -0.707  0.   ]
+ [ 0.577  0.    -0.816  0.     0.     0.   ]
+ [ 0.     0.577  0.     0.816  0.     0.   ]
+ [ 0.     0.577  0.    -0.408  0.     0.707]
+ [ 0.     0.577  0.    -0.408  0.    -0.707]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]]
+(9, 6)
+[[ 0.577  0.     0.408  0.     0.707  0.   ]
+ [ 0.577  0.     0.408  0.    -0.707  0.   ]
+ [ 0.577  0.    -0.816  0.     0.     0.   ]
+ [ 0.     0.577  0.     0.816  0.     0.   ]
+ [ 0.     0.577  0.    -0.408  0.     0.707]
+ [ 0.     0.577  0.    -0.408  0.    -0.707]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]]
+(9, 6)
+[[ 0.577  0.     0.408  0.     0.707  0.   ]
+ [ 0.577  0.     0.408  0.    -0.707  0.   ]
+ [ 0.577  0.    -0.816  0.     0.     0.   ]
+ [ 0.     0.577  0.     0.816  0.     0.   ]
+ [ 0.     0.577  0.    -0.408  0.     0.707]
+ [ 0.     0.577  0.    -0.408  0.    -0.707]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]
+ [ 0.     0.     0.     0.     0.     0.   ]]
+             frequency #:        1       2       3       4       5       6
+--------------------------------------------------------------------------
+               frequency:      0.0     0.0     0.0     0.0     0.0     0.0
+--------------------------------------------------------------------------
+               B1   STRE:     33.3    -0.0    16.7    -0.0    50.0    -0.0
+               B2   STRE:     33.3    -0.0    16.7     0.0    50.0     0.0
+               B3   STRE:     33.3     0.0    66.7     0.0     0.0     0.0
+               A1   BEND:      0.0    33.3     0.0    66.7     0.0    -0.0
+               A2   BEND:      0.0    33.3     0.0    16.7    -0.0    50.0
+               A3   BEND:      0.0    33.3     0.0    16.7    -0.0    50.0
+               O1    OOP:      0.0     0.0     0.0     0.0     0.0     0.0
+               O2    OOP:      0.0     0.0     0.0     0.0     0.0     0.0
+               O3    OOP:      0.0     0.0     0.0     0.0     0.0     0.0
+
+Normal Coordinate Values:
+Normal Coordinate #1   :  3.31027
+Normal Coordinate #2   :  3.20435
+Normal Coordinate #3   :  0.00000
+Normal Coordinate #4   : -0.00000
+Normal Coordinate #5   :  0.00000
+Normal Coordinate #6   :  0.00000
+This displacement did not converge.
+(array([0, 1]),)
+Norm:
+5.713636783954089e-07
+Tolerance:
+1e-07
+This displacement did not converge.
+(array([0, 1]),)
+Norm:
+4.52257334665631e-07
+Tolerance:
+1e-07
+This displacement did not converge.
+(array([1]),)
+Norm:
+5.530517591494135e-07
+Tolerance:
+1e-07
+This displacement did not converge.
+(array([1]),)
+Norm:
+4.6765335060746414e-07
+Tolerance:
+1e-07
+If something looks wrong with the final frequencies, check these energies!
+(Job number 1 == Reference energy) :D
+/home/vulcan/nlk36701/github/new_cma_branch/concordantmodes/examples/3_Ammonia/DispsInit
+Reference energy: -56.402068861876
+Relative plus     2   0    0: -0.000168873
+Relative minus    3   0    0:  0.000217131
+Relative plus     4   0    1: -0.000091888
+Relative minus    5   0    1:  0.000165405
+Relative plus     6   1    1:  0.000070739
+Relative minus    7   1    1: -0.000057967
+Relative plus     8   2    2:  0.000024815
+Relative minus    9   2    2:  0.000024591
+Relative plus    10   2    3:  0.000035189
+Relative minus   11   2    3:  0.000035003
+Relative plus    12   3    3:  0.000008049
+Relative minus   13   3    3:  0.000008052
+Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements
+[[-0. -0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]]
+Relative energies minus-displacements on the diagonal and minus/minus-displacements on the off-diagonal elements
+[[ 0.  0.  0.  0.  0.  0.]
+ [ 0. -0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.]]
+Degenerate, need to add PF offset index to fill out degenerate blocks which were not explicitly computed
+Number of functions that span space of irrep 2
+Computed Force Constants:
+[[0.48 0.06 0.   0.   0.   0.  ]
+ [0.06 0.13 0.   0.   0.   0.  ]
+ [0.   0.   0.49 0.02 0.   0.  ]
+ [0.   0.   0.02 0.16 0.   0.  ]
+ [0.   0.   0.   0.   0.49 0.02]
+ [0.   0.   0.   0.   0.02 0.16]]
+F and then G:
+[[0.4826 0.0624 0.     0.     0.     0.    ]
+ [0.0624 0.1277 0.     0.     0.     0.    ]
+ [0.     0.     0.4941 0.0234 0.     0.    ]
+ [0.     0.     0.0234 0.161  0.     0.    ]
+ [0.     0.     0.     0.     0.4941 0.0234]
+ [0.     0.     0.     0.     0.0234 0.161 ]]
+[[ 1.0243 -0.0445  0.      0.      0.      0.    ]
+ [-0.0445  0.3984 -0.     -0.      0.      0.    ]
+ [ 0.     -0.      1.0833 -0.0633  0.      0.    ]
+ [ 0.     -0.     -0.0633  0.6906  0.      0.    ]
+ [ 0.      0.      0.      0.      1.0833 -0.0633]
+ [ 0.      0.      0.      0.     -0.0633  0.6906]]
+Initial Frequencies:
+/home/vulcan/nlk36701/github/new_cma_branch/concordantmodes/concordantmodes/gf_method.py:93: ComplexWarning: Casting complex values to real discards the imaginary part
+  self.freq = self.freq.astype(float)
+frequency #  1:    1122.23
+frequency #  2:    3605.58
+frequency #  3:    1706.85
+frequency #  4:    3753.63
+frequency #  5:    1706.85
+frequency #  6:    3753.63
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3       4       5       6
+--------------------------------------------------------------------------
+               frequency:   1122.2  3605.6  1706.8  3753.6  1706.8  3753.6
+--------------------------------------------------------------------------
+               Mode #  1       0.1    99.9    -0.0    -0.0     0.0     0.0
+               Mode #  2      99.9     0.1    -0.0    -0.0     0.0     0.0
+               Mode #  3      -0.0    -0.0    -0.1   100.1     0.0     0.0
+               Mode #  4      -0.0    -0.0   100.1    -0.1     0.0     0.0
+               Mode #  5       0.0     0.0     0.0     0.0    -0.1   100.1
+               Mode #  6       0.0     0.0     0.0     0.0   100.1    -0.1
+
+TED Frequencies:
+frequency #  1:    1122.23
+frequency #  2:    3605.58
+frequency #  3:    1706.85
+frequency #  4:    3753.63
+frequency #  5:    1706.85
+frequency #  6:    3753.63
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3       4       5       6
+--------------------------------------------------------------------------
+               frequency:   1122.2  3605.6  1706.8  3753.6  1706.8  3753.6
+--------------------------------------------------------------------------
+               Mode #  1     100.0     0.0     0.0     0.0     0.0     0.0
+               Mode #  2       0.0   100.0     0.0     0.0     0.0     0.0
+               Mode #  3       0.0     0.0   100.0     0.0     0.0     0.0
+               Mode #  4       0.0     0.0     0.0   100.0     0.0     0.0
+               Mode #  5       0.0     0.0     0.0     0.0   100.0     0.0
+               Mode #  6       0.0     0.0     0.0     0.0     0.0   100.0
+
+[[0, 0], [1, 1], [2, 2], [3, 3]]
+proj singular values:
+[2.6641 1.7398 1.7398 1.0323 0.9528 0.9528 0.     0.     0.    ]
+Normal Coordinate Values:
+Normal Coordinate #1   : -3.17895
+Normal Coordinate #2   : -3.69913
+Normal Coordinate #3   :  0.00000
+Normal Coordinate #4   : -0.00000
+Normal Coordinate #5   : -0.00000
+Normal Coordinate #6   : -0.00000
+This displacement did not converge.
+(array([0]),)
+Norm:
+4.7333676388793255e-07
+Tolerance:
+1e-07
+This displacement did not converge.
+(array([0]),)
+Norm:
+5.545977301560406e-07
+Tolerance:
+1e-07
+printing disp list
+['7', '1', '8', '9', '5', '3', '4', '6', '2']
+6
+If something looks wrong with the final frequencies, check these energies!
+(Job number 1 == Reference energy) :D
+/home/vulcan/nlk36701/github/new_cma_branch/concordantmodes/examples/3_Ammonia/Disps
+Reference energy: -56.473178075529
+Relative energies plus-displacements on the diagonal and plus/plus-displacements on the off-diagonal elements
+[[0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]]
+Relative energies minus-displacements on the diagonal and minus/minus-displacements on the off-diagonal elements
+[[0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0. 0.]]
+Degenerate, need to add PF offset index to fill out degenerate blocks which were not explicitly computed
+Number of functions that span space of irrep 2
+Computed Force Constants:
+[[0.11 0.   0.   0.   0.   0.  ]
+ [0.   0.46 0.   0.   0.   0.  ]
+ [0.   0.   0.16 0.   0.   0.  ]
+ [0.   0.   0.   0.46 0.   0.  ]
+ [0.   0.   0.   0.   0.16 0.  ]
+ [0.   0.   0.   0.   0.   0.46]]
+Final Harmonic Frequencies:
+/home/vulcan/nlk36701/github/new_cma_branch/concordantmodes/concordantmodes/gf_method.py:93: ComplexWarning: Casting complex values to real discards the imaginary part
+  self.freq = self.freq.astype(float)
+frequency #  1:    1101.08
+frequency #  2:    3501.17
+frequency #  3:    1692.22
+frequency #  4:    3630.12
+frequency #  5:    1692.22
+frequency #  6:    3630.12
+////////////////////////////////////////////
+//    Total Energy Distribution (TED)     //
+////////////////////////////////////////////
+             frequency #:        1       2       3       4       5       6
+--------------------------------------------------------------------------
+               frequency:   1101.1  3501.2  1692.2  3630.1  1692.2  3630.1
+--------------------------------------------------------------------------
+               Mode #  1     100.0     0.0    -0.0    -0.0     0.0     0.0
+               Mode #  2       0.0   100.0    -0.0    -0.0     0.0     0.0
+               Mode #  3      -0.0    -0.0   100.0     0.0     0.0     0.0
+               Mode #  4      -0.0    -0.0    -0.0   100.0     0.0     0.0
+               Mode #  5       0.0     0.0     0.0     0.0   100.0     0.0
+               Mode #  6       0.0     0.0     0.0     0.0     0.0   100.0
+
+////////////////////////////////////////////
+//                Final TED               //
+////////////////////////////////////////////
+             frequency #:        1       2       3       4       5       6
+--------------------------------------------------------------------------
+               frequency:   1101.1  3501.2  1692.2  3630.1  1692.2  3630.1
+--------------------------------------------------------------------------
+               B1   STRE:      0.0    33.3    -0.0    16.7    -0.1    50.1
+               B2   STRE:      0.0    33.3    -0.0    16.7    -0.1    50.1
+               B3   STRE:      0.0    33.3    -0.1    66.8     0.0     0.0
+               A1   BEND:     33.3     0.0    66.8    -0.1     0.0     0.0
+               A2   BEND:     33.3     0.0    16.7    -0.0    50.1    -0.1
+               A3   BEND:     33.3     0.0    16.7    -0.0    50.1    -0.1
+               O1    OOP:      0.0     0.0     0.0     0.0     0.0     0.0
+               O2    OOP:      0.0     0.0     0.0     0.0     0.0     0.0
+               O3    OOP:      0.0     0.0     0.0     0.0     0.0     0.0
+
+Final Harmonic ZPVE in: 7623.47 (cm^-1)  21.80 (kcal mol^-1)   0.03 (hartrees) 
+print_const has run
+Frequency Shift (cm^-1): 
+[ -21.14 -104.41  -14.63 -123.51  -14.63 -123.51]
+This program took 109.8025050163269 seconds to run.

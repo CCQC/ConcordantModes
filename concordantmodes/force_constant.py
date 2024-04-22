@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 from numpy import linalg as LA
-
+import sys
 
 class ForceConstant(object):
     # This script will calculate the force constants of the CMA normal
@@ -27,6 +27,8 @@ class ForceConstant(object):
         ref_en,
         options,
         indices,
+        symm_obj,
+        algo,
         deriv_level=0,
         anharm=False,
         anharm_indices=[],
@@ -44,7 +46,9 @@ class ForceConstant(object):
         self.anharm_indices = anharm_indices
         self.p_anharm = p_anharm
         self.m_anharm = m_anharm
-
+        self.symm_obj = symm_obj
+        self.algo = algo
+    np.set_printoptions(precision=3, threshold=np.inf, linewidth=2000)
     def run(self):
         indices = self.indices
         disp = self.disp
@@ -52,32 +56,87 @@ class ForceConstant(object):
         self.FC = np.zeros((dim, dim))
         if not self.deriv_level:
             if not self.anharm:
-                p_en_array = self.p_array
-                m_en_array = self.m_array
-                e_r = self.ref_en
-                for index in indices:
-                    i, j = index[0], index[1]
-                    e_pi, e_pj = p_en_array[i, i], p_en_array[j, j]
-                    e_mi, e_mj = m_en_array[i, i], m_en_array[j, j]
-                    e_pp, e_mm = p_en_array[i, j], m_en_array[i, j]
-                    if i == j:
-                        self.FC[i, i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i])
-                    elif i != j:
-                        self.FC[i, j] = self.off_diag_fc(
-                            e_pp,
-                            e_pi,
-                            e_pj,
-                            e_mi,
-                            e_mj,
-                            e_mm,
-                            e_r,
-                            disp.disp[i],
-                            disp.disp[j],
-                        )
-                # Take advantage of FC[i,j] = FC[j,i]
-                cf = np.triu_indices(dim, 1)
-                il = (cf[1], cf[0])
-                self.FC[il] = self.FC[cf]
+                if self.options.symmetry:
+                    p_en_array = self.p_array
+                    m_en_array = self.m_array
+                    e_r = self.ref_en
+                    for h, irrep in enumerate(self.symm_obj.symtext.irreps):
+                        if self.symm_obj.symtext.irreps[h].d == 1:
+                            for index in self.algo.indices_by_irrep[h]:
+                                i, j = index[0], index[1]
+                                e_pi, e_pj = p_en_array[i, i], p_en_array[j, j]
+                                e_mi, e_mj = m_en_array[i, i], m_en_array[j, j]
+                                e_pp, e_mm = p_en_array[i, j], m_en_array[i, j]
+                                if i == j:
+                                    self.FC[i, i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i])
+                                elif i != j:
+                                    self.FC[i, j] = self.off_diag_fc(
+                                        e_pp,
+                                        e_pi,
+                                        e_pj,
+                                        e_mi,
+                                        e_mj,
+                                        e_mm,
+                                        e_r,
+                                        disp.disp[i],
+                                        disp.disp[j],
+                                    )
+                        elif self.symm_obj.symtext.irreps[h].d > 1:
+                            print("Degenerate, need to add PF offset index to fill out degenerate blocks which were not explicitly computed")
+                            print(f"Number of functions that span space of irrep {self.symm_obj.proj_irreps[h]}")
+                            for index in self.algo.indices_by_irrep[h]:
+                                for pf in range(0, self.symm_obj.symtext.irreps[h].d):
+                                    pf_offset = self.symm_obj.proj_irreps[h] * pf
+                                    i, j = index[0], index[1]
+                                    e_pi, e_pj = p_en_array[i, i], p_en_array[j, j]
+                                    e_mi, e_mj = m_en_array[i, i], m_en_array[j, j]
+                                    e_pp, e_mm = p_en_array[i, j], m_en_array[i, j]
+                                    if i == j:
+                                        self.FC[i + pf_offset, i + pf_offset] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i])
+                                    elif i != j:
+                                        self.FC[i + pf_offset, j + pf_offset] = self.off_diag_fc(
+                                            e_pp,
+                                            e_pi,
+                                            e_pj,
+                                            e_mi,
+                                            e_mj,
+                                            e_mm,
+                                            e_r,
+                                            disp.disp[i],
+                                            disp.disp[j],
+                                        )
+                    cf = np.triu_indices(dim, 1)
+                    il = (cf[1], cf[0])
+                    self.FC[il] = self.FC[cf]
+
+
+                else:
+                    p_en_array = self.p_array
+                    m_en_array = self.m_array
+                    e_r = self.ref_en
+                    for index in indices:
+                        i, j = index[0], index[1]
+                        e_pi, e_pj = p_en_array[i, i], p_en_array[j, j]
+                        e_mi, e_mj = m_en_array[i, i], m_en_array[j, j]
+                        e_pp, e_mm = p_en_array[i, j], m_en_array[i, j]
+                        if i == j:
+                            self.FC[i, i] = self.diag_fc(e_pi, e_mi, e_r, disp.disp[i])
+                        elif i != j:
+                            self.FC[i, j] = self.off_diag_fc(
+                                e_pp,
+                                e_pi,
+                                e_pj,
+                                e_mi,
+                                e_mj,
+                                e_mm,
+                                e_r,
+                                disp.disp[i],
+                                disp.disp[j],
+                            )
+                    # Take advantage of FC[i,j] = FC[j,i]
+                    cf = np.triu_indices(dim, 1)
+                    il = (cf[1], cf[0])
+                    self.FC[il] = self.FC[cf]
             else:
                 p_en_array = self.p_array
                 m_en_array = self.m_array

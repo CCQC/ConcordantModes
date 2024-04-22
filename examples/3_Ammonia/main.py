@@ -1,18 +1,23 @@
 from concordantmodes.options import Options
 
 options_kwargs = {
-    "queue": "gen4.q,gen6.q",
+    "queue": "gen4.q,gen6.q,debug.q",
     "program_init": "molpro@2010.1.67+mpi",
     "program": "molpro@2010.1.67+mpi",
     "energy_regex": r"\(T\) total energy\s+(\-\d+\.\d+)",
     "energy_regex_init": r"\(T\) total energy\s+(\-\d+\.\d+)",
     "cart_insert_init": 9,
     "cart_insert": 9,
+    #"subgroup" : "C1",
+    #"gen_disps_init": False,
+    #"calc_init": False,
+    #"gen_disps": False,
+    #"calc": False,
     "coords": "Redundant",
-    "calc_init":False,
-    "disps_init": False,
     "success_regex": r"Variable memory released",
     "success_regex_init": r"Variable memory released",
+    "symmetry": True,
+    "qr_project": True,
 }
 options_obj = Options(**options_kwargs)
 

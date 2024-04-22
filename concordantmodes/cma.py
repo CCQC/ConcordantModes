@@ -4,6 +4,7 @@ import sys
 import shutil
 import subprocess
 import time
+import copy
 import numpy as np
 from numpy import linalg as LA
 from numpy.linalg import inv
@@ -21,6 +22,8 @@ from concordantmodes.molden_writer import MoldenWriter
 from concordantmodes.reap import Reap
 from concordantmodes.rmsd import RMSD
 from concordantmodes.s_vectors import SVectors
+from concordantmodes.symmetry import Symmetry
+#from concordantmodes.newpg_symmetry import NewPGSymmetry
 from concordantmodes.submit import Submit
 from concordantmodes.ted import TED
 from concordantmodes.transf_disp import TransfDisp
@@ -57,13 +60,18 @@ class ConcordantModes(object):
         if self.options.geom_check:
             raise RuntimeError
 
+        if self.options.symmetry:
+            self.symm_obj = Symmetry(self.zmat_obj, self.options)
+            self.symm_obj.run()
+
         # Compute the initial s-vectors
         s_vec = SVectors(
             self.zmat_obj, self.options, self.zmat_obj.variable_dictionary_init
         )
         if self.options.man_proj:
             proj = self.proj
-            np.set_printoptions(precision=4, linewidth=240)
+            np.set_printoptions(precision=4, threshold=np.inf)
+            #np.set_printoptions(precision=4, linewidth=240)
             print(proj.shape)
             print(proj)
             s_vec.run(
@@ -79,12 +87,11 @@ class ConcordantModes(object):
                 True,
                 second_order=self.options.second_order,
             )
+        #Symm stuff
+        if self.options.symmetry:
+            self.symm_obj.make_proj_v2(s_vec)
+            s_vec.proj = copy.deepcopy(self.symm_obj.bloc)
         self.TED_obj = TED(s_vec.proj, self.zmat_obj)
-        print(s_vec.proj.shape)
-        print(s_vec.proj)
-        print(self.TED_obj.proj.shape)
-        print(self.TED_obj.proj)
-
         # Print out the percentage composition of the projected coordinates
         if self.options.coords != "ZMAT":
             self.TED_obj.run(
@@ -119,7 +126,11 @@ class ConcordantModes(object):
                 indices = np.array(indices).T
             else:
                 indices = np.arange(len(eigs_init))
-
+            if self.options.symmetry:
+                 algo = Algorithm(len(eigs_init), self.options, self.symm_obj)
+                 algo.run()
+                 indices = algo.indices
+                 indices = np.array(indices)
             init_disp = TransfDisp(
                 s_vec,
                 self.zmat_obj,
@@ -257,6 +268,8 @@ class ConcordantModes(object):
                 ref_en_init,
                 self.options,
                 indices,
+                self.symm_obj,
+                algo,
                 deriv_level=deriv_level,
             )
             fc_init.run()
@@ -292,7 +305,7 @@ class ConcordantModes(object):
         # print("F and then G:")
         # print(F)
         # print(g_mat.G)
-
+        np.set_printoptions(precision=4, threshold=sys.maxsize, linewidth=2000)
         if self.options.coords != "ZMAT" and not self.options.init_bool:
             F = np.dot(self.TED_obj.proj.T, np.dot(F, self.TED_obj.proj))
         if self.options.coords != "ZMAT":
@@ -314,6 +327,9 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
+            self.options,
+            self.symm_obj,
+            algo,
             cma="init",
         )
         init_GF.run()
@@ -332,6 +348,9 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
+            self.options,
+            self.symm_obj,
+            algo,
             cma=False,
         )
         TED_GF.run()
@@ -339,7 +358,8 @@ class ConcordantModes(object):
         initial_fc = TED_GF.eig_v
         eigs = len(TED_GF.S)
 
-        algo = Algorithm(eigs, initial_fc, self.options)
+        algo = Algorithm(len(eigs_init), self.options, self.symm_obj, diag = True)
+        #algo = Algorithm(eigs, initial_fc, self.options)
         # algo.options.off_diag_bands = 2
         # algo.options.off_diag_limit = False
         # algo.options.off_diag = True
@@ -491,7 +511,7 @@ class ConcordantModes(object):
         ref_en = reap_obj.ref_en
 
         fc = ForceConstant(
-            transf_disp, p_en_array, m_en_array, ref_en, self.options, algo.indices
+            transf_disp, p_en_array, m_en_array, ref_en, self.options, algo.indices, self.symm_obj, algo
         )
         fc.run()
         print("Computed Force Constants:")
@@ -530,6 +550,9 @@ class ConcordantModes(object):
             self.options.proj_tol,
             self.zmat_obj,
             self.TED_obj,
+            self.options,
+            self.symm_obj,
+            algo,
             cma=cma,
         )
         final_GF.run()
@@ -702,6 +725,9 @@ class ConcordantModes(object):
                 self.options.proj_tol,
                 self.zmat_obj,
                 self.TED_obj,
+                self.options,
+                self.symm_obj,
+                algo,
                 cma=cma,
             )
             final_GF.run()
