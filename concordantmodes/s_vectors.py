@@ -497,7 +497,7 @@ class SVectors:
         return rc
 
     def num_differentiate(self, B_list_p, B_list_m):
-        disp_size = self.options.disp
+        disp_size = self.options.disp_b
 
         # Numerical first derivative
         B = (B_list_p - B_list_m) / (2 * disp_size)

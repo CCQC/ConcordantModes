@@ -193,12 +193,12 @@ class FcConv:
                 C2 = np.einsum("rpj,qj->rpq", C2, self.A_T)
                 V2 = np.einsum("q,qpr->pr", self.v_q, C2)
 
-                grad = np.dot(grad, self.A_T.T)
+                self.grad = np.dot(grad, self.A_T.T)
 
             self.F -= V2
 
             if self.print_f:
-                self.print_const(fc_name="fc_int.dat", grad=grad)
+                self.print_const(fc_name="fc_int.dat", grad=self.grad)
         elif self.coord.lower() == "cartesian":
 
             if not len(self.proj):

@@ -210,6 +210,9 @@ class ForceConstant:
             self.FC[il] = self.FC[cf]
         elif self.deriv_level == 1:
             self.FC = self.first_deriv(self.p_array, self.m_array, denom_disp[0])
+            # print(self.p_array.shape)
+            # print(self.FC.shape)
+            # raise RuntimeError
             for i in range(len(self.FC) - 1):
                 for j in range(i + 1):
                     self.FC[i + 1, j] = (self.FC[i + 1, j] + self.FC[j, i + 1]) / 2

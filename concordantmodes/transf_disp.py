@@ -152,7 +152,6 @@ class TransfDisp:
         self.ref_carts = self.zmat.cartesians_a.copy()
         self.ref_carts = np.array(self.ref_carts).astype(float)
         self.u = np.identity(3 * len(zmat.atom_list))
-        self.disp = self.options.disp
         self.proj = proj
         self.eigs = eigs
         self.disp_cart = {}
@@ -162,13 +161,22 @@ class TransfDisp:
         self.deriv_level = deriv_level
         self.coord_type = coord_type
         self.cma_level = cma_level
+        if cma_level.upper() == "A":
+            self.disp = self.options.disp_a
+        elif cma_level.upper() == "B":
+            self.disp = self.options.disp_b
+        elif cma_level.upper() == "C":
+            self.disp = self.options.disp_c
+        else:
+            print("Not a valid cma_level specification.")
+            raise RuntimeError
 
     def run(self, fc=None):
         np.set_printoptions(precision=8, linewidth=240)
 
         fc = np.asarray(fc) if fc is not None else np.array([])
 
-        self._build_eig_inv()
+        self.eig_inv = self._build_eig_inv(self.eigs)
 
         if self.coord_type == "internal":
             self._run_internal(fc)
@@ -179,21 +187,23 @@ class TransfDisp:
         else:
             raise RuntimeError("coord_type must be either 'cartesian' or 'internal'.")
 
-    def _build_eig_inv(self, proj_tol=1.0e-3):
+    def _build_eig_inv(self, eigs, proj_tol=1.0e-3):
         """
         Invert and normalize the eigenvector matrix.
         """
 
-        self.eig_inv = LA.inv(self.eigs)
+        eig_inv = LA.inv(eigs)
 
-        for i, row in enumerate(self.eig_inv):
+        for i, row in enumerate(eig_inv):
 
             row /= LA.norm(row)
 
             thresh = np.max(np.abs(row)) * proj_tol
             row[np.abs(row) < thresh] = 0.0
 
-            self.eig_inv[i] = row
+            eig_inv[i] = row
+
+        return eig_inv
 
     def _build_mass_matrix(self):
         """
@@ -255,7 +265,7 @@ class TransfDisp:
 
         self.Disp = self.disp
         self.disp = np.full(len(self.n_coord), self.Disp)
-
+        
         #
         # Reduced displacements
         #
@@ -271,15 +281,17 @@ class TransfDisp:
             print(self.disp)
 
         #
-        # CMA scaling
+        # Scaling the initial disps such that the largest displaced coordinate
+        # is normalized to the target displacement size
         #
         elif self.options.scaled_disp and self.cma_level == "B":
 
             for i in range(len(self.disp)):
 
                 self.disp[i] /= np.max(self.proj.T[i])
-                self.disp[i] /= np.max(self.eig_inv[i])
-                self.disp[i] *= LA.norm(self.eig_inv[i])
+                # self.disp[i] /= np.max(self.eig_inv[i])
+                # self.disp[i] *= LA.norm(self.eig_inv[i])
+
 
     def _build_second_order_A2(self):
 
@@ -313,7 +325,8 @@ class TransfDisp:
 
             disp = np.zeros(n)
             disp[i] = self.disp[i]
-
+            print(disp)
+            
             p_disp[i] = self.coord_convert(
                 disp,
                 self.n_coord.copy(),
@@ -338,6 +351,7 @@ class TransfDisp:
 
         self.p_disp = p_disp
         self.m_disp = m_disp
+        # raise RuntimeError
 
     def _generate_internal_second_deriv(self, A2):
 
@@ -381,7 +395,7 @@ class TransfDisp:
     # Now we have the cartesian functions.
     def _run_cartesian(self):
 
-        self.disp_mag = self.options.disp
+        self.disp_mag = self.options.disp_b
         if self.deriv_level == 1:
             self._generate_cartesian_first_deriv()
 
@@ -426,10 +440,11 @@ class TransfDisp:
             minus = ref.copy()
 
             plus[i] += self.disp
-            plus[j] += self.disp
-
             minus[i] -= self.disp
-            minus[j] -= self.disp
+            if i != j:
+                plus[j] += self.disp
+                minus[j] -= self.disp
+
 
             p_disp[i, j] = plus.reshape(-1, 3)
             m_disp[i, j] = minus.reshape(-1, 3)
