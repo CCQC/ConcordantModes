@@ -192,6 +192,8 @@ class TransfDisp:
         Invert and normalize the eigenvector matrix.
         """
 
+        # proj_tol = 1.0e-2
+
         eig_inv = LA.inv(eigs)
 
         for i, row in enumerate(eig_inv):
@@ -202,6 +204,17 @@ class TransfDisp:
             row[np.abs(row) < thresh] = 0.0
 
             eig_inv[i] = row
+
+        # For now we keep normalization of eig_inv rows in.
+        # if not self.options.reduced_disp:
+            # for i, row in enumerate(eig_inv):
+
+                # row /= LA.norm(row)
+
+                # thresh = np.max(np.abs(row)) * proj_tol
+                # row[np.abs(row) < thresh] = 0.0
+
+                # eig_inv[i] = row
 
         return eig_inv
 
@@ -232,7 +245,7 @@ class TransfDisp:
             u,
             cma_level=self.cma_level,
         )
-
+        
         self.n_coord = self.int_c(
             self.ref_carts,
             self.eig_inv,
@@ -276,9 +289,20 @@ class TransfDisp:
             self.disp = np.array(
                 [scale / abs(fc[i, i]) ** 0.25 for i in range(len(self.disp))]
             )
-
-            print("Reduced displacements")
-            print(self.disp)
+            
+            # print("Reduced displacements")
+            # print(self.disp)
+            # for i in range(len(self.disp)):
+                # print("Fourth root force constant.")
+                # print(abs(fc[i, i]) ** 0.25)
+                # print("Reciprocal")
+                # print(1/(abs(fc[i, i]) ** 0.25))
+                # buff_disp = np.zeros(len(self.disp))
+                # buff_disp[i] = self.disp[i]
+                # print("Simple coord disps:")
+                # buff_disp = np.dot(buff_disp, inv(self.eig_inv).T)
+                # buff_disp = np.dot(buff_disp, self.proj.T)
+                # print(buff_disp)
 
         #
         # Scaling the initial disps such that the largest displaced coordinate
@@ -366,6 +390,9 @@ class TransfDisp:
 
             disp[i] = self.disp[i]
             disp[j] = self.disp[j]
+            
+            # print(i, j)
+            # print("p_disp ")
 
             p_disp[i, j] = self.coord_convert(
                 disp,
@@ -377,6 +404,8 @@ class TransfDisp:
                 self.options,
                 A2=A2,
             )
+            
+            # print("m_disp ")
 
             m_disp[i, j] = self.coord_convert(
                 -disp,
@@ -700,13 +729,14 @@ class TransfDisp:
             new_carts += cart_disp_shaped
             coord_check = self.int_c(new_carts, self.eig_inv, self.proj)
             n_disp = new_n - coord_check
+            # print(n_disp)
 
-            if tight_disp:
-                sVec = s_vec(zmat, options)
-                sVec.run(new_carts, False)
-                A = self.compute_A(
-                    sVec.B, self.proj, self.eig_inv, self.zmat.mass_weight
-                )
+            # if tight_disp:
+                # sVec = s_vec(zmat, options)
+                # sVec.run(new_carts, False)
+                # A = self.compute_A(
+                    # sVec.B, self.proj, self.eig_inv, self.zmat.mass_weight
+                # )
             if LA.norm(n_disp) < tolerance:
                 break
         if LA.norm(n_disp) > tolerance:
@@ -727,20 +757,27 @@ class TransfDisp:
 
         L = inv(eig_inv)
 
-        A = LA.pinv(B)  # (3N x s)
-        A = np.dot(A, proj)  # (3N x S)
-        A = A.T  # (S x 3N)
+
+        # A = LA.pinv(B)  # (3N x s)
+        # A = np.dot(A, proj)  # (3N x S)
+        # A = A.T  # (S x 3N)
 
         # This could be necessary
         # for intensities.
-        # B = np.dot(proj.T,B)
+        B = np.dot(proj.T,B)
+        
+        # Toggle this
         # u = np.eye(len(B.T))
-        # # A = inv(B.dot(np.sqrt(u)).dot(B.T)) # (s x s)
-        # A = inv(B.dot(u).dot(B.T)) # (s x s)
-        # A = (B.T).dot(A) # (3N x s)
-        # # A = np.sqrt(u).dot(A)
-        # # A = u.dot(A)
-        # A = A.T  # (S x 3N)
+        
+        # A = inv(B.dot(np.sqrt(u)).dot(B.T)) # (s x s)
+        A = inv(B.dot(u).dot(B.T)) # (s x s)
+        # print(u)
+        # print("inv G-mat:")
+        # print(A)
+        A = (B.T).dot(A) # (3N x s)
+        # A = np.sqrt(u).dot(A)
+        A = u.dot(A)
+        A = A.T  # (S x 3N)
 
         # This step modifies A to convert from normal coords to carts.
         A = np.dot(L.T, A)  # (Q x 3N)

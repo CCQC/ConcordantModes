@@ -207,8 +207,26 @@ class ConcordantModes:
             ted_b = ted_b[flat_sym_modes_b]
             ted_b = ted_b.T
             #### end of block that could probably be moved inside the symmetry.py module?
-        self.F_b = np.dot(np.dot(b_GF.L.T, self.F_b), b_GF.L)
-        # Now for the TED check.
+        
+        self.disp = TransfDisp(
+            None,
+            self.zmat_obj,
+            None,
+            None,
+            None,
+            self.options,
+            None,
+        )
+        eig_inv = self.disp._build_eig_inv(b_GF.L)
+
+        # Use inv of normalized eig_inv instead of b_GF.L?
+        # self.F_b = np.dot(np.dot(b_GF.L.T, self.F_b), b_GF.L)
+        self.F_b = np.dot(np.dot(inv(eig_inv).T, self.F_b), inv(eig_inv))
+        # Now for the TED check. The statement above could be problematic
+        # for the TED check. Might want to fold it into an "else"
+        # statement to the TED check. Also, might want to use
+        # normalized eig_inv for TED check, it's just a scale factor
+        # to the diagonal G-matrix anyways...
         if self.options.ted_check:
             self.G = np.dot(np.dot(LA.inv(b_GF.L), G), LA.inv(b_GF.L).T)
             self.G[np.abs(self.G) < self.options.tol] = 0
@@ -223,7 +241,6 @@ class ConcordantModes:
                 self.TED_obj,
                 self.options,
                 self.symm_obj.symtext,
-                cma=False,
             )
             TED_GF.run()
 
@@ -286,6 +303,7 @@ class ConcordantModes:
         # Can we generalize compute_hessian to run this too?
         # Now switch state to cma_level = "A"
         cma_level = "A"
+        self.options.cart_fc_b = False
 
         fc = np.array([])
         if self.options.reduced_disp:
@@ -306,7 +324,7 @@ class ConcordantModes:
             eigs=b_GF.L,
             fc=fc,
         )
-        print(self.F_a)
+        # print(self.F_a)
 
         # Recompute the G-matrix with the new geometry, and then transform
         # the G-matrix using the lower level of theory eigenvalue matrix.
@@ -317,34 +335,20 @@ class ConcordantModes:
         np.set_printoptions(precision=7, linewidth=240)
 
         self.G = g_mat.G
+        
         if len(self.sym_sort) > 1:
             _, self.G = self.symm_obj.GF_sym_sort(np.zeros(self.F_b.shape), self.G, self.sym_sort)
 
-        self.disp = TransfDisp(
-            None,
-            self.zmat_obj,
-            None,
-            None,
-            None,
-            self.options,
-            None,
-        )
-        eig_inv = self.disp._build_eig_inv(b_GF.L)
-
-        np.set_printoptions(precision=7, edgeitems=60, linewidth=10000)
-        # print(eig_inv)
+        # # print(eig_inv)
         self.G = np.dot(np.dot(eig_inv, self.G), eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
+        # self.G[np.abs(self.G) < 1.0e-6] = 0
         
-        # print("Normal Mode G")
-        # print(self.G)
+        np.set_printoptions(precision=7, edgeitems=60, linewidth=10000)
+        print("Normal Mode G")
+        print(self.G)
         print("Diag F")
         print(self.F_a)
-
-        if self.options.benchmark_full:
-            cma = True
-        else:
-            cma = False
 
         # Final GF Matrix run
         print("Final Harmonic Frequencies:")
@@ -355,7 +359,6 @@ class ConcordantModes:
             self.TED_obj,
             self.options,
             self.symm_obj.symtext,
-            cma=cma,
         )
         a_GF.run()
 
@@ -456,8 +459,7 @@ class ConcordantModes:
         self.proj = self.s_vec.proj
 
         self.TED_obj = TED(self.proj, zmat, options)
-
-
+        
         num_deg_free = self.proj.shape[1]
         options.init_bool = False
         cart_fc = False
@@ -519,7 +521,6 @@ class ConcordantModes:
                 and not options.molsym_symmetry
                 and cma_level == "B"
             ):
-                # Sym_sort doesn't seem to be working
                 if len(self.sym_sort) > 1 and coord_type.lower() == "internal":
                     print("symmetric displacements:")
                     algo.indices = self.symm_obj.create_sym_sort_disps(
@@ -527,9 +528,11 @@ class ConcordantModes:
                     )
             else:
                 self.symm_obj.indices_by_irrep = algo.indices_by_irrep
+            
             print("Post sym indices:")
             print(len(algo.indices))
             print(algo.indices)
+            
             if cma_level == "A" and len(self.extra_indices):
                 algo.indices += self.extra_indices
             self.disp = TransfDisp(

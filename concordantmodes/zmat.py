@@ -268,7 +268,7 @@ class Zmat:
                 temp = re.findall(self.cartesian_regex, cart_output_b[i])
                 atom = re.findall(self.cartesian_atom_regex, cart_output_b[i])
                 self.cartesians_b.append(temp[0])
-                self.atom_list.append(atom[0])
+                self.atom_list.append(atom[0].upper())
         self.cartesians_b = np.array(self.cartesians_b).astype(float)
 
         # The masses are assigned to the respective atom from the masses.py file
