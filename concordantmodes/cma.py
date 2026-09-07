@@ -207,7 +207,7 @@ class ConcordantModes:
             ted_b = ted_b[flat_sym_modes_b]
             ted_b = ted_b.T
             #### end of block that could probably be moved inside the symmetry.py module?
-        
+
         self.disp = TransfDisp(
             None,
             self.zmat_obj,
@@ -335,15 +335,17 @@ class ConcordantModes:
         np.set_printoptions(precision=7, linewidth=240)
 
         self.G = g_mat.G
-        
+
         if len(self.sym_sort) > 1:
-            _, self.G = self.symm_obj.GF_sym_sort(np.zeros(self.F_b.shape), self.G, self.sym_sort)
+            _, self.G = self.symm_obj.GF_sym_sort(
+                np.zeros(self.F_b.shape), self.G, self.sym_sort
+            )
 
         # # print(eig_inv)
         self.G = np.dot(np.dot(eig_inv, self.G), eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
         # self.G[np.abs(self.G) < 1.0e-6] = 0
-        
+
         np.set_printoptions(precision=7, edgeitems=60, linewidth=10000)
         print("Normal Mode G")
         print(self.G)
@@ -393,7 +395,7 @@ class ConcordantModes:
         # Write a molden file
         molden = MoldenWriter(self.zmat_obj, self.disp, a_GF.freq)
         molden.run()
-        
+
         # This code converts the force constants back into cartesian
         # coordinates and writes out "fc_a.dat" and "fc_a.grad" files, which
         # are of the same format as FCMFINAL of CFOUR for the force constants.
@@ -417,7 +419,6 @@ class ConcordantModes:
             cart_conv.run()
 
         self.F_cart = cart_conv.F
-
 
         t2 = time.time()
         print("This program took " + str(t2 - t1) + " seconds to run.")
@@ -459,7 +460,7 @@ class ConcordantModes:
         self.proj = self.s_vec.proj
 
         self.TED_obj = TED(self.proj, zmat, options)
-        
+
         num_deg_free = self.proj.shape[1]
         options.init_bool = False
         cart_fc = False
@@ -485,7 +486,9 @@ class ConcordantModes:
                     self.proj,
                     options,
                 )
-                if self.options.second_order and os.path.exists(rootdir + "/fc_" + suff + cma_level.lower() + ".grad"):
+                if self.options.second_order and os.path.exists(
+                    rootdir + "/fc_" + suff + cma_level.lower() + ".grad"
+                ):
                     g_read_obj = GrRead("fc_" + suff + cma_level.lower() + ".grad")
                     # Need to pass in general carts here.
                     g_read_obj.run(ref_carts)
@@ -528,11 +531,11 @@ class ConcordantModes:
                     )
             else:
                 self.symm_obj.indices_by_irrep = algo.indices_by_irrep
-            
+
             print("Post sym indices:")
             print(len(algo.indices))
             print(algo.indices)
-            
+
             if cma_level == "A" and len(self.extra_indices):
                 algo.indices += self.extra_indices
             self.disp = TransfDisp(
@@ -660,12 +663,11 @@ class ConcordantModes:
                     fc_output += "\n"
                 with open(fc_name, "w+") as file:
                     file.write(fc_output)
-                
+
                 f_conv_obj.run(grad=fc.gradient)
                 fc.FC = f_conv_obj.F
             elif not self.options.cart_fc_b:
                 f_conv_obj.print_const(fc_name="fc_int_" + cma_level.lower() + ".dat")
-
 
             F = fc.FC
             grad = fc.gradient

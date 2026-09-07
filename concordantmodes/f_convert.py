@@ -287,7 +287,7 @@ class FcConv:
             # Introduce grad_name
             with open("fc_cart_a.grad", "w+") as file:
                 file.write(gr_output)
-    
+
     def _build_mass_matrix(self):
         """
         Construct inverse mass-weight matrix.

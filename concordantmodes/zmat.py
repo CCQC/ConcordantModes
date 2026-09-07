@@ -778,30 +778,40 @@ class Zmat:
                 + " "
                 + self.variables[i]
                 + " = "
-                + str(self.variable_dictionary_a[self.variables[i]]*self.Bohr_Ang)
+                + str(self.variable_dictionary_a[self.variables[i]] * self.Bohr_Ang)
             )
         if self.options.geom_check:
             Sum = 0
             bond_diff = []
             for i in range(len(self.bond_indices)):
-                diff = self.variable_dictionary_a[self.variables[i]] - self.variable_dictionary_b[self.variables[i]]
+                diff = (
+                    self.variable_dictionary_a[self.variables[i]]
+                    - self.variable_dictionary_b[self.variables[i]]
+                )
                 Sum += diff**2
                 bond_diff.append(diff)
             ang_diff = []
-            for i in range(len(self.variables)-len(self.bond_indices)):
-                diff = self.variable_dictionary_a[self.variables[i+len(self.bond_indices)]] - self.variable_dictionary_b[self.variables[i+len(self.bond_indices)]]
+            for i in range(len(self.variables) - len(self.bond_indices)):
+                diff = (
+                    self.variable_dictionary_a[
+                        self.variables[i + len(self.bond_indices)]
+                    ]
+                    - self.variable_dictionary_b[
+                        self.variables[i + len(self.bond_indices)]
+                    ]
+                )
                 # Sum += diff**2
                 ang_diff.append(diff)
             print("max signed bond diff angstrom")
-            print(np.max(bond_diff)*self.Bohr_Ang)
+            print(np.max(bond_diff) * self.Bohr_Ang)
             print("max signed bond diff bohr")
             print(np.max(bond_diff))
             print("min signed bond diff angstrom")
-            print(np.min(bond_diff)*self.Bohr_Ang)
+            print(np.min(bond_diff) * self.Bohr_Ang)
             print("min signed bond diff bohr")
             print(np.min(bond_diff))
             print("max abs bond diff angstrom")
-            print(np.max(np.abs(bond_diff))*self.Bohr_Ang)
+            print(np.max(np.abs(bond_diff)) * self.Bohr_Ang)
             print("max abs bond diff bohr")
             print(np.max(np.abs(bond_diff)))
             print(bond_diff)

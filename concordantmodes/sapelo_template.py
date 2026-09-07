@@ -101,7 +101,7 @@ psi4 -n $NSLOTS -o output.dat
 
 #ignored line -- do not remove
 """
-# psi4 -n $NSLOTS -o output.dat
+        # psi4 -n $NSLOTS -o output.dat
         # rm $PSI_SCRATCH -r
         elif self.prog_name == "orca":
             self.sapelo_template = """#!/bin/bash
@@ -230,5 +230,6 @@ rm $scratch_dir -r
 
 # ignored line -- do not remove
 """
+
     def run(self):
         return self.sapelo_template.format(**self.odict)

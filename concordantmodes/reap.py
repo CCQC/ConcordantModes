@@ -287,7 +287,7 @@ class Reap:
         ref_grad = self._read_gradient(1)
 
         print(self.indices)
-        
+
         for idx in self.indices:
             i = idx[0]
 
@@ -333,7 +333,7 @@ class Reap:
         if not self.success_re.search(data):
             self.fail_list.append(str(direc))
             return 0.0
-        
+
         return float(self.energy_re.findall(data)[0])
 
     def _read_gradient(self, direc):
@@ -407,7 +407,6 @@ class Reap:
             A = pinv(svec.B) @ self.proj
             m_grad_buff.append((self.m_grad_array[i].T @ A).T)
             # m_grad_buff.append((self.m_grad_array[i].T @ A))
-
 
         self.p_grad_array = np.array(p_grad_buff)
         self.m_grad_array = np.array(m_grad_buff)

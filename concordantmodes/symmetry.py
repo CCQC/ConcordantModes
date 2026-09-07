@@ -422,7 +422,7 @@ class Symmetry:
             for i in del_list:
                 print(freqs[sym_modes[i][0]])
         # for i in del_list:
-            # del sym_freqs[i]
+        # del sym_freqs[i]
         flat_sym_freqs = [x for xs in sym_freqs for x in xs]
         flat_sym_freqs = np.array(flat_sym_freqs)
 
