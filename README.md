@@ -4,7 +4,7 @@
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
-This program utilizes the Concordant Modes theoretical framework to compute highly accurate Hessians with linear scaling. The CMA protocol is detailed in literature (J. Am. Chem. Soc., 2022, 144, 51, 23271–23274.; J. Chem. Theory Comput., 2024, 20, 24, 10886–10898.).
+This program utilizes the Concordant Modes theoretical framework to compute highly accurate Hessians with linear scaling. The CMA protocol is detailed in literature (J. Am. Chem. Soc., 2022, 144, 51, 23271–23274.; J. Chem. Theory Comput., 2024, 20, 24, 10886–10898.; J Phys Chem A. 2026 Apr 13;130(16):3249–3260).
 As of right now, the user must be on a cluster with either a Sun Grid Engine or Slurm queueing system and have access to CCQC programs to use the built in computation submission procedure. A feature to allow for custom submit scripts to be utilized is in the works.
 The following procedure may be used to enact the CMA-0A procedure using manual submission of computations for any electronic structure program on any machine. To use CMA-0A, the following files must be present in the working directory: templateA.dat, templateB.dat, main.py, and zmat. These files are discussed below, and sample versions are present in the examples directory. When the files are set, then follow this procedure.
 1)	Set the "gen_disps_b" keyword to True and the "calc_b" keyword to False, then run the CMA program
