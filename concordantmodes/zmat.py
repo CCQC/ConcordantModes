@@ -394,7 +394,7 @@ class Zmat:
             self._build_angles()
 
             # Form all possible torsions from angles
-            self._build_torsions()
+            self._build_four_center()
 
             # Perform a topological analysis, this is the first step to the
             # automatic generation of Natural Internal Coordinates
@@ -911,7 +911,7 @@ class Zmat:
                     ang_count += 1
                     self.angle_variables.append("A" + str(ang_count))
 
-    def _build_torsions(self):
+    def _build_four_center(self):
         for i in range(len(self.angle_indices)):
             for j in range(len(self.bond_indices)):
                 a = np.setdiff1d(self.angle_indices[i], self.bond_indices[j])
