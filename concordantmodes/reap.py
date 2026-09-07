@@ -202,7 +202,7 @@ class Reap:
         by the :class:`ForceConstant` class to construct finite-difference
         gradients and Hessians.
         """
-        if self.deriv_level:
+        if self.deriv_level == 1:
             return self._run_gradients()
         return self._run_energies()
 
@@ -286,15 +286,25 @@ class Reap:
 
         ref_grad = self._read_gradient(1)
 
+        print(self.indices)
+
         for idx in self.indices:
             i = idx[0]
 
             p_grad = self._read_gradient(2 * i + 2)
             m_grad = self._read_gradient(2 * i + 3)
+            # p_grad[np.abs(p_grad) < 1.0e-6] = 0
+            # m_grad[np.abs(m_grad) < 1.0e-6] = 0
+            # print("Grads " + str(i))
+            # print(p_grad)
+            # print(m_grad)
+            # print("Diff:")
+            # print(p_grad-m_grad)
 
             p_list.append(p_grad)
             m_list.append(m_grad)
 
+        # raise RuntimeError
         self.ref_grad = np.array(ref_grad)
         self.p_grad_array = np.array(p_list)
         self.m_grad_array = np.array(m_list)
@@ -372,12 +382,13 @@ class Reap:
         The transformed gradients replace the Cartesian gradients stored
         in ``p_grad_array`` and ``m_grad_array``.
         """
+
         if not (
             self.options.conv_grad
             and self.zmat is not None
             and len(self.proj)
             and self.disp is not None
-            and not self.deriv_level
+            and self.deriv_level
         ):
             return
 
@@ -390,10 +401,12 @@ class Reap:
             svec.run(self.disp.p_disp[i], False)
             A = pinv(svec.B) @ self.proj
             p_grad_buff.append((self.p_grad_array[i].T @ A).T)
+            # p_grad_buff.append((self.p_grad_array[i].T @ A))
 
             svec.run(self.disp.m_disp[i], False)
             A = pinv(svec.B) @ self.proj
             m_grad_buff.append((self.m_grad_array[i].T @ A).T)
+            # m_grad_buff.append((self.m_grad_array[i].T @ A))
 
         self.p_grad_array = np.array(p_grad_buff)
         self.m_grad_array = np.array(m_grad_buff)

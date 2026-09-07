@@ -305,7 +305,8 @@ class Symmetry:
         # flat_sym_sort_inv = flat_sym_sort_inv[flat_sym_sort]
         self.flat_sym_sort_inv = self.flat_sym_sort_inv.astype(int)
 
-    def GF_sym_sort(self, F, g_mat, sym_sort):
+    # Need to include degenerate logic
+    def GF_sym_sort(self, F, G, sym_sort):
         Fbuff1 = np.array([])
         Fbuff2 = {}
         Gbuff1 = np.array([])
@@ -315,7 +316,7 @@ class Symmetry:
             Fbuff1 = Fbuff1[sym_sort[i]]
             Fbuff1 = np.array([Fbuff1[:, sym_sort[i]]])
             Fbuff2[str(i)] = Fbuff1.copy()
-            Gbuff1 = g_mat.G.copy()
+            Gbuff1 = G.copy()
             Gbuff1 = Gbuff1[sym_sort[i]]
             Gbuff1 = np.array([Gbuff1[:, sym_sort[i]]])
             Gbuff2[str(i)] = Gbuff1.copy()
@@ -342,21 +343,21 @@ class Symmetry:
             )
         F = Fbuff3[self.flat_sym_sort_inv]
         F = F[:, self.flat_sym_sort_inv]
-        g_mat.G = Gbuff3[self.flat_sym_sort_inv]
-        g_mat.G = g_mat.G[:, self.flat_sym_sort_inv]
+        G = Gbuff3[self.flat_sym_sort_inv]
+        G = G[:, self.flat_sym_sort_inv]
 
         F_sym = F[self.flat_sym_sort].copy()
         F_sym = F_sym[:, self.flat_sym_sort]
         print("Sym Force Constants:")
         print(F_sym)
 
-        g_sym = g_mat.G[self.flat_sym_sort].copy()
+        g_sym = G[self.flat_sym_sort].copy()
         g_sym = g_sym[:, self.flat_sym_sort]
         g_sym[np.abs(g_sym) < 1e-9] = 0
         print("Sym G-Matrix:")
         print(sym_sort)
         print(g_sym)
-        return F, g_mat.G
+        return F, G
 
     def cma2_sym_sort(self, sym_sort, od_inds, irreps_b, F_inter, xi, xi_tol_i):
         total_off_diags_buff = 0
@@ -384,18 +385,24 @@ class Symmetry:
                     sym_disps.append([j[0], j[1]])
         return sym_disps
 
-    def mode_symmetry_sort(self, TED, sym_sort, freqs):
+    def mode_symmetry_sort(self, TED, sym_sort, freqs, percent_tol=90.0):
         ref_TED_b = TED
         sym_modes = []
         for irrep in sym_sort:
             irrep_modes = []
+            if len(np.array(irrep).shape) > 1:
+                buff_irrep = np.array(irrep).flatten()
+            else:
+                buff_irrep = irrep
             for i in range(len(ref_TED_b.T)):
                 Sum = 0
-                for j in irrep:
+                for j in buff_irrep:
                     Sum += ref_TED_b.T[i, j]
-                if Sum > 80.0:
+                # print(i)
+                # print(Sum)
+                if Sum > percent_tol:
                     irrep_modes.append(i)
-            if len(irrep_modes) != len(irrep):
+            if len(irrep_modes) != len(buff_irrep):
                 print("Something's wrong with the irrep symmetry sorter:")
                 raise RuntimeError
             sym_modes.append(irrep_modes)
@@ -403,14 +410,19 @@ class Symmetry:
         sym_freqs = copy.deepcopy(sym_modes)
         del_list = []
         for i in range(len(sym_modes)):
-            for j in range(len(sym_modes[i])):
-                index = sym_modes[i][j]
-                sym_freqs[i][j] = freqs[index].copy()
-            sym_freqs[i].reverse()
+            if len(sym_modes[i]) > 0:
+                for j in range(len(sym_modes[i])):
+                    index = sym_modes[i][j]
+                    sym_freqs[i][j] = freqs[index].copy()
+                sym_freqs[i].reverse()
+            else:
+                pass
         del_list.reverse()
         if len(del_list):
             for i in del_list:
                 print(freqs[sym_modes[i][0]])
+        # for i in del_list:
+        # del sym_freqs[i]
         flat_sym_freqs = [x for xs in sym_freqs for x in xs]
         flat_sym_freqs = np.array(flat_sym_freqs)
 
