@@ -896,8 +896,6 @@ class Zmat:
                 adj_mat2[i, i] = 0
             print("Covalent Radius Scale Factor:")
             print(self.options.bond_threshold)
-            # print("Resulting bond indices:")
-            # print(self.bond_indices)
         else:
             for i in range(len(zmat_output)):
                 if re.search(self.bond_regex, zmat_output[i]):
@@ -1012,7 +1010,6 @@ class Zmat:
                             new_walks = np.append(new_walks, new_walk)
 
             count += 1
-            # new_walks = new_walks.reshape((-1, count))
             new_walks = new_walks.reshape((-1, count)).tolist()
             print(new_walks)
             new_walks = np.unique(new_walks, axis=0)
@@ -1041,7 +1038,6 @@ class Zmat:
         print("Looking for rings")
         cycles_dict = {}
         for i in range(dict_len):
-            # print(str(i + 3))
             cycles_dict[str(i + 3)] = np.array([])
             for j in range(len(X_len_walks_dict[str(i + 3) + "_length_walks"])):
                 a = np.array(

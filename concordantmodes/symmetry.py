@@ -329,50 +329,16 @@ class Symmetry:
         print("Sym G-Matrix:")
         print(sym_sort)
         print(g_sym)
-        # flat_sym_sort = self.flat_sym_sort
-        # flat_sym_sort_inv = self.flat_sym_sort_inv
-
-        # if len(mode_irreps):
-        # flat_sym_sort = np.array([])
-        # flat_sym_sort_inv = np.array([])
-        # for i in range(len(mode_irreps)):
-        # flat_sym_sort = np.append(flat_sym_sort, mode_irreps[i])
-
-        # flat_sym_sort = flat_sym_sort.astype(int)
-
-        # for i in range(len(flat_sym_sort)):
-        # flat_sym_sort_inv = np.append(
-        # flat_sym_sort_inv, np.where(flat_sym_sort == i)[0][0]
-        # )
-
-        # flat_sym_sort_inv = flat_sym_sort_inv.astype(int)
 
         for i, irrep in enumerate(sym_sort):
             Fbuff1 = F.copy()
             Gbuff1 = G.copy()
-            # if len(mode_irreps):
-            # irr = mode_irreps[i]
-            # print("Degen mode irreps:")
-            # print(irr)
-            # print(irrep)
-            # else:
-            # irr = irrep
             # Separate logic here to average the FC blocks of degenerate blocks
-            # if len(np.shape(irrep)) > 1 and len(mode_irreps):
             if len(np.shape(irrep)) > 1:
-                # irr = np.reshape(np.array(mode_irreps[i]),np.shape(irrep))
-                # print("Reshaped irr:")
-                # print(irr)
                 print("F averaging:")
                 Fbuff2[str(i)] = self._average_blocks(Fbuff1, F, irrep)
                 print("G averaging:")
                 Gbuff2[str(i)] = self._average_blocks(Gbuff1, G, irrep)
-                # raise RuntimeError
-                # sym_int = np.array(irrep.flatten()).astype(int)
-                # Gbuff1 = G.copy()
-                # Gbuff1 = Gbuff1[sym_int]
-                # Gbuff1 = np.array(Gbuff1[:, sym_int])
-                # Gbuff2[str(i)] = Gbuff1.copy()
             else:
                 sym_int = np.array(irrep).astype(int)
                 print("sym_int: ")
@@ -453,10 +419,6 @@ class Symmetry:
         Mbuff_degen = np.zeros(len(sym_sort_T), dtype=object)
         M_sign = {}
 
-        print("irrep:")
-        print(irrep)
-        # print(Mbuff.shape)
-
         for j in range(len(sym_sort_T)):
             Mbuff = Mbuff[sym_sort_T[j].astype(int)]
             Mbuff = Mbuff[:, sym_sort_T[j].astype(int)]
@@ -465,29 +427,11 @@ class Symmetry:
             Mbuff = M.copy()
 
         np.set_printoptions(threshold=np.inf, precision=6, linewidth=1000)
-        print("Mbuff1:")
-        print(Mbuff_degen[0])
-        # print(np.sign(Mbuff_degen[0]))
-        # M_sign["0"] = np.sign(Mbuff_degen[0])
-        print("Mbuff2:")
-        print(Mbuff_degen[1])
-        # print(np.sign(Mbuff_degen[1]))
-        # M_sign["1"] = np.sign(Mbuff_degen[1])
-        print("Diff:")
-        print(Mbuff_degen[1] - Mbuff_degen[0])
 
         M_ave = np.sum(np.abs(Mbuff_degen), axis=0) / len(sym_sort_T)
-        # M_ave = np.sum(Mbuff_degen,axis=0)/len(sym_sort_T)
-
-        print("M_ave:")
-        print(M_ave)
 
         for j in range(len(sym_sort_T)):
-            # print("j: " + str(j))
-            # print(Mbuff_degen[j])
-            # print(Mbuff_degen[j]-M_ave)
             Mbuff_degen[j] = np.multiply(M_ave, M_sign[str(j)])
-            # Mbuff_degen[j] = M_ave
 
         Mbuff = Mbuff_degen[0].copy()
 
@@ -501,8 +445,6 @@ class Symmetry:
                     ],
                 ]
             )
-        print("sign included:")
-        print(Mbuff)
 
         return Mbuff
 
@@ -529,8 +471,6 @@ class Symmetry:
                 Sum = 0
                 for j in buff_irrep:
                     Sum += ref_TED_b.T[i, j]
-                # print(i)
-                # print(Sum)
                 if Sum > percent_tol:
                     irrep_modes.append(i)
             if len(irrep_modes) != len(buff_irrep):
@@ -552,8 +492,6 @@ class Symmetry:
         if len(del_list):
             for i in del_list:
                 print(freqs[sym_modes[i][0]])
-        # for i in del_list:
-        # del sym_freqs[i]
         flat_sym_freqs = [x for xs in sym_freqs for x in xs]
         flat_sym_freqs = np.array(flat_sym_freqs)
 

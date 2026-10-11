@@ -293,18 +293,10 @@ class Reap:
 
             p_grad = self._read_gradient(2 * i + 2)
             m_grad = self._read_gradient(2 * i + 3)
-            # p_grad[np.abs(p_grad) < 1.0e-6] = 0
-            # m_grad[np.abs(m_grad) < 1.0e-6] = 0
-            # print("Grads " + str(i))
-            # print(p_grad)
-            # print(m_grad)
-            # print("Diff:")
-            # print(p_grad-m_grad)
 
             p_list.append(p_grad)
             m_list.append(m_grad)
 
-        # raise RuntimeError
         self.ref_grad = np.array(ref_grad)
         self.p_grad_array = np.array(p_list)
         self.m_grad_array = np.array(m_list)
@@ -401,12 +393,10 @@ class Reap:
             svec.run(self.disp.p_disp[i], False)
             A = pinv(svec.B) @ self.proj
             p_grad_buff.append((self.p_grad_array[i].T @ A).T)
-            # p_grad_buff.append((self.p_grad_array[i].T @ A))
 
             svec.run(self.disp.m_disp[i], False)
             A = pinv(svec.B) @ self.proj
             m_grad_buff.append((self.m_grad_array[i].T @ A).T)
-            # m_grad_buff.append((self.m_grad_array[i].T @ A))
 
         self.p_grad_array = np.array(p_grad_buff)
         self.m_grad_array = np.array(m_grad_buff)

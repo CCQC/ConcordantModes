@@ -192,8 +192,6 @@ class TransfDisp:
         Invert and normalize the eigenvector matrix.
         """
 
-        # proj_tol = 1.0e-2
-
         eig_inv = LA.inv(eigs)
 
         for i, row in enumerate(eig_inv):
@@ -204,17 +202,6 @@ class TransfDisp:
             row[np.abs(row) < thresh] = 0.0
 
             eig_inv[i] = row
-
-        # For now we keep normalization of eig_inv rows in.
-        # if not self.options.reduced_disp:
-        # for i, row in enumerate(eig_inv):
-
-        # row /= LA.norm(row)
-
-        # thresh = np.max(np.abs(row)) * proj_tol
-        # row[np.abs(row) < thresh] = 0.0
-
-        # eig_inv[i] = row
 
         return eig_inv
 
@@ -290,20 +277,6 @@ class TransfDisp:
                 [scale / abs(fc[i, i]) ** 0.25 for i in range(len(self.disp))]
             )
 
-            # print("Reduced displacements")
-            # print(self.disp)
-            # for i in range(len(self.disp)):
-            # print("Fourth root force constant.")
-            # print(abs(fc[i, i]) ** 0.25)
-            # print("Reciprocal")
-            # print(1/(abs(fc[i, i]) ** 0.25))
-            # buff_disp = np.zeros(len(self.disp))
-            # buff_disp[i] = self.disp[i]
-            # print("Simple coord disps:")
-            # buff_disp = np.dot(buff_disp, inv(self.eig_inv).T)
-            # buff_disp = np.dot(buff_disp, self.proj.T)
-            # print(buff_disp)
-
         #
         # Scaling the initial disps such that the largest displaced coordinate
         # is normalized to the target displacement size
@@ -313,8 +286,6 @@ class TransfDisp:
             for i in range(len(self.disp)):
 
                 self.disp[i] /= np.max(self.proj.T[i])
-                # self.disp[i] /= np.max(self.eig_inv[i])
-                # self.disp[i] *= LA.norm(self.eig_inv[i])
 
     def _build_second_order_A2(self):
 
@@ -374,7 +345,6 @@ class TransfDisp:
 
         self.p_disp = p_disp
         self.m_disp = m_disp
-        # raise RuntimeError
 
     def _generate_internal_second_deriv(self, A2):
 
@@ -390,9 +360,6 @@ class TransfDisp:
             disp[i] = self.disp[i]
             disp[j] = self.disp[j]
 
-            # print(i, j)
-            # print("p_disp ")
-
             p_disp[i, j] = self.coord_convert(
                 disp,
                 self.n_coord.copy(),
@@ -403,8 +370,6 @@ class TransfDisp:
                 self.options,
                 A2=A2,
             )
-
-            # print("m_disp ")
 
             m_disp[i, j] = self.coord_convert(
                 -disp,

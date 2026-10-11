@@ -125,8 +125,6 @@ class GMatrix:
         """
         B = self.s_vectors.B
 
-        # Compute and temper G
-        # tol = 1e-12
         u = np.array(self.zmat.masses)
         for i in range(len(u)):
             if self.zmat.atom_list[i] == "X":
@@ -141,12 +139,3 @@ class GMatrix:
         if len(self.proj) and self.options.coords != "ZMAT":
             self.G = np.dot(self.proj.T, np.dot(self.G, self.proj))
 
-        # del_tol = 1.0e-3
-        # for row in self.G:
-        # abs_row = np.abs(row)
-        # row[abs_row < np.max(abs_row) * del_tol] = 0
-        # self.G = self.G.T
-        # for row in self.G:
-        # abs_row = np.abs(row)
-        # row[abs_row < np.max(abs_row) * del_tol] = 0
-        # self.G = self.G.T

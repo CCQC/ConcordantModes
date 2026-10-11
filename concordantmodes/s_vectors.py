@@ -284,12 +284,6 @@ class SVectors:
 
         self.B = np.array(rows)
 
-        # print(self.B)
-        # for i in self.B:
-        # for j in i:
-        # print(j)
-        # raise RuntimeError
-
         # if len(self.proj):
         # print("Redundancy Check:")
         # # B_projected = np.dot(self.proj.T,self.B)
@@ -300,13 +294,13 @@ class SVectors:
         # print(proj[:,-1])
         # raise RuntimeError
 
-        tol = 1e-4
+        tol = self.options.red_tol
         # Now we acquire a linearly independant set of internal coordinates from the diagonalized
         # BB^T Matrix
         if not self.options.man_proj:
             if self.options.coords.upper() != "ZMAT":
                 proj, eigs, _ = LA.svd(self.B)
-                proj[np.abs(proj) < tol] = 0
+                # proj[np.abs(proj) < tol] = 0
                 print("proj singular values:")
                 print(eigs)
                 if B_proj:

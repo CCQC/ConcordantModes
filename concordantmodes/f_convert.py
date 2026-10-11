@@ -167,20 +167,11 @@ class FcConv:
         # First construct the transpose of the A matrix.
         if self.coord.lower() == "internal":
             # The cartesian force constants must be in units of Hartree/bohr^2.
-            # print(self.s_vec.B.shape)
             if not len(self.proj):
                 B = self.s_vec.B
             else:
                 B = np.dot(self.proj.T, self.s_vec.B)
 
-            # If this doesn't work, get rid of all references to u in calculations
-            # u = self._build_mass_matrix()
-
-            # G = np.dot(B,np.dot(u, B.T))
-            # self.A_T = np.dot(np.dot(LA.inv(G), B),u)
-
-            # print(B.shape)
-            # raise RuntimeError
             G = np.dot(B, B.T)
             self.A_T = np.dot(LA.inv(G), B)
 

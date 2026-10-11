@@ -341,10 +341,8 @@ class ConcordantModes:
                 np.zeros(self.F_b.shape), self.G, self.sym_sort
             )
 
-        # # print(eig_inv)
         self.G = np.dot(np.dot(eig_inv, self.G), eig_inv.T)
         self.G[np.abs(self.G) < self.options.tol] = 0
-        # self.G[np.abs(self.G) < 1.0e-6] = 0
 
         np.set_printoptions(precision=7, edgeitems=60, linewidth=10000)
         print("Normal Mode G")
@@ -673,13 +671,4 @@ class ConcordantModes:
             grad = fc.gradient
 
         F[np.abs(F) < self.options.tol] = 0
-        # del_tol = 1.0e-3
-        # for row in F:
-        # abs_row = np.abs(row)
-        # row[abs_row < np.max(abs_row) * del_tol] = 0
-        # F = F.T
-        # for row in F:
-        # abs_row = np.abs(row)
-        # row[abs_row < np.max(abs_row) * del_tol] = 0
-        # F = F.T
         return F, grad
