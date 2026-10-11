@@ -292,12 +292,17 @@ class Symmetry:
         self.flat_sym_sort = np.array([])
         self.flat_sym_sort_inv = np.array([])
         for i in range(len(sym_sort)):
-            self.flat_sym_sort = np.append(self.flat_sym_sort, sym_sort[i])
+            irrep = sym_sort[i].copy()
+            if len(np.array(sym_sort[i]).shape) > 1:
+                print(np.transpose(irrep))
+                irrep = np.transpose(irrep)
+            self.flat_sym_sort = np.append(self.flat_sym_sort, irrep)
 
         self.flat_sym_sort = self.flat_sym_sort.astype(int)
 
         print("Flattened sym_sort: ")
         print(self.flat_sym_sort)
+        print(sym_sort)
         for i in range(len(self.flat_sym_sort)):
             self.flat_sym_sort_inv = np.append(
                 self.flat_sym_sort_inv, np.where(self.flat_sym_sort == i)[0][0]
@@ -311,36 +316,100 @@ class Symmetry:
         Fbuff2 = {}
         Gbuff1 = np.array([])
         Gbuff2 = {}
-        for i in range(len(sym_sort)):
+
+        F_sym = F[self.flat_sym_sort].copy()
+        F_sym = F_sym[:, self.flat_sym_sort]
+        np.set_printoptions(threshold=np.inf, precision=8, linewidth=1000)
+        print("Sym Force Constants:")
+        print(F_sym)
+
+        g_sym = G[self.flat_sym_sort].copy()
+        g_sym = g_sym[:, self.flat_sym_sort]
+        g_sym[np.abs(g_sym) < 1e-9] = 0
+        print("Sym G-Matrix:")
+        print(sym_sort)
+        print(g_sym)
+        # flat_sym_sort = self.flat_sym_sort
+        # flat_sym_sort_inv = self.flat_sym_sort_inv
+
+        # if len(mode_irreps):
+        # flat_sym_sort = np.array([])
+        # flat_sym_sort_inv = np.array([])
+        # for i in range(len(mode_irreps)):
+        # flat_sym_sort = np.append(flat_sym_sort, mode_irreps[i])
+
+        # flat_sym_sort = flat_sym_sort.astype(int)
+
+        # for i in range(len(flat_sym_sort)):
+        # flat_sym_sort_inv = np.append(
+        # flat_sym_sort_inv, np.where(flat_sym_sort == i)[0][0]
+        # )
+
+        # flat_sym_sort_inv = flat_sym_sort_inv.astype(int)
+
+        for i, irrep in enumerate(sym_sort):
             Fbuff1 = F.copy()
-            Fbuff1 = Fbuff1[sym_sort[i]]
-            Fbuff1 = np.array([Fbuff1[:, sym_sort[i]]])
-            Fbuff2[str(i)] = Fbuff1.copy()
             Gbuff1 = G.copy()
-            Gbuff1 = Gbuff1[sym_sort[i]]
-            Gbuff1 = np.array([Gbuff1[:, sym_sort[i]]])
-            Gbuff2[str(i)] = Gbuff1.copy()
-        Fbuff3 = Fbuff2[str(0)][0].copy()
-        Gbuff3 = Gbuff2[str(0)][0].copy()
+            # if len(mode_irreps):
+            # irr = mode_irreps[i]
+            # print("Degen mode irreps:")
+            # print(irr)
+            # print(irrep)
+            # else:
+            # irr = irrep
+            # Separate logic here to average the FC blocks of degenerate blocks
+            # if len(np.shape(irrep)) > 1 and len(mode_irreps):
+            if len(np.shape(irrep)) > 1:
+                # irr = np.reshape(np.array(mode_irreps[i]),np.shape(irrep))
+                # print("Reshaped irr:")
+                # print(irr)
+                print("F averaging:")
+                Fbuff2[str(i)] = self._average_blocks(Fbuff1, F, irrep)
+                print("G averaging:")
+                Gbuff2[str(i)] = self._average_blocks(Gbuff1, G, irrep)
+                # raise RuntimeError
+                # sym_int = np.array(irrep.flatten()).astype(int)
+                # Gbuff1 = G.copy()
+                # Gbuff1 = Gbuff1[sym_int]
+                # Gbuff1 = np.array(Gbuff1[:, sym_int])
+                # Gbuff2[str(i)] = Gbuff1.copy()
+            else:
+                sym_int = np.array(irrep).astype(int)
+                print("sym_int: ")
+                print(sym_int)
+
+                Fbuff1 = F.copy()
+                Fbuff1 = Fbuff1[sym_int]
+                Fbuff1 = np.array(Fbuff1[:, sym_int])
+                print("Sym block F:")
+                print(Fbuff1)
+                Fbuff2[str(i)] = Fbuff1.copy()
+                Gbuff1 = G.copy()
+                Gbuff1 = Gbuff1[sym_int]
+                Gbuff1 = np.array(Gbuff1[:, sym_int])
+                Gbuff2[str(i)] = Gbuff1.copy()
+        Fbuff3 = Fbuff2[str(0)].copy()
+        Gbuff3 = Gbuff2[str(0)].copy()
         for i in range(len(sym_sort) - 1):
-            Fbuff3 = np.block(
-                [
-                    [Fbuff3, np.zeros((len(Fbuff3), len(Fbuff2[str(i + 1)][0])))],
+            if len(sym_sort[i + 1]):
+                Fbuff3 = np.block(
                     [
-                        np.zeros((len(Fbuff2[str(i + 1)][0]), len(Fbuff3))),
-                        Fbuff2[str(i + 1)][0],
-                    ],
-                ]
-            )
-            Gbuff3 = np.block(
-                [
-                    [Gbuff3, np.zeros((len(Gbuff3), len(Gbuff2[str(i + 1)][0])))],
+                        [Fbuff3, np.zeros((len(Fbuff3), len(Fbuff2[str(i + 1)])))],
+                        [
+                            np.zeros((len(Fbuff2[str(i + 1)]), len(Fbuff3))),
+                            Fbuff2[str(i + 1)],
+                        ],
+                    ]
+                )
+                Gbuff3 = np.block(
                     [
-                        np.zeros((len(Gbuff2[str(i + 1)][0]), len(Gbuff3))),
-                        Gbuff2[str(i + 1)][0],
-                    ],
-                ]
-            )
+                        [Gbuff3, np.zeros((len(Gbuff3), len(Gbuff2[str(i + 1)])))],
+                        [
+                            np.zeros((len(Gbuff2[str(i + 1)]), len(Gbuff3))),
+                            Gbuff2[str(i + 1)],
+                        ],
+                    ]
+                )
         F = Fbuff3[self.flat_sym_sort_inv]
         F = F[:, self.flat_sym_sort_inv]
         G = Gbuff3[self.flat_sym_sort_inv]
@@ -348,6 +417,7 @@ class Symmetry:
 
         F_sym = F[self.flat_sym_sort].copy()
         F_sym = F_sym[:, self.flat_sym_sort]
+        np.set_printoptions(threshold=np.inf, precision=8, linewidth=1000)
         print("Sym Force Constants:")
         print(F_sym)
 
@@ -377,9 +447,70 @@ class Symmetry:
                 total_off_diags_buff += (len(irrep) ** 2 - len(irrep)) / 2
         return od_inds, total_off_diags_buff
 
+    def _average_blocks(self, Mbuff, M, irrep):
+
+        sym_sort_T = np.array(irrep).T
+        Mbuff_degen = np.zeros(len(sym_sort_T), dtype=object)
+        M_sign = {}
+
+        print("irrep:")
+        print(irrep)
+        # print(Mbuff.shape)
+
+        for j in range(len(sym_sort_T)):
+            Mbuff = Mbuff[sym_sort_T[j].astype(int)]
+            Mbuff = Mbuff[:, sym_sort_T[j].astype(int)]
+            Mbuff_degen[j] = Mbuff
+            M_sign[str(j)] = np.sign(Mbuff)
+            Mbuff = M.copy()
+
+        np.set_printoptions(threshold=np.inf, precision=6, linewidth=1000)
+        print("Mbuff1:")
+        print(Mbuff_degen[0])
+        # print(np.sign(Mbuff_degen[0]))
+        # M_sign["0"] = np.sign(Mbuff_degen[0])
+        print("Mbuff2:")
+        print(Mbuff_degen[1])
+        # print(np.sign(Mbuff_degen[1]))
+        # M_sign["1"] = np.sign(Mbuff_degen[1])
+        print("Diff:")
+        print(Mbuff_degen[1] - Mbuff_degen[0])
+
+        M_ave = np.sum(np.abs(Mbuff_degen), axis=0) / len(sym_sort_T)
+        # M_ave = np.sum(Mbuff_degen,axis=0)/len(sym_sort_T)
+
+        print("M_ave:")
+        print(M_ave)
+
+        for j in range(len(sym_sort_T)):
+            # print("j: " + str(j))
+            # print(Mbuff_degen[j])
+            # print(Mbuff_degen[j]-M_ave)
+            Mbuff_degen[j] = np.multiply(M_ave, M_sign[str(j)])
+            # Mbuff_degen[j] = M_ave
+
+        Mbuff = Mbuff_degen[0].copy()
+
+        for j in range(len(sym_sort_T) - 1):
+            Mbuff = np.block(
+                [
+                    [Mbuff, np.zeros((len(Mbuff), len(Mbuff_degen[j + 1])))],
+                    [
+                        np.zeros((len(Mbuff_degen[j + 1]), len(Mbuff))),
+                        Mbuff_degen[j + 1],
+                    ],
+                ]
+            )
+        print("sign included:")
+        print(Mbuff)
+
+        return Mbuff
+
     def create_sym_sort_disps(self, sym_sort, indices):
         sym_disps = []
         for i in sym_sort:
+            if len(np.array(i).shape) > 1:
+                i = np.array(i).flatten()
             for j in indices:
                 if j[0] in i and j[1] in i:
                     sym_disps.append([j[0], j[1]])

@@ -128,7 +128,7 @@ class FcConv:
 
     def __init__(self, fc_mat, s_vec, zmat, coord, print_f, proj, options):
         self.coord = coord
-        self.F = fc_mat
+        self.F = fc_mat.copy()
         self.print_f = print_f
         self.s_vec = s_vec
         self.proj = proj
@@ -167,17 +167,23 @@ class FcConv:
         # First construct the transpose of the A matrix.
         if self.coord.lower() == "internal":
             # The cartesian force constants must be in units of Hartree/bohr^2.
+            # print(self.s_vec.B.shape)
             if not len(self.proj):
                 B = self.s_vec.B
             else:
                 B = np.dot(self.proj.T, self.s_vec.B)
+
             # If this doesn't work, get rid of all references to u in calculations
-            # u = self._build_mass_matrix
+            # u = self._build_mass_matrix()
 
             # G = np.dot(B,np.dot(u, B.T))
             # self.A_T = np.dot(np.dot(LA.inv(G), B),u)
+
+            # print(B.shape)
+            # raise RuntimeError
             G = np.dot(B, B.T)
             self.A_T = np.dot(LA.inv(G), B)
+
             if self.options.units == "MdyneAng":
                 self.F /= self.BOHR_ANG
                 self.F *= self.MDYNE_HART

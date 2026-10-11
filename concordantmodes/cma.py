@@ -673,13 +673,13 @@ class ConcordantModes:
             grad = fc.gradient
 
         F[np.abs(F) < self.options.tol] = 0
-        del_tol = 1.0e-3
-        for row in F:
-            abs_row = np.abs(row)
-            row[abs_row < np.max(abs_row) * del_tol] = 0
-        F = F.T
-        for row in F:
-            abs_row = np.abs(row)
-            row[abs_row < np.max(abs_row) * del_tol] = 0
-        F = F.T
+        # del_tol = 1.0e-3
+        # for row in F:
+        # abs_row = np.abs(row)
+        # row[abs_row < np.max(abs_row) * del_tol] = 0
+        # F = F.T
+        # for row in F:
+        # abs_row = np.abs(row)
+        # row[abs_row < np.max(abs_row) * del_tol] = 0
+        # F = F.T
         return F, grad

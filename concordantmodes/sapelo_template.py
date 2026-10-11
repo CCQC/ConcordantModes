@@ -13,7 +13,7 @@ class SapeloTemplate:
         self.progdict = {
             "molpro": "molpro -n $NSLOTS --nouse-logfile --no-xml-output -o \
                 output.dat input.dat",
-            "psi4": "psi4 -n $NSLOTS",
+            "psi4": "psi4 -n $THREADS",
             "cfour": prog + "+vectorization",
             "orca": "",
         }
@@ -42,7 +42,7 @@ class SapeloTemplate:
 #SBATCH --ntasks-per-node=4    # How many tasks on each node
 #SBATCH --cpus-per-task=1     # Number of cores per MPI rank 
 #SBATCH --mem=120GB        # Memory per processor
-#SBATCH --gres=lscratch:800
+#SBATCH --gres=lscratch:100
 #SBATCH --time={time_limit}
 #SBATCH --output="%x.%j".out     # Standard output log
 #SBATCH --error="%x.%j".err      # Standard error log
@@ -67,24 +67,24 @@ rm $SCRATCH_DIR -r
 
 #ignored line -- do not remove
 """
+        # SBATCH --ntasks-per-node=1    # How many tasks on each node
+        # SBATCH --nodes=1                     # Number of nodes
+        # export NSLOTS=1
         elif self.prog_name == "psi4":
             self.sapelo_template = """#!/bin/sh
 #SBATCH --job-name=Concordant             # Job name
 #SBATCH --partition=batch               # Partition (queue) name
 #SBATCH --constraint=EPYC|Intel
-#SBATCH --nodes=1                     # Number of nodes
 #SBATCH --ntasks=1             # Number of MPI ranks
-#SBATCH --ntasks-per-node=1    # How many tasks on each node
-#SBATCH --cpus-per-task=1     # Number of cores per MPI rank 
+#SBATCH --cpus-per-task=8     # Number of cores per MPI rank 
 #SBATCH --mem=120GB        # Memory per processor
-#SBATCH --gres=lscratch:800
+#SBATCH --gres=lscratch:100
 #SBATCH --time={time_limit}
 #SBATCH --output="%x.%j".out     # Standard output log
 #SBATCH --error="%x.%j".err      # Standard error log
 
 cd $SLURM_SUBMIT_DIR
-export NSLOTS=1
-export THREADS=1
+export THREADS=8
 
 set -eE
 trap 'cleanup' EXIT
@@ -97,7 +97,7 @@ source ~/.bashrc
 conda activate psi4_dlpno
 export PSI_SCRATCH=/lscratch/$USER/tmp/$SLURM_JOB_ID
 mkdir -p $PSI_SCRATCH
-psi4 -n $NSLOTS -o output.dat
+psi4 -n $THREADS -o output.dat
 
 #ignored line -- do not remove
 """
@@ -113,7 +113,7 @@ psi4 -n $NSLOTS -o output.dat
 #SBATCH --ntasks-per-node=4           # How many tasks on each node
 #SBATCH --cpus-per-task=1             # Number of cores per MPI rank 
 #SBATCH --mem=120G                     # total Memory no more per processor
-#SBATCH --gres=lscratch:800
+#SBATCH --gres=lscratch:100
 #SBATCH --time={time_limit}
 #SBATCH --output="%x.%j".out     # Standard output log
 #SBATCH --error="%x.%j".err      # Standard error log
@@ -168,7 +168,7 @@ rm $scratch_dir -r
 #SBATCH --cpus-per-task=1
 #SBATCH --time=4:00:00
 #SBATCH --mem=60GB
-#SBATCH --gres=lscratch:400
+#SBATCH --gres=lscratch:100
 #SBATCH --output="%x.%j".out    # Standard output log
 #SBATCH --error="%x.%j".err     # Standard error log
 
